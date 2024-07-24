@@ -9,7 +9,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
+Route::middleware(env('APP_ENV') === 'production' ? 'throttle:3,10' : [])->post('/register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->get('/',  function (Request $request) {
     return response()->json([
         'data' => 'sample data',
