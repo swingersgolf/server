@@ -2,13 +2,37 @@
 
 namespace Tests\Feature\Api\Controllers;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
+    public function test_it_logs_in_a_user(): void
+    {
+        $password = 'password';
+        $user = User::factory()->create([
+            'password' => Hash::make($password),
+        ]);
+
+        $this->post('/api/login', [
+            'email' => $user->email,
+            'password' => $password,
+        ])->assertStatus(200);
+    }
+
+    public function test_it_validates_the_credentials(): void
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make('password'),
+        ]);
+
+        $this->post('/api/login', [
+            'email' => $user->email,
+            'password' => 'not password',
+        ])->assertUnauthorized();
+    }
     public function test_it_registers_a_new_user(): void
     {
         $userPayload = [
