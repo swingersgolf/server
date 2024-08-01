@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Api\Controllers;
+namespace Tests\Feature\Controllers\Api;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
