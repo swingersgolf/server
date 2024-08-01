@@ -33,6 +33,7 @@ class AuthControllerTest extends TestCase
             'password' => 'not password',
         ])->assertUnauthorized();
     }
+
     public function test_it_registers_a_new_user(): void
     {
         $userPayload = [
@@ -49,14 +50,16 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseHas('users', $userPayload);
     }
 
-    #[DataProvider('loginPayloads')] public function test_login_validates_payload($payload, $error):void
+    #[DataProvider('loginPayloads')]
+    public function test_login_validates_payload($payload, $error): void
     {
 
         $this->post('/api/login', $payload)
             ->assertSessionHasErrors($error);
     }
 
-    #[DataProvider('registrationPayloads')] public function test_registration_validates_payload($payload, $error):void
+    #[DataProvider('registrationPayloads')]
+    public function test_registration_validates_payload($payload, $error): void
     {
 
         $response = $this->post('/api/register', $payload)
@@ -65,7 +68,7 @@ class AuthControllerTest extends TestCase
 
     public static function registrationPayloads()
     {
-        return[
+        return [
             [
                 'payload' => [
                     'email' => 'my.name@example.com',
@@ -102,12 +105,13 @@ class AuthControllerTest extends TestCase
                     'password' => 'password',
                 ],
                 'error' => 'email',
-            ]
+            ],
         ];
     }
+
     public static function loginPayloads()
     {
-        return[
+        return [
             [
                 'payload' => [
                     'password' => 'password',
@@ -133,8 +137,7 @@ class AuthControllerTest extends TestCase
                     'password' => 'password',
                 ],
                 'error' => 'email',
-            ]
+            ],
         ];
     }
-
 }

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
 
@@ -23,5 +22,4 @@ class PersonalAccessToken extends SanctumPersonalAccessToken
             $model->id = (string) Str::uuid();
         });
     }
-
 }
