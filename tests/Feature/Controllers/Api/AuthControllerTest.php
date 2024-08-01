@@ -16,7 +16,7 @@ class AuthControllerTest extends TestCase
             'password' => Hash::make($password),
         ]);
 
-        $this->post('/api/login', [
+        $this->post(route('api.login'), [
             'email' => $user->email,
             'password' => $password,
         ])->assertStatus(200);
@@ -28,7 +28,7 @@ class AuthControllerTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $this->post('/api/login', [
+        $this->post(route('api.login'), [
             'email' => $user->email,
             'password' => 'not password',
         ])->assertUnauthorized();
@@ -41,7 +41,7 @@ class AuthControllerTest extends TestCase
             'password' => 'password',
         ];
 
-        $this->post('/api/register', $userPayload)
+        $this->post(route('api.register'), $userPayload)
             ->assertCreated();
 
         unset($userPayload['password']);
@@ -52,7 +52,7 @@ class AuthControllerTest extends TestCase
     #[DataProvider('loginPayloads')] public function test_login_validates_payload($payload, $error):void
     {
 
-        $this->post('/api/login', $payload)
+        $this->post(route('api.login'), $payload)
             ->assertSessionHasErrors($error);
     }
 
