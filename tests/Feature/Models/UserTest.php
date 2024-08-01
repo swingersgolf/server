@@ -18,4 +18,10 @@ class UserTest extends TestCase
         ]);
         $this->assertDatabaseHas('users', $user->toArray());
     }
+
+    public function test_it_creates_empty_profile(): void
+    {
+        $user = User::factory()->create();
+        $this->assertNull($user->userProfile->handicap);
+    }
 }
