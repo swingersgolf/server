@@ -10,17 +10,13 @@ use Tests\TestCase;
 
 class UserProfileControllerTest extends TestCase
 {
-    public function test_it_updates_user_profile(): void
+    #[DataProvider('validPayloads')] public function test_it_updates_user_profile_handicap($payload): void
     {
         $user = User::factory()->create();
         $userProfile = UserProfile::first();
         $userProfile->update(['handicap' => 5]);
 
         $this->assertDatabaseHas('user_profiles', $userProfile->toArray());
-
-        $payload = [
-            'handicap' => 10
-        ];
 
         $this->actingAs($user)->patch(route('api.v1.user-profile.update'), $payload)
             ->assertSuccessful();
@@ -45,7 +41,7 @@ class UserProfileControllerTest extends TestCase
         ]);
     }
 
-    #[DataProvider('payloads')] public function test_session_has_errors_when_payload_invalid($payload, $sessionError): void
+    #[DataProvider('invalidPayloads')] public function test_session_has_errors_when_payload_invalid($payload, $sessionError): void
     {
         $user = User::factory()->create();
 
@@ -53,19 +49,35 @@ class UserProfileControllerTest extends TestCase
             ->assertSessionHasErrors($sessionError);
     }
 
-    public static function payloads()
+    public static function validPayloads()
+    {
+        return [
+            'handicap can have no decimal' => [
+                'payload' => ['handicap' => 10],
+            ],
+            'handicap can have one decimal' => [
+                'payload' => ['handicap' => 10.1],
+            ],
+        ];
+    }
+
+    public static function invalidPayloads()
     {
         return [
             'handicap cannot be string' => [
                 'payload' => [ 'handicap' => 'foo' ],
                 'sessionError' => 'handicap'
             ],
-            'handicap cannot be less than -100' => [
-                'payload' => [ 'handicap' => -101 ],
+            'handicap cannot be less than -54' => [
+                'payload' => [ 'handicap' => -55 ],
                 'sessionError' => 'handicap'
             ],
-            'handicap cannot be greater than 100' => [
-                'payload' => [ 'handicap' => 101 ],
+            'handicap cannot be greater than 54' => [
+                'payload' => [ 'handicap' => 55 ],
+                'sessionError' => 'handicap'
+            ],
+            'handicap cannot have more than one decimal' => [
+                'payload' => [ 'handicap' => 55.55 ],
                 'sessionError' => 'handicap'
             ]
         ];

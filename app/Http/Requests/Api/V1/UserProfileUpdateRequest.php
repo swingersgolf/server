@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Rules\HandicapPrecision;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserProfileUpdateRequest extends FormRequest
@@ -15,7 +16,7 @@ class UserProfileUpdateRequest extends FormRequest
     {
         return [
             'user_id' => 'exclude',
-            'handicap' => 'integer|nullable|between:-100,100',
+            'handicap' => ['numeric', 'min:-54.0', 'max:54.0', new HandicapPrecision],
         ];
     }
 }
