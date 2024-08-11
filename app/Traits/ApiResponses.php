@@ -13,11 +13,10 @@ trait ApiResponses
 
     protected function success($message, $data, $code = 200): JsonResponse
     {
-        return response()->json([
-            'data' => $data,
-            'message' => $message,
-            'status' => $code,
-        ], $code);
+        return response()->json(array_merge(
+            $data,
+            ['message' => $message]
+        ), $code);
     }
 
     protected function error($message, $code): JsonResponse
