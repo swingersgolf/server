@@ -10,7 +10,8 @@ use Tests\TestCase;
 
 class UserProfileControllerTest extends TestCase
 {
-    #[DataProvider('validPayloads')] public function test_it_updates_user_profile_handicap($payload): void
+    #[DataProvider('validPayloads')]
+    public function test_it_updates_user_profile_handicap($payload): void
     {
         $user = User::factory()->create();
         $userProfile = UserProfile::first();
@@ -41,7 +42,8 @@ class UserProfileControllerTest extends TestCase
         ]);
     }
 
-    #[DataProvider('invalidPayloads')] public function test_session_has_errors_when_payload_invalid($payload, $sessionError): void
+    #[DataProvider('invalidPayloads')]
+    public function test_session_has_errors_when_payload_invalid($payload, $sessionError): void
     {
         $user = User::factory()->create();
 
@@ -65,21 +67,21 @@ class UserProfileControllerTest extends TestCase
     {
         return [
             'handicap cannot be string' => [
-                'payload' => [ 'handicap' => 'foo' ],
-                'sessionError' => 'handicap'
+                'payload' => ['handicap' => 'foo'],
+                'sessionError' => 'handicap',
             ],
             'handicap cannot be less than -54' => [
-                'payload' => [ 'handicap' => -55 ],
-                'sessionError' => 'handicap'
+                'payload' => ['handicap' => -55],
+                'sessionError' => 'handicap',
             ],
             'handicap cannot be greater than 54' => [
-                'payload' => [ 'handicap' => 55 ],
-                'sessionError' => 'handicap'
+                'payload' => ['handicap' => 55],
+                'sessionError' => 'handicap',
             ],
             'handicap cannot have more than one decimal' => [
-                'payload' => [ 'handicap' => 55.55 ],
-                'sessionError' => 'handicap'
-            ]
+                'payload' => ['handicap' => 55.55],
+                'sessionError' => 'handicap',
+            ],
         ];
     }
 }
