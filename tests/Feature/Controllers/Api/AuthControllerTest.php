@@ -50,6 +50,24 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseHas('users', $userPayload);
     }
 
+    public function test_it_prevents_duplicate_user_registration(): void
+    {
+        $userPayload = [
+            'name' => 'my name',
+            'email' => 'my.name@example.com',
+            'password' => 'password',
+        ];
+
+        User::factory()->create([
+            'name' => $userPayload['name'],
+            'email' => $userPayload['email'],
+            'password' => Hash::make('password'),
+        ]);
+
+        $this->post(route('api.register'), $userPayload)
+            ->assertSessionHasErrors('email');
+    }
+
     #[DataProvider('loginPayloads')]
     public function test_login_validates_payload($payload, $error): void
     {
