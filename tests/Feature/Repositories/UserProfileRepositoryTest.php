@@ -5,8 +5,6 @@ namespace Tests\Feature\Repositories;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Repositories\UserProfileRepository;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class UserProfileRepositoryTest extends TestCase
@@ -32,5 +30,20 @@ class UserProfileRepositoryTest extends TestCase
 
         $this->userProfileRepository->update($user->id, $attributes);
         $this->assertDatabaseHas('user_profiles', $attributes);
+    }
+
+    public function test_it_updates_account_name()
+    {
+        $user = User::factory()->create();
+        $userProfile = UserProfile::first();
+
+        $this->assertDatabaseHas('user_profiles', $userProfile->toArray());
+
+        $attributes = [
+            'name' => "new name",
+        ];
+
+        $this->userProfileRepository->update($user->id, $attributes);
+        $this->assertDatabaseHas('users', $attributes);
     }
 }

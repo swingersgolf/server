@@ -13,4 +13,13 @@ class UserProfile extends Model
         'user_id',
         'handicap',
     ];
+
+    public function updateFillableAttributes(array $attributes): void
+    {
+        $fillables = $this->getFillable();
+        $flippedFillables = array_flip($fillables);
+        $updateArray = array_intersect_key($attributes, $flippedFillables);
+        $this->update($updateArray);
+    }
+
 }

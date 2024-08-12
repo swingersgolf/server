@@ -18,8 +18,7 @@ class UserProfileController extends Controller
     }
     public function update(UserProfileUpdateRequest $request)
     {
-        $userProfile = UserProfile::where('user_id', Auth::id())->first();
         $data = $request->validated();
-        $this->userProfileRepository->update($userProfile->id, $data);
+        $this->userProfileRepository->update(Auth::id(), $data);
     }
 }
