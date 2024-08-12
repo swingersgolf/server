@@ -3,12 +3,35 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
+use App\Models\UserProfile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
+
+    public function test_it_returns_user_with_profile(): void
+    {
+        $name = 'John Doe';
+        $email = 'john.doe@example.com';
+        $user = User::factory()->create([
+            'name' => $name,
+            'email' => $email,
+            'password' => Hash::make('password'),
+        ]);
+
+        $userProfile = UserProfile::firstWhere('user_id', $user->id);
+        $handicap = 10.4;
+        $userProfile->update(['handicap' => $handicap]);
+
+        $response = $this->actingAs($user)->get(route('api.v1.user.show', $user));
+        $responseData = $response->json('data');
+        $this->assertEquals($name, $responseData['name']);
+        $this->assertEquals($email, $responseData['email']);
+        $this->assertEquals($handicap, $responseData['handicap']);
+    }
     #[DataProvider('validPayloads')]
     public function test_it_updates_user_profile_handicap($payload): void
     {

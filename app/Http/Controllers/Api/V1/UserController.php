@@ -16,6 +16,13 @@ class UserController extends Controller
     {
         $this->userRepository = $userRepository;
     }
+
+    public function show()
+    {
+        $user = Auth::user();
+        return $this->userRepository->show($user->id);
+    }
+
     public function update(UserUpdateRequest $request)
     {
         $data = $request->validated();
