@@ -9,7 +9,7 @@ class UserProfileRepository implements UserProfileRepositoryInterface
     public function update(string $userId, array $attributes)
     {
         $user = User::find($userId);
-        $user->updateFillableAttributes($attributes);
-        $user->userProfile->updateFillableAttributes($attributes);
+        $user->updateFillableAttributesOnly($attributes);
+        $user->userProfile->updateFillableAttributesOnly($attributes);
     }
 }

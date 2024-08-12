@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Observers\UserObserver;
+use App\Traits\UpdatesFillablesOnly;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,7 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 #[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, UpdatesFillablesOnly;
 
     // $keyType and $incrementing required below to support using UUIDs as primary key in users table
     protected $keyType = 'string';
@@ -67,11 +68,4 @@ class User extends Authenticatable
         return $this->hasOne(UserProfile::class);
     }
 
-    public function updateFillableAttributes(array $attributes): void
-    {
-        $fillables = $this->getFillable();
-        $flippedFillables = array_flip($fillables);
-        $updateArray = array_intersect_key($attributes, $flippedFillables);
-        $this->update($updateArray);
-    }
 }
