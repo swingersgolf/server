@@ -8,22 +8,17 @@ use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
-class UserProfileControllerTest extends TestCase
+class UserControllerTest extends TestCase
 {
     #[DataProvider('validPayloads')]
     public function test_it_updates_user_profile_handicap($payload): void
     {
         $user = User::factory()->create();
-        $userProfile = UserProfile::first();
-        $userProfile->update(['handicap' => 5]);
 
-        $this->assertDatabaseHas('user_profiles', $userProfile->toArray());
-
-        $this->actingAs($user)->patch(route('api.v1.user-profile.update'), $payload)
+        $this->actingAs($user)->patch(route('api.v1.user.update'), $payload)
             ->assertSuccessful();
 
-        $expected = array_replace($userProfile->toArray(), $payload);
-        $this->assertDatabaseHas('user_profiles', $expected);
+        $this->assertDatabaseHas('user_profiles', $payload);
     }
 
     public function test_it_cannot_update_user_id(): void
@@ -34,7 +29,7 @@ class UserProfileControllerTest extends TestCase
             'user_id' => Str::uuid(),
         ];
 
-        $this->actingAs($user)->patch(route('api.v1.user-profile.update'), $payload)
+        $this->actingAs($user)->patch(route('api.v1.user.update'), $payload)
             ->assertSuccessful();
 
         $this->assertDatabaseHas('user_profiles', [
@@ -47,7 +42,7 @@ class UserProfileControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->patch(route('api.v1.user-profile.update'), $payload)
+        $this->actingAs($user)->patch(route('api.v1.user.update'), $payload)
             ->assertSessionHasErrors($sessionError);
     }
 

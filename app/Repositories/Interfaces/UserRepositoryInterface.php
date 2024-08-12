@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Repositories\Interfaces;
-interface UserProfileRepositoryInterface
+interface UserRepositoryInterface
 {
     public function update(string $userId, array $attributes);
 }
