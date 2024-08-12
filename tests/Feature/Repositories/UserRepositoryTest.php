@@ -5,6 +5,7 @@ namespace Tests\Feature\Repositories;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UserRepositoryTest extends TestCase
@@ -39,5 +40,23 @@ class UserRepositoryTest extends TestCase
 
         $this->userRepository->update($user->id, $attributes);
         $this->assertDatabaseHas('users', $attributes);
+    }
+
+    public function test_it_returns_user_with_profile()
+    {
+        $user = User::factory()->create([
+            'name' => 'new name',
+            'email' => 'new@email.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        $userProfile = UserProfile::firstWhere('user_id', $user->id);
+        $userProfile->update(['handicap'=>8.2]);
+        $this->assertDatabaseHas('user_profiles', $userProfile->toArray());
+
+        $result = $this->userRepository->show($user->id);
+        $this->assertEquals($user->name, $result->toArray(request())['name']);
+        $this->assertEquals($user->email, $result->toArray(request())['email']);
+        $this->assertEquals($userProfile->handicap, $result->toArray(request())['handicap']);
     }
 }

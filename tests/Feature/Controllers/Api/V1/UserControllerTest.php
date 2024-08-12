@@ -3,7 +3,6 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
-use App\Models\UserProfile;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
