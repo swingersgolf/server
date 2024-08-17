@@ -20,6 +20,7 @@ class GoogleLoginController extends Controller
     public function handleGoogleCallback()
     {
         $googleUser = Socialite::driver('google')->user();
+
         $user = User::where('email', $googleUser->email)->first();
         if (! $user) {
             $user = User::create([
@@ -29,9 +30,9 @@ class GoogleLoginController extends Controller
             ]);
         }
 
-        return $this->ok('Authenticated',
-            [
-                'token' => $user->createToken('API Token for Google user '.$user->email)->plainTextToken,
-            ]);
+        $token = $user->createToken('API Token for Google user '.$user->email)->plainTextToken;
+        $redirectUrl = config("services.google.redirect_client_url");
+
+        return redirect()->to( $redirectUrl . '?token=' . $token);
     }
 }
