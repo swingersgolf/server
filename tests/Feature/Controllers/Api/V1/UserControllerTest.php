@@ -33,7 +33,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($handicap, $responseData['handicap']);
     }
     #[DataProvider('validPayloads')]
-    public function test_it_updates_user_profile_handicap($payload): void
+    public function test_it_updates_user_profile_payloads($payload): void
     {
         $user = User::factory()->create();
 
@@ -76,6 +76,9 @@ class UserControllerTest extends TestCase
             ],
             'handicap can have one decimal' => [
                 'payload' => ['handicap' => 10.1],
+            ],
+            'date of birth' => [
+                'payload' => ['dob' => '1970-12-31'],
             ],
         ];
     }

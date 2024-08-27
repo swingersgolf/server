@@ -13,5 +13,6 @@ class UserProfile extends Model
     protected $fillable = [
         'user_id',
         'handicap',
+        'dob',
     ];
 }

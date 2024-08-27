@@ -30,6 +30,31 @@ class UserRepositoryTest extends TestCase
         $this->assertDatabaseHas('user_profiles', $attributes);
     }
 
+    public function test_it_updates_dob()
+    {
+        $user = User::factory()->create();
+
+        $attributes = [
+            'dob' => "1972-12-31",
+        ];
+
+        $this->userRepository->update($user->id, $attributes);
+        $this->assertDatabaseHas('user_profiles', $attributes);
+    }
+
+    public function test_it_updates_profile_date_of_birth()
+    {
+        $user = User::factory()->create();
+
+        $attributes = [
+            'handicap' => 8.2,
+            'dob' => "1970-12-31"
+        ];
+
+        $this->userRepository->update($user->id, $attributes);
+        $this->assertDatabaseHas('user_profiles', $attributes);
+    }
+
     public function test_it_updates_account_name()
     {
         $user = User::factory()->create();
