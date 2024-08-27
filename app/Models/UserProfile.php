@@ -14,5 +14,6 @@ class UserProfile extends Model
         'user_id',
         'handicap',
         'dob',
+        'postal_code'
     ];
 }

@@ -19,6 +19,10 @@ class UserUpdateRequest extends FormRequest
             'handicap' => ['numeric', 'min:-54.0', 'max:54.0', new HandicapPrecision],
             'name' => 'string|max:255',
             'dob' => 'date',
+            'postal_code' => [
+                'nullable',
+                'regex:/^(\d{5}(-\d{4})?|[A-Z]\d[A-Z]\s?\d[A-Z]\d)$/i',
+            ]
         ];
     }
 }

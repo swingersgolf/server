@@ -48,7 +48,8 @@ class UserRepositoryTest extends TestCase
 
         $attributes = [
             'handicap' => 8.2,
-            'dob' => "1970-12-31"
+            'dob' => "1970-12-31",
+            'postal_code' => "A1A1A1",
         ];
 
         $this->userRepository->update($user->id, $attributes);
@@ -77,11 +78,15 @@ class UserRepositoryTest extends TestCase
 
         $userProfile = UserProfile::firstWhere('user_id', $user->id);
         $userProfile->update(['handicap'=>8.2]);
+        $userProfile->update(['dob'=>"1970-12-31"]);
+        $userProfile->update(['postal_code'=>"H0H0H0"]);
         $this->assertDatabaseHas('user_profiles', $userProfile->toArray());
 
         $result = $this->userRepository->show($user->id);
         $this->assertEquals($user->name, $result->toArray(request())['name']);
         $this->assertEquals($user->email, $result->toArray(request())['email']);
         $this->assertEquals($userProfile->handicap, $result->toArray(request())['handicap']);
+        $this->assertEquals($userProfile->dob, $result->toArray(request())['dob']);
+        $this->assertEquals($userProfile->postal_code, $result->toArray(request())['postal_code']);
     }
 }

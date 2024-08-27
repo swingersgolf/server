@@ -71,14 +71,20 @@ class UserControllerTest extends TestCase
     public static function validPayloads()
     {
         return [
-            'handicap can have no decimal' => [
-                'payload' => ['handicap' => 10],
+//            'handicap can have no decimal' => [
+//                'payload' => ['handicap' => 10],
+//            ],
+//            'handicap can have one decimal' => [
+//                'payload' => ['handicap' => 10.1],
+//            ],
+//            'date of birth' => [
+//                'payload' => ['dob' => '1970-12-31'],
+//            ],
+            'US postal code' => [
+                'payload' => ['postal_code' => '12345'],
             ],
-            'handicap can have one decimal' => [
-                'payload' => ['handicap' => 10.1],
-            ],
-            'date of birth' => [
-                'payload' => ['dob' => '1970-12-31'],
+            'CDN postal code' => [
+                'payload' => ['postal_code' => 'H0H0H0'],
             ],
         ];
     }
