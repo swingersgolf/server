@@ -17,6 +17,7 @@ class UserUpdateRequest extends FormRequest
         return [
             'user_id' => 'exclude',
             'handicap' => ['numeric', 'min:-54.0', 'max:54.0', new HandicapPrecision],
+            'name' => 'string|max:255',
         ];
     }
 }
