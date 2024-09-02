@@ -97,6 +97,15 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'birth_date',
             ],
+            'not 18' => [
+                'payload' => [
+                    'email' => 'birth_date@example.com',
+                    'password' => 'password',
+                    'name' => 'Birthday',
+                    'birthDate' => now()->subYears(17)->format('Y-m-d'),
+                ],
+                'error' => 'birth_date',
+            ],
             'invalid date format m-d-y' => [
                 'payload' => [
                     'email' => 'birthDate@example.com',
