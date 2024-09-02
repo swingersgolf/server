@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Controllers\Api;
+namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +16,7 @@ class AuthControllerTest extends TestCase
             'password' => Hash::make($password),
         ]);
 
-        $this->post(route('api.login'), [
+        $this->post(route('api.v1.login'), [
             'email' => $user->email,
             'password' => $password,
         ])->assertStatus(200);
@@ -28,7 +28,7 @@ class AuthControllerTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $this->post(route('api.login'), [
+        $this->post(route('api.v1.login'), [
             'email' => $user->email,
             'password' => 'not password',
         ])->assertUnauthorized();
@@ -43,7 +43,7 @@ class AuthControllerTest extends TestCase
             'birth_date' => '1970-12-31',
         ];
 
-        $this->post(route('api.register'), $userPayload)
+        $this->post(route('api.v1.register'), $userPayload)
             ->assertCreated();
 
         unset($userPayload['password']);
@@ -65,7 +65,7 @@ class AuthControllerTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $this->post(route('api.register'), $userPayload)
+        $this->post(route('api.v1.register'), $userPayload)
             ->assertSessionHasErrors('email');
     }
 
@@ -73,7 +73,7 @@ class AuthControllerTest extends TestCase
     public function test_login_validates_payload($payload, $error): void
     {
 
-        $this->post(route('api.login'), $payload)
+        $this->post(route('api.v1.login'), $payload)
             ->assertSessionHasErrors($error);
     }
 
@@ -81,7 +81,7 @@ class AuthControllerTest extends TestCase
     public function test_registration_validates_payload($payload, $error): void
     {
 
-        $response = $this->post('/api/register', $payload)
+        $response = $this->post(route('api.v1.register'), $payload)
             ->assertSessionHasErrors($error);
     }
 
