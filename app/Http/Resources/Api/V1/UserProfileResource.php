@@ -16,6 +16,7 @@ class UserProfileResource extends JsonResource
     {
         return [
             'handicap' => $this->handicap,
+            'postalCode' => $this->postal_code,
         ];
     }
 }

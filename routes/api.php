@@ -20,6 +20,7 @@ Route::name('api.')->group(function () {
                 Route::get('user', [UserController::class, 'show'])->name('show');
             });
             Route::name('user-profile.')->group(function () {
+                Route::get('user-profile', [UserProfileController::class, 'show'])->name('show');
                 Route::patch('user-profile', [UserProfileController::class, 'update'])->name('update');
             });
         });
