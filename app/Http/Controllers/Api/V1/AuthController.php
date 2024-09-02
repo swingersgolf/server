@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\LoginUserRequest;
-use App\Http\Requests\Api\RegisterUserRequest;
+use App\Http\Requests\Api\V1\LoginUserRequest;
+use App\Http\Requests\Api\V1\RegisterUserRequest;
 use App\Models\User;
 use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
