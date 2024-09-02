@@ -88,7 +88,7 @@ class AuthControllerTest extends TestCase
     public static function registrationPayloads(): array
     {
         return [
-            [
+            'invalid date format m-d-Y' => [
                 'payload' => [
                     'email' => 'birth_date@example.com',
                     'password' => 'password',
@@ -97,7 +97,7 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'birth_date',
             ],
-            [
+            'invalid date format m-d-y' => [
                 'payload' => [
                     'email' => 'birthDate@example.com',
                     'password' => 'password',
@@ -106,7 +106,7 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'birth_date',
             ],
-            [
+            'invalid date format Y-d-m' => [
                 'payload' => [
                     'email' => 'birthDate@example.com',
                     'password' => 'password',
@@ -115,7 +115,7 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'birth_date',
             ],
-            [
+            'invalid date format - not a date' => [
                 'payload' => [
                     'email' => 'birthDate@example.com',
                     'password' => 'password',
@@ -124,7 +124,7 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'birth_date',
             ],
-            [
+            'birth date missing' => [
                 'payload' => [
                     'email' => 'birthDate@example.com',
                     'password' => 'password',
@@ -132,7 +132,7 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'birth_date',
             ],
-            [
+            'name missing' => [
                 'payload' => [
                     'email' => 'my.name@example.com',
                     'password' => 'password',
@@ -140,7 +140,7 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'name',
             ],
-            [
+            'email missing' => [
                 'payload' => [
                     'name' => 'my name',
                     'password' => 'password',
@@ -148,7 +148,7 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'email',
             ],
-            [
+            'password missing' => [
                 'payload' => [
                     'name' => 'my name',
                     'email' => 'my.name@example.com',
@@ -156,7 +156,7 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'password',
             ],
-            [
+            'password too short' => [
                 'payload' => [
                     'name' => 'my name',
                     'email' => 'my.name@example.com',
@@ -165,7 +165,7 @@ class AuthControllerTest extends TestCase
                 ],
                 'error' => 'password',
             ],
-            [
+            'invalid email format' => [
                 'payload' => [
                     'name' => 'my name',
                     'email' => 'not an email',
