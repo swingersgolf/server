@@ -14,18 +14,18 @@ class UserControllerTest extends TestCase
     {
         $name = 'John Doe';
         $email = 'john.doe@example.com';
-        $birthDate = '2000-11-30';
+        $birthdate = '2000-11-30';
         $user = User::factory()->create([
             'name' => $name,
             'email' => $email,
-            'birth_date' => $birthDate,
+            'birthdate' => $birthdate,
             'password' => Hash::make('password'),
         ]);
         $response = $this->actingAs($user)->get(route('api.v1.user.show'));
         $responseData = $response->json('data');
         $this->assertEquals($name, $responseData['name']);
         $this->assertEquals($email, $responseData['email']);
-        $this->assertEquals($birthDate, $responseData['birthDate']);
+        $this->assertEquals($birthdate, $responseData['birthdate']);
     }
 
     public function test_it_cannot_update_user_id(): void
