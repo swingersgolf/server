@@ -25,7 +25,7 @@ class RegisterUserRequest extends FormRequest
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'birth_date' => 'required|date',
+            'birth_date' => 'required|date|date_format:Y-m-d|before_or_equal:'.now()->subYears(18)->format('Y-m-d'),
         ];
     }
 }
