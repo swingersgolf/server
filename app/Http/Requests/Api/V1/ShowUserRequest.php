@@ -24,7 +24,7 @@ class ShowUserRequest extends FormRequest
         return [
             'name' => 'nullable|string',
             'email' => 'required|string|email',
-            'birthday' => 'required|date',
+            'birth_date' => 'required|date',
         ];
     }
 }
