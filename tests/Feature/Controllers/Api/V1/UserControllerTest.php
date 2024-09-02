@@ -3,7 +3,6 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
-use App\Models\UserProfile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -11,36 +10,22 @@ use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
-
-    public function test_it_returns_user_with_profile(): void
+    public function test_it_returns_user(): void
     {
         $name = 'John Doe';
         $email = 'john.doe@example.com';
+        $birthday = '2000-11-30';
         $user = User::factory()->create([
             'name' => $name,
             'email' => $email,
+            'birthday' => $birthday,
             'password' => Hash::make('password'),
         ]);
-
-        $userProfile = UserProfile::firstWhere('user_id', $user->id);
-        $handicap = 10.4;
-        $userProfile->update(['handicap' => $handicap]);
-
         $response = $this->actingAs($user)->get(route('api.v1.user.show', $user));
         $responseData = $response->json('data');
         $this->assertEquals($name, $responseData['name']);
         $this->assertEquals($email, $responseData['email']);
-        $this->assertEquals($handicap, $responseData['handicap']);
-    }
-    #[DataProvider('validPayloads')]
-    public function test_it_updates_user_profile_payloads($payload): void
-    {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)->patch(route('api.v1.user.update'), $payload)
-            ->assertSuccessful();
-
-        $this->assertDatabaseHas('user_profiles', $payload);
+        $this->assertEquals($birthday, $responseData['birthday']);
     }
 
     public function test_it_cannot_update_user_id(): void
@@ -51,7 +36,7 @@ class UserControllerTest extends TestCase
             'user_id' => Str::uuid(),
         ];
 
-        $this->actingAs($user)->patch(route('api.v1.user.update'), $payload)
+        $this->actingAs($user)->patch(route('api.v1.user-profile.update'), $payload)
             ->assertSuccessful();
 
         $this->assertDatabaseHas('user_profiles', [
@@ -64,29 +49,8 @@ class UserControllerTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->patch(route('api.v1.user.update'), $payload)
+        $this->actingAs($user)->patch(route('api.v1.user-profile.update'), $payload)
             ->assertSessionHasErrors($sessionError);
-    }
-
-    public static function validPayloads()
-    {
-        return [
-//            'handicap can have no decimal' => [
-//                'payload' => ['handicap' => 10],
-//            ],
-//            'handicap can have one decimal' => [
-//                'payload' => ['handicap' => 10.1],
-//            ],
-//            'date of birth' => [
-//                'payload' => ['dob' => '1970-12-31'],
-//            ],
-            'US postal code' => [
-                'payload' => ['postal_code' => '12345'],
-            ],
-            'CDN postal code' => [
-                'payload' => ['postal_code' => 'H0H0H0'],
-            ],
-        ];
     }
 
     public static function invalidPayloads()

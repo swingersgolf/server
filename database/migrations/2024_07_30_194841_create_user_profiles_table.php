@@ -16,7 +16,6 @@ return new class extends Migration
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->decimal('handicap', 3, 1)->nullable();
-            $table->date('dob')->nullable();
             $table->string('postal_code')->nullable();
             $table->timestamps();
         });

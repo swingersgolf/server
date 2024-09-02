@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\UserProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +18,9 @@ Route::name('api.')->group(function () {
         Route::name('v1.')->prefix('v1')->group(function () {
             Route::name('user.')->group(function () {
                 Route::get('user', [UserController::class, 'show'])->name('show');
-                Route::patch('user', [UserController::class, 'update'])->name('update');
+            });
+            Route::name('user-profile.')->group(function () {
+                Route::patch('user-profile', [UserProfileController::class, 'update'])->name('update');
             });
         });
     });
