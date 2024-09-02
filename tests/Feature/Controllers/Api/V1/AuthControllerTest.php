@@ -40,7 +40,7 @@ class AuthControllerTest extends TestCase
             'name' => 'my name',
             'email' => 'my.name@example.com',
             'password' => 'password',
-            'birth_date' => '1970-12-31',
+            'birthdate' => '1970-12-31',
         ];
 
         $this->post(route('api.v1.register'), $userPayload)
@@ -90,62 +90,62 @@ class AuthControllerTest extends TestCase
         return [
             'invalid date format m-d-Y' => [
                 'payload' => [
-                    'email' => 'birth_date@example.com',
+                    'email' => 'birthdate@example.com',
                     'password' => 'password',
                     'name' => 'Birthday',
-                    'birthDate' => '12-31-1970',
+                    'birthdate' => '12-31-1970',
                 ],
-                'error' => 'birth_date',
+                'error' => 'birthdate',
             ],
             'not 18' => [
                 'payload' => [
-                    'email' => 'birth_date@example.com',
+                    'email' => 'birthdate@example.com',
                     'password' => 'password',
                     'name' => 'Birthday',
-                    'birthDate' => now()->subYears(17)->format('Y-m-d'),
+                    'birthdate' => now()->subYears(17)->format('Y-m-d'),
                 ],
-                'error' => 'birth_date',
+                'error' => 'birthdate',
             ],
             'invalid date format m-d-y' => [
                 'payload' => [
-                    'email' => 'birthDate@example.com',
+                    'email' => 'birthdate@example.com',
                     'password' => 'password',
                     'name' => 'Birthday',
-                    'birthDate' => '12-31-70',
+                    'birthdate' => '12-31-70',
                 ],
-                'error' => 'birth_date',
+                'error' => 'birthdate',
             ],
             'invalid date format Y-d-m' => [
                 'payload' => [
-                    'email' => 'birthDate@example.com',
+                    'email' => 'birthdate@example.com',
                     'password' => 'password',
                     'name' => 'Birthday',
-                    'birthDate' => '1970-31-12',
+                    'birthdate' => '1970-31-12',
                 ],
-                'error' => 'birth_date',
+                'error' => 'birthdate',
             ],
             'invalid date format - not a date' => [
                 'payload' => [
-                    'email' => 'birthDate@example.com',
+                    'email' => 'birthdate@example.com',
                     'password' => 'password',
                     'name' => 'Birthday',
-                    'birthDate' => 'not a birthDate',
+                    'birthdate' => 'not a birthdate',
                 ],
-                'error' => 'birth_date',
+                'error' => 'birthdate',
             ],
             'birth date missing' => [
                 'payload' => [
-                    'email' => 'birthDate@example.com',
+                    'email' => 'birthdate@example.com',
                     'password' => 'password',
                     'name' => 'Birthday',
                 ],
-                'error' => 'birth_date',
+                'error' => 'birthdate',
             ],
             'name missing' => [
                 'payload' => [
                     'email' => 'my.name@example.com',
                     'password' => 'password',
-                    'birthDate' => '1970-01-31',
+                    'birthdate' => '1970-01-31',
                 ],
                 'error' => 'name',
             ],
@@ -153,7 +153,7 @@ class AuthControllerTest extends TestCase
                 'payload' => [
                     'name' => 'my name',
                     'password' => 'password',
-                    'birthDate' => '1970-01-31',
+                    'birthdate' => '1970-01-31',
                 ],
                 'error' => 'email',
             ],
@@ -161,7 +161,7 @@ class AuthControllerTest extends TestCase
                 'payload' => [
                     'name' => 'my name',
                     'email' => 'my.name@example.com',
-                    'birthDate' => '1970-01-31',
+                    'birthdate' => '1970-01-31',
                 ],
                 'error' => 'password',
             ],
@@ -170,7 +170,7 @@ class AuthControllerTest extends TestCase
                     'name' => 'my name',
                     'email' => 'my.name@example.com',
                     'password' => 'passwor',
-                    'birthDate' => '1970-01-31',
+                    'birthdate' => '1970-01-31',
                 ],
                 'error' => 'password',
             ],
@@ -179,7 +179,7 @@ class AuthControllerTest extends TestCase
                     'name' => 'my name',
                     'email' => 'not an email',
                     'password' => 'password',
-                    'birthDate' => '1970-01-31',
+                    'birthdate' => '1970-01-31',
                 ],
                 'error' => 'email',
             ],
