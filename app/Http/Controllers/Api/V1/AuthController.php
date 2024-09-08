@@ -10,7 +10,6 @@ use App\Notifications\VerifyEmailNotification;
 use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -52,10 +51,10 @@ class AuthController extends Controller
 
         Cache::put("verification_code_{$email}", [
             'code' => $code,
-            'expires_at' => $expiration
+            'expires_at' => $expiration,
         ], $expiration);
 
-        $user->notify(new VerifyEmailNotification($code,30));
+        $user->notify(new VerifyEmailNotification($code, 30));
 
         return $this->success('User created', [], 201);
     }
@@ -70,7 +69,8 @@ class AuthController extends Controller
         if ($cachedData && $cachedData['code'] === $code && now()->lessThanOrEqualTo($cachedData['expires_at'])) {
             Cache::forget("verification_code_{$email}");
             $user->markEmailAsVerified();
-            return $this->ok('Code verified successfully.',[]);
+
+            return $this->ok('Code verified successfully.', []);
         }
 
         return $this->error('Invalid or expired code.', ResponseAlias::HTTP_BAD_REQUEST);
