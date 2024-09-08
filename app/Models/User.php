@@ -6,21 +6,17 @@ namespace App\Models;
 use App\Observers\UserObserver;
 use App\Traits\UpdatesFillablesOnly;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 #[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, UpdatesFillablesOnly;
+    use HasApiTokens, HasFactory, HasUuids, Notifiable, UpdatesFillablesOnly;
 
-    // $keyType and $incrementing required below to support using UUIDs as primary key in users table
-    protected $keyType = 'string';
-
-    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.
@@ -34,6 +30,10 @@ class User extends Authenticatable
         'birthdate',
     ];
 
+    protected $casts = [
+        'id' => 'string',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -43,13 +43,6 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-
-    public static function booted()
-    {
-        static::creating(function ($user) {
-            $user->id = Str::uuid();
-        });
-    }
 
     /**
      * Get the attributes that should be cast.
@@ -68,5 +61,4 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserProfile::class);
     }
-
 }

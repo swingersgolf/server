@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\LoginUserRequest;
 use App\Http\Requests\Api\V1\RegisterUserRequest;
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
 use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -34,7 +35,9 @@ class AuthController extends Controller
     {
         $request->validated($request->all());
 
-        User::create($request->all());
+        $user = User::create($request->all());
+
+        $user->notify(new VerifyEmailNotification());
 
         return $this->success('User created', [], 201);
     }

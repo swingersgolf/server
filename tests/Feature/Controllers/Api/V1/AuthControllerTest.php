@@ -3,13 +3,15 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
-    public function test_it_logs_in_a_user(): void
+    public function test_login_logs_in_a_user(): void
     {
         $password = 'password';
         $user = User::factory()->create([
@@ -22,7 +24,7 @@ class AuthControllerTest extends TestCase
         ])->assertStatus(200);
     }
 
-    public function test_it_validates_the_credentials(): void
+    public function test_login_validates_the_credentials(): void
     {
         $user = User::factory()->create([
             'password' => Hash::make('password'),
@@ -34,7 +36,7 @@ class AuthControllerTest extends TestCase
         ])->assertUnauthorized();
     }
 
-    public function test_it_registers_a_new_user(): void
+    public function test_register_registers_a_new_user(): void
     {
         $userPayload = [
             'name' => 'my name',
@@ -51,7 +53,23 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseHas('users', $userPayload);
     }
 
-    public function test_it_prevents_duplicate_user_registration(): void
+    public function test_register_sends_email_verification_notification(): void
+    {
+        Notification::fake();
+        $userPayload = [
+            'name' => 'my name',
+            'email' => 'my.name@example.com',
+            'password' => 'password',
+            'birthdate' => '1970-12-31',
+        ];
+
+        $this->post(route('api.v1.register'), $userPayload)
+            ->assertCreated();
+        $user = User::first();
+        Notification::assertSentTo($user, VerifyEmailNotification::class);
+    }
+
+    public function test_register_prevents_duplicate_user_registration(): void
     {
         $userPayload = [
             'name' => 'my name',
@@ -78,7 +96,7 @@ class AuthControllerTest extends TestCase
     }
 
     #[DataProvider('registrationPayloads')]
-    public function test_registration_validates_payload($payload, $error): void
+    public function test_register_validates_payload($payload, $error): void
     {
 
         $response = $this->post(route('api.v1.register'), $payload)
