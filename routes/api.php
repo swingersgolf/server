@@ -14,6 +14,7 @@ Route::name('api.')->group(function () {
     Route::name('v1.')->prefix('v1')->group(function () {
         Route::post('/login', [AuthController::class, 'login'])->name('login');
         Route::middleware(env('APP_ENV') === 'production' ? 'throttle:3,10' : [])->post('/register', [AuthController::class, 'register'])->name('register');
+        Route::post('/verify', [AuthController::class, 'verify'])->name('verify');
     });
 
     Route::middleware('auth:sanctum')->group(function () {
