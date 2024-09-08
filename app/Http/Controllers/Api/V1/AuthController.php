@@ -10,6 +10,7 @@ use App\Notifications\VerifyEmailNotification;
 use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {
@@ -37,7 +38,17 @@ class AuthController extends Controller
 
         $user = User::create($request->all());
 
-        $user->notify(new VerifyEmailNotification());
+        $email = $request->email;
+        $code = random_int(100000, 999999);
+        $expiryMinutes = 30;
+        $expiration = now()->addMinutes($expiryMinutes);
+
+        Cache::put("verification_code_{$email}", [
+            'code' => $code,
+            'expires_at' => $expiration
+        ], $expiration);
+
+        $user->notify(new VerifyEmailNotification($code,30));
 
         return $this->success('User created', [], 201);
     }

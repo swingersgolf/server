@@ -4,6 +4,7 @@ namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -53,12 +54,13 @@ class AuthControllerTest extends TestCase
         $this->assertDatabaseHas('users', $userPayload);
     }
 
-    public function test_register_sends_email_verification_notification(): void
+    public function test_register_sends_email_verification_notification_and_caches_code(): void
     {
         Notification::fake();
+        $email = 'my.name@example.com';
         $userPayload = [
             'name' => 'my name',
-            'email' => 'my.name@example.com',
+            'email' => $email,
             'password' => 'password',
             'birthdate' => '1970-12-31',
         ];
@@ -67,6 +69,24 @@ class AuthControllerTest extends TestCase
             ->assertCreated();
         $user = User::first();
         Notification::assertSentTo($user, VerifyEmailNotification::class);
+        Cache::shouldReceive('put')
+            ->with('verification_code_'.$email);
+    }
+
+    public function test_email_verification_contains_code_and_expiry(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create([]);
+        $code = 123456;
+        $expiry = 30;
+        $user->notify(new VerifyEmailNotification($code, $expiry));
+        Notification::assertSentTo($user, VerifyEmailNotification::class,
+        function (VerifyEmailNotification $notification) use ($code, $expiry) {
+            $mailContents = $notification->toMail($notification);
+            return
+                $mailContents->actionUrl === strval($code) &&
+                $mailContents->outroLines[0] === "This code will expire in ".$expiry." minutes.";
+        });
     }
 
     public function test_register_prevents_duplicate_user_registration(): void

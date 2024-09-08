@@ -11,12 +11,16 @@ class VerifyEmailNotification extends Notification
 {
     use Queueable;
 
+    protected string $code;
+    protected int $expiryMinutes;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(string $code, int $expiryMinutes)
     {
-        //
+        $this->code = $code;
+        $this->expiryMinutes = $expiryMinutes;
     }
 
     /**
@@ -35,9 +39,11 @@ class VerifyEmailNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->subject('Swingers Email Address Verification')
+            ->line('You are receiving this email because we received an account registration for this email.')
+            ->action('Please verify you own this email by entering the following code in your Swingers mobile application:', $this->code)
+            ->line('This code will expire in '.$this->expiryMinutes.' minutes.')
+            ->line('If you did not request the creation of this Swingers account, no further action is required.');
     }
 
     /**
