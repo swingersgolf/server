@@ -4,7 +4,6 @@ namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -97,15 +96,16 @@ class AuthControllerTest extends TestCase
         $expiry = 30;
         $user->notify(new VerifyEmailNotification($code, $expiry));
         Notification::assertSentTo($user, VerifyEmailNotification::class,
-        function (VerifyEmailNotification $notification) use ($code, $expiry) {
-            $mailContents = $notification->toMail($notification);
-            return
-                $mailContents->actionUrl === strval($code) &&
-                $mailContents->outroLines[0] === "This code will expire in ".$expiry." minutes.";
-        });
+            function (VerifyEmailNotification $notification) use ($code, $expiry) {
+                $mailContents = $notification->toMail($notification);
+
+                return
+                    $mailContents->actionUrl === strval($code) &&
+                    $mailContents->outroLines[0] === 'This code will expire in '.$expiry.' minutes.';
+            });
     }
 
-    public function test_verify_validates_the_code():void
+    public function test_verify_validates_the_code(): void
     {
         $email = 'foo@bar.com';
         $code = '123456';
@@ -116,7 +116,7 @@ class AuthControllerTest extends TestCase
             'email_verified_at' => null,
         ]);
 
-        Cache::put("verification_code_".$email, [
+        Cache::put('verification_code_'.$email, [
             'code' => $code,
             'expires_at' => $expires_at,
         ], $expires_at);
