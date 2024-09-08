@@ -52,6 +52,14 @@ class AuthControllerTest extends TestCase
         ])->assertStatus(ResponseAlias::HTTP_UNAUTHORIZED);
     }
 
+    #[DataProvider('loginPayloads')]
+    public function test_login_validates_payload($payload, $error): void
+    {
+
+        $this->post(route('api.v1.login'), $payload)
+            ->assertSessionHasErrors($error);
+    }
+
     public function test_register_registers_a_new_user(): void
     {
         $userPayload = [
@@ -105,6 +113,32 @@ class AuthControllerTest extends TestCase
             });
     }
 
+    public function test_register_prevents_duplicate_user_registration(): void
+    {
+        $userPayload = [
+            'name' => 'my name',
+            'email' => 'my.name@example.com',
+            'password' => 'password',
+        ];
+
+        User::factory()->create([
+            'name' => $userPayload['name'],
+            'email' => $userPayload['email'],
+            'password' => Hash::make('password'),
+        ]);
+
+        $this->post(route('api.v1.register'), $userPayload)
+            ->assertSessionHasErrors('email');
+    }
+
+    #[DataProvider('registrationPayloads')]
+    public function test_register_validates_payload($payload, $error): void
+    {
+
+        $response = $this->post(route('api.v1.register'), $payload)
+            ->assertSessionHasErrors($error);
+    }
+
     public function test_verify_validates_the_code(): void
     {
         $email = 'foo@bar.com';
@@ -127,38 +161,26 @@ class AuthControllerTest extends TestCase
         Cache::flush();
     }
 
-    public function test_register_prevents_duplicate_user_registration(): void
+    public function test_verification_rejects_expired_code():void
     {
-        $userPayload = [
-            'name' => 'my name',
-            'email' => 'my.name@example.com',
-            'password' => 'password',
-        ];
+        $email = 'foo@bar.com';
+        $code = '123456';
+        $expires_at = now()->subMinutes(5);
 
-        User::factory()->create([
-            'name' => $userPayload['name'],
-            'email' => $userPayload['email'],
-            'password' => Hash::make('password'),
+        $user = User::factory()->create([
+            'email' => $email,
+            'email_verified_at' => null,
         ]);
 
-        $this->post(route('api.v1.register'), $userPayload)
-            ->assertSessionHasErrors('email');
-    }
+        Cache::put('verification_code_'.$email, [
+            'code' => $code,
+            'expires_at' => $expires_at,
+        ], $expires_at);
 
-    #[DataProvider('loginPayloads')]
-    public function test_login_validates_payload($payload, $error): void
-    {
+        $response = $this->post(route('api.v1.verify'), ['email' => $email, 'code' => $code]);
+        $response->assertStatus(ResponseAlias::HTTP_BAD_REQUEST);
 
-        $this->post(route('api.v1.login'), $payload)
-            ->assertSessionHasErrors($error);
-    }
-
-    #[DataProvider('registrationPayloads')]
-    public function test_register_validates_payload($payload, $error): void
-    {
-
-        $response = $this->post(route('api.v1.register'), $payload)
-            ->assertSessionHasErrors($error);
+        Cache::flush();
     }
 
     public static function registrationPayloads(): array
