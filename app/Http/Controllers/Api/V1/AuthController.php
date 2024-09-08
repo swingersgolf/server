@@ -9,8 +9,11 @@ use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class AuthController extends Controller
 {
@@ -25,6 +28,10 @@ class AuthController extends Controller
         }
 
         $user = User::firstWhere('email', $request->email);
+
+        if (empty($user->email_verified_at)) {
+            return $this->error('Invalid Credentials', 401);
+        }
 
         return $this->ok('Authenticated',
             [
@@ -51,5 +58,21 @@ class AuthController extends Controller
         $user->notify(new VerifyEmailNotification($code,30));
 
         return $this->success('User created', [], 201);
+    }
+
+    public function verify(Request $request)
+    {
+        $email = $request->email;
+        $code = $request->code;
+        $cachedData = Cache::get("verification_code_{$email}");
+        $user = User::where('email', $email)->first();
+
+        if ($cachedData && $cachedData['code'] === $code && now()->lessThanOrEqualTo($cachedData['expires_at'])) {
+            Cache::forget("verification_code_{$email}");
+            $user->markEmailAsVerified();
+            return $this->ok('Code verified successfully.',[]);
+        }
+
+        return $this->error('Invalid or expired code.', ResponseAlias::HTTP_BAD_REQUEST);
     }
 }

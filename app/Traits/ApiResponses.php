@@ -3,6 +3,8 @@
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 trait ApiResponses
 {
@@ -11,7 +13,7 @@ trait ApiResponses
         return $this->success($message, $data, 200);
     }
 
-    protected function success($message, $data, $code = 200): JsonResponse
+    protected function success($message, $data, $code = ResponseAlias::HTTP_OK): JsonResponse
     {
         return response()->json(array_merge(
             $data,

@@ -4,10 +4,12 @@ namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
@@ -35,6 +37,20 @@ class AuthControllerTest extends TestCase
             'email' => $user->email,
             'password' => 'not password',
         ])->assertUnauthorized();
+    }
+
+    public function test_login_rejects_login_without_verified_email(): void
+    {
+        $password = 'password';
+        $user = User::factory()->create([
+            'password' => Hash::make($password),
+            'email_verified_at' => null,
+        ]);
+
+        $this->post(route('api.v1.login'), [
+            'email' => $user->email,
+            'password' => $password,
+        ])->assertStatus(ResponseAlias::HTTP_UNAUTHORIZED);
     }
 
     public function test_register_registers_a_new_user(): void
@@ -73,7 +89,7 @@ class AuthControllerTest extends TestCase
             ->with('verification_code_'.$email);
     }
 
-    public function test_email_verification_contains_code_and_expiry(): void
+    public function test_registers_email_verification_contains_code_and_expiry(): void
     {
         Notification::fake();
         $user = User::factory()->create([]);
@@ -87,6 +103,28 @@ class AuthControllerTest extends TestCase
                 $mailContents->actionUrl === strval($code) &&
                 $mailContents->outroLines[0] === "This code will expire in ".$expiry." minutes.";
         });
+    }
+
+    public function test_verify_validates_the_code():void
+    {
+        $email = 'foo@bar.com';
+        $code = '123456';
+        $expires_at = now()->addMinutes(30);
+
+        $user = User::factory()->create([
+            'email' => $email,
+            'email_verified_at' => null,
+        ]);
+
+        Cache::put("verification_code_".$email, [
+            'code' => $code,
+            'expires_at' => $expires_at,
+        ], $expires_at);
+
+        $response = $this->post(route('api.v1.verify'), ['email' => $email, 'code' => $code]);
+        $response->assertStatus(200);
+
+        Cache::flush();
     }
 
     public function test_register_prevents_duplicate_user_registration(): void
