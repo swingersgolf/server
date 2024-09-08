@@ -49,7 +49,7 @@ class AuthControllerTest extends TestCase
         $this->post(route('api.v1.login'), [
             'email' => $user->email,
             'password' => $password,
-        ])->assertStatus(ResponseAlias::HTTP_UNAUTHORIZED);
+        ])->assertStatus(ResponseAlias::HTTP_PRECONDITION_REQUIRED);
     }
 
     #[DataProvider('loginPayloads')]
@@ -175,10 +175,34 @@ class AuthControllerTest extends TestCase
         Cache::put('verification_code_'.$email, [
             'code' => $code,
             'expires_at' => $expires_at,
-        ], $expires_at);
+        ]);
+
 
         $response = $this->post(route('api.v1.verify'), ['email' => $email, 'code' => $code]);
-        $response->assertStatus(ResponseAlias::HTTP_BAD_REQUEST);
+        $response->assertStatus(ResponseAlias::HTTP_PRECONDITION_REQUIRED);
+
+        Cache::flush();
+    }
+
+    public function test_verification_rejects_incorrect_code():void
+    {
+        $email = 'foo@bar.com';
+        $code = '123456';
+        $expires_at = now()->addMinutes(30);
+
+        $user = User::factory()->create([
+            'email' => $email,
+            'email_verified_at' => null,
+        ]);
+
+        Cache::put('verification_code_'.$email, [
+            'code' => '567890',
+            'expires_at' => $expires_at,
+        ]);
+
+
+        $response = $this->post(route('api.v1.verify'), ['email' => $email, 'code' => $code]);
+        $response->assertStatus(ResponseAlias::HTTP_PRECONDITION_REQUIRED);
 
         Cache::flush();
     }

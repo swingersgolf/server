@@ -29,7 +29,7 @@ class AuthController extends Controller
         $user = User::firstWhere('email', $request->email);
 
         if (empty($user->email_verified_at)) {
-            return $this->error('Invalid Credentials', 401);
+            return $this->error('Expired Credentials', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
         }
 
         return $this->ok('Authenticated',
@@ -66,13 +66,18 @@ class AuthController extends Controller
         $cachedData = Cache::get("verification_code_{$email}");
         $user = User::where('email', $email)->first();
 
-        if ($cachedData && $cachedData['code'] === $code && now()->lessThanOrEqualTo($cachedData['expires_at'])) {
-            Cache::forget("verification_code_{$email}");
-            $user->markEmailAsVerified();
-
-            return $this->ok('Code verified successfully.', []);
+        if (! ($cachedData && $cachedData['code'] === $code)){
+            return $this->error('Bad Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
         }
 
-        return $this->error('Invalid or expired code.', ResponseAlias::HTTP_BAD_REQUEST);
+        if (! now()->lessThanOrEqualTo($cachedData['expires_at'])){
+            return $this->error('Expired Credentials', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
+        }
+
+        Cache::forget("verification_code_{$email}");
+        $user->markEmailAsVerified();
+
+        return $this->ok('Code verified successfully.', []);
+
     }
 }
