@@ -161,7 +161,7 @@ class AuthControllerTest extends TestCase
         Cache::flush();
     }
 
-    public function test_verification_rejects_expired_code():void
+    public function test_verification_rejects_expired_code(): void
     {
         $email = 'foo@bar.com';
         $code = '123456';
@@ -177,14 +177,13 @@ class AuthControllerTest extends TestCase
             'expires_at' => $expires_at,
         ]);
 
-
         $response = $this->post(route('api.v1.verify'), ['email' => $email, 'code' => $code]);
         $response->assertStatus(ResponseAlias::HTTP_PRECONDITION_REQUIRED);
 
         Cache::flush();
     }
 
-    public function test_verification_rejects_incorrect_code():void
+    public function test_verification_rejects_incorrect_code(): void
     {
         $email = 'foo@bar.com';
         $code = '123456';
@@ -200,29 +199,28 @@ class AuthControllerTest extends TestCase
             'expires_at' => $expires_at,
         ]);
 
-
         $response = $this->post(route('api.v1.verify'), ['email' => $email, 'code' => $code]);
         $response->assertStatus(ResponseAlias::HTTP_PRECONDITION_REQUIRED);
 
         Cache::flush();
     }
 
-    public function test_verify_requires_email_and_code():void
+    public function test_verify_requires_email_and_code(): void
     {
         $this->post(route('api.v1.verify'))
-        ->assertSessionHasErrors(['email','code']);
+            ->assertSessionHasErrors(['email', 'code']);
     }
 
-    public function test_verify_requires_email_that_exists():void
+    public function test_verify_requires_email_that_exists(): void
     {
         User::factory()->create([
             'email' => 'foo@bar.com',
             'email_verified_at' => null,
         ]);
         $this->post(route('api.v1.verify'),
-        [
-            'email' => 'not_foo@bar.com',
-        ])
+            [
+                'email' => 'not_foo@bar.com',
+            ])
             ->assertSessionHasErrors('email');
     }
 
@@ -246,13 +244,13 @@ class AuthControllerTest extends TestCase
         Notification::assertSentTo($user, VerifyEmailNotification::class);
     }
 
-    public function test_resend_requires_email():void
+    public function test_resend_requires_email(): void
     {
         $this->post(route('api.v1.verify'))
             ->assertSessionHasErrors(['email']);
     }
 
-    public function test_resend_requires_email_that_exists():void
+    public function test_resend_requires_email_that_exists(): void
     {
         User::factory()->create([
             'email' => 'foo@bar.com',

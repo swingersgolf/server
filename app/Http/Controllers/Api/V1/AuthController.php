@@ -11,7 +11,6 @@ use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -60,6 +59,7 @@ class AuthController extends Controller
 
         return $this->success('User created', [], ResponseAlias::HTTP_CREATED);
     }
+
     public function resend(ResendVerificationEmailRequest $request): JsonResponse
     {
         $email = $request->email;
@@ -86,11 +86,11 @@ class AuthController extends Controller
         $cachedData = Cache::get("verification_code_{$email}");
         $user = User::where('email', $email)->first();
 
-        if (! ($cachedData && $cachedData['code'] === $code)){
+        if (! ($cachedData && $cachedData['code'] === $code)) {
             return $this->error('Bad Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
         }
 
-        if (! now()->lessThanOrEqualTo($cachedData['expires_at'])){
+        if (! now()->lessThanOrEqualTo($cachedData['expires_at'])) {
             return $this->error('Expired Credentials', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
         }
 
