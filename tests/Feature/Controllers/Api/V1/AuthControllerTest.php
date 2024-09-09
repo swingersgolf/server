@@ -207,6 +207,64 @@ class AuthControllerTest extends TestCase
         Cache::flush();
     }
 
+    public function test_verify_requires_email_and_code():void
+    {
+        $this->post(route('api.v1.verify'))
+        ->assertSessionHasErrors(['email','code']);
+    }
+
+    public function test_verify_requires_email_that_exists():void
+    {
+        User::factory()->create([
+            'email' => 'foo@bar.com',
+            'email_verified_at' => null,
+        ]);
+        $this->post(route('api.v1.verify'),
+        [
+            'email' => 'not_foo@bar.com',
+        ])
+            ->assertSessionHasErrors('email');
+    }
+
+    public function test_resend_sends_email_verification_notification(): void
+    {
+        Notification::fake();
+
+        $email = 'foo@bar.com';
+
+        $user = User::factory()->create([
+            'email' => $email,
+            'password' => Hash::make('password'),
+            'birthdate' => '1970-12-31',
+            'email_verified_at' => null,
+        ]);
+
+        $this->post(route('api.v1.resend'), [
+            'email' => $email]
+        );
+
+        Notification::assertSentTo($user, VerifyEmailNotification::class);
+    }
+
+    public function test_resend_requires_email():void
+    {
+        $this->post(route('api.v1.verify'))
+            ->assertSessionHasErrors(['email']);
+    }
+
+    public function test_resend_requires_email_that_exists():void
+    {
+        User::factory()->create([
+            'email' => 'foo@bar.com',
+            'email_verified_at' => null,
+        ]);
+
+        $this->post(route('api.v1.verify'), [
+            'email' => 'not_foo@bar.com',
+        ])
+            ->assertSessionHasErrors(['email']);
+    }
+
     public static function registrationPayloads(): array
     {
         return [

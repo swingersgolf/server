@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\LoginUserRequest;
 use App\Http\Requests\Api\V1\RegisterUserRequest;
+use App\Http\Requests\Api\V1\ResendVerificationEmailRequest;
+use App\Http\Requests\Api\V1\VerifyEmailRequest;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use App\Traits\ApiResponses;
@@ -56,10 +58,28 @@ class AuthController extends Controller
 
         $user->notify(new VerifyEmailNotification($code, 30));
 
-        return $this->success('User created', [], 201);
+        return $this->success('User created', [], ResponseAlias::HTTP_CREATED);
+    }
+    public function resend(ResendVerificationEmailRequest $request): JsonResponse
+    {
+        $email = $request->email;
+        $user = User::where('email', $email)->first();
+
+        $code = random_int(100000, 999999);
+        $expiryMinutes = 30;
+        $expiration = now()->addMinutes($expiryMinutes);
+
+        Cache::put("verification_code_{$email}", [
+            'code' => $code,
+            'expires_at' => $expiration,
+        ], $expiration);
+
+        $user->notify(new VerifyEmailNotification($code, 30));
+
+        return $this->success('Verification Email Resent', [], ResponseAlias::HTTP_OK);
     }
 
-    public function verify(Request $request)
+    public function verify(VerifyEmailRequest $request)
     {
         $email = $request->email;
         $code = $request->code;
