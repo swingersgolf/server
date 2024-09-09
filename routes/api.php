@@ -12,8 +12,10 @@ Route::get('/user', function (Request $request) {
 
 Route::name('api.')->group(function () {
     Route::name('v1.')->prefix('v1')->group(function () {
-        Route::post('/login', [AuthController::class, 'login'])->name('login');
-        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:3,10' : [])->post('/register', [AuthController::class, 'register'])->name('register');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/login', [AuthController::class, 'login'])->name('login');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/register', [AuthController::class, 'register'])->name('register');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/verify', [AuthController::class, 'verify'])->name('verify');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/resend', [AuthController::class, 'resend'])->name('resend');
     });
 
     Route::middleware('auth:sanctum')->group(function () {
