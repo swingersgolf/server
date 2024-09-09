@@ -151,7 +151,7 @@ class AuthControllerTest extends TestCase
         ]);
 
         Cache::put('verification_code_'.$email, [
-            'code' => $code,
+            'code' => strval($code),
             'expires_at' => $expires_at,
         ], $expires_at);
 
@@ -173,7 +173,7 @@ class AuthControllerTest extends TestCase
         ]);
 
         Cache::put('verification_code_'.$email, [
-            'code' => $code,
+            'code' => strval($code),
             'expires_at' => $expires_at,
         ]);
 

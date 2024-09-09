@@ -51,7 +51,7 @@ class AuthController extends Controller
         $expiration = now()->addMinutes($expiryMinutes);
 
         Cache::put("verification_code_{$email}", [
-            'code' => $code,
+            'code' => strval($code),
             'expires_at' => $expiration,
         ], $expiration);
 
@@ -70,7 +70,7 @@ class AuthController extends Controller
         $expiration = now()->addMinutes($expiryMinutes);
 
         Cache::put("verification_code_{$email}", [
-            'code' => $code,
+            'code' => strval($code),
             'expires_at' => $expiration,
         ], $expiration);
 
@@ -82,11 +82,12 @@ class AuthController extends Controller
     public function verify(VerifyEmailRequest $request)
     {
         $email = $request->email;
-        $code = $request->code;
+        $code = strval($request->code);
         $cachedData = Cache::get("verification_code_{$email}");
+
         $user = User::where('email', $email)->first();
 
-        if (! ($cachedData && $cachedData['code'] === $code)) {
+        if (! ($cachedData && strval($cachedData['code']) === $code)) {
             return $this->error('Bad Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
         }
 
