@@ -88,7 +88,7 @@ class AuthController extends Controller
         $user = User::where('email', $email)->first();
 
         if (! ($cachedData && strval($cachedData['code']) === $code)) {
-            return $this->error('Bad Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
+            return $this->error('Invalid Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
         }
 
         if (! now()->lessThanOrEqualTo($cachedData['expires_at'])) {
