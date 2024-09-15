@@ -20,7 +20,7 @@ class UserProfileUpdateRequest extends FormRequest
             'postal_code' => [
                 'nullable',
                 'regex:/^(\d{5}(-\d{4})?|[A-Z]\d[A-Z]\s?\d[A-Z]\d)$/i',
-            ]
+            ],
         ];
     }
 }

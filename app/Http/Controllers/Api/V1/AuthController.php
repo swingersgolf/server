@@ -3,16 +3,20 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\LoginUserRequest;
 use App\Http\Requests\Api\V1\RegisterUserRequest;
 use App\Http\Requests\Api\V1\ResendVerificationEmailRequest;
+use App\Http\Requests\Api\V1\ResetPasswordRequest;
 use App\Http\Requests\Api\V1\VerifyEmailRequest;
 use App\Models\User;
+use App\Notifications\ResetPasswordNotification;
 use App\Notifications\VerifyEmailNotification;
 use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class AuthController extends Controller
@@ -92,7 +96,7 @@ class AuthController extends Controller
         }
 
         if (! now()->lessThanOrEqualTo($cachedData['expires_at'])) {
-            return $this->error('Expired Credentials', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
+            return $this->error('Expired Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
         }
 
         Cache::forget("verification_code_{$email}");
@@ -100,5 +104,46 @@ class AuthController extends Controller
 
         return $this->ok('Code verified successfully.', []);
 
+    }
+
+    public function forgot(ForgotPasswordRequest $request): JsonResponse
+    {
+        $user = User::where('email', $request->input('email'))->firstOrFail();
+
+        $email = $request->input('email');
+        $code = random_int(100000, 999999);
+        $expiryMinutes = 30;
+        $expiration = now()->addMinutes($expiryMinutes);
+        Cache::put("reset_code_{$email}", [
+            'code' => strval($code),
+            'expires_at' => $expiration,
+        ], $expiration);
+
+        $user->notify(new ResetPasswordNotification($code, 30));
+
+        return $this->ok('Password reset link sent.');
+
+    }
+
+    public function reset(ResetPasswordRequest $request): JsonResponse
+    {
+        $email = $request->email;
+        $code = strval($request->code);
+        $password = $request->password;
+
+        $cachedData = Cache::get("reset_code_{$email}");
+
+        if (! ($cachedData && strval($cachedData['code']) === $code)) {
+            return $this->error('Invalid Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
+        }
+
+        Cache::forget("reset_code_{$email}");
+        $user = User::where('email', $email)->first();
+
+        $user->password = Hash::make($password);
+
+        $user->save();
+
+        return $this->ok('Password reset successfully.');
     }
 }

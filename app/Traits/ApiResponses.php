@@ -3,12 +3,11 @@
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 trait ApiResponses
 {
-    protected function ok($message, $data)
+    protected function ok($message, $data = [])
     {
         return $this->success($message, $data, 200);
     }

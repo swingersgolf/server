@@ -11,8 +11,10 @@ class UserProfileController extends Controller
     public function show(): UserProfileResource
     {
         $user = auth()->user();
+
         return new UserProfileResource($user->userProfile);
     }
+
     public function update(UserProfileUpdateRequest $request): UserProfileResource
     {
         $user = auth()->user();

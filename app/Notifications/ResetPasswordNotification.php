@@ -6,18 +6,18 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class VerifyEmailNotification extends Notification
+class ResetPasswordNotification extends Notification
 {
     use Queueable;
 
-    protected string $code;
+    protected $code;
 
-    protected int $expiryMinutes;
+    protected $expiryMinutes;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(string $code, int $expiryMinutes)
+    public function __construct($code, $expiryMinutes = 30)
     {
         $this->code = $code;
         $this->expiryMinutes = $expiryMinutes;
@@ -38,12 +38,13 @@ class VerifyEmailNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+
         return (new MailMessage)
-            ->subject('Swingers Email Address Verification')
-            ->line('You are receiving this email because we received an account registration for this email.')
-            ->action('Please verify you own this email by entering the following code in your Swingers mobile application:', $this->code)
-            ->line('This code will expire in '.$this->expiryMinutes.' minutes.')
-            ->line('If you did not request the creation of this Swingers account, no further action is required.');
+            ->subject('Reset Password Notification')
+            ->line('You are receiving this email because we received a password reset request for your account.')
+            ->line("Reset Code: $this->code")
+            ->line("This password reset code will expire in $this->expiryMinutes minutes.")
+            ->line('If you did not request a password reset, no further action is required.');
     }
 
     /**
