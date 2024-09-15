@@ -8,9 +8,12 @@ use App\Http\Requests\Api\V1\RegisterUserRequest;
 use App\Http\Requests\Api\V1\ResendVerificationEmailRequest;
 use App\Http\Requests\Api\V1\VerifyEmailRequest;
 use App\Models\User;
+use App\Notifications\ResetPasswordNotification;
 use App\Notifications\VerifyEmailNotification;
 use App\Traits\ApiResponses;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -99,6 +102,22 @@ class AuthController extends Controller
         $user->markEmailAsVerified();
 
         return $this->ok('Code verified successfully.', []);
+
+    }
+
+    public function forgot(Request $request): JsonResponse
+    {
+        //        $request->validate(['email' => 'required|email']);
+
+        //        try {
+        $user = User::where('email', $request->input('email'))->firstOrFail();
+        //        } catch (ModelNotFoundException $e) {
+        //            return $this->error('User not found', ResponseAlias::HTTP_NOT_FOUND);
+        //        }
+
+        $user->notify(new ResetPasswordNotification);
+
+        return $this->ok('Password reset link sent.');
 
     }
 }

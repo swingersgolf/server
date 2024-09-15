@@ -3,6 +3,8 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
+use App\Notifications\CustomResetPasswordNotification;
+use App\Notifications\ResetPasswordNotification;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -261,6 +263,24 @@ class AuthControllerTest extends TestCase
             'email' => 'not_foo@bar.com',
         ])
             ->assertSessionHasErrors(['email']);
+    }
+
+    public function test_forgot_password_sends_customResetPasswordNotification(): void
+    {
+        Notification::fake();
+
+        $email = 'test@example.com';
+        $user = User::factory()->create([
+            'email' => $email,
+        ]);
+
+        $payload = [
+            'email' => $email,
+        ];
+        $this->post(route('api.v1.forgot'), $payload)
+            ->assertSuccessful();
+
+        Notification::assertSentTo([$user], ResetPasswordNotification::class);
     }
 
     public static function registrationPayloads(): array
