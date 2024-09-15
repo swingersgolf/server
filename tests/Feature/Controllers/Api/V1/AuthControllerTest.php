@@ -3,10 +3,8 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\User;
-use App\Notifications\CustomResetPasswordNotification;
 use App\Notifications\ResetPasswordNotification;
 use App\Notifications\VerifyEmailNotification;
-use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -267,7 +265,7 @@ class AuthControllerTest extends TestCase
             ->assertSessionHasErrors(['email']);
     }
 
-    public function test_forgot_password_sends_ResetPasswordNotification(): void
+    public function test_forgot_sends_ResetPasswordNotification(): void
     {
         Notification::fake();
 
@@ -288,7 +286,7 @@ class AuthControllerTest extends TestCase
 
     }
 
-    public function test_forgot_sends_reset_password_notification_with_expiry_and_code(): void
+    public function test_reset_password_notification_includes_expiry_and_code(): void
     {
         Notification::fake();
 
@@ -298,8 +296,9 @@ class AuthControllerTest extends TestCase
 
         $user->notify(new ResetPasswordNotification($code, $expiry));
 
-        Notification::assertSentTo($user, ResetPasswordNotification::class, function(ResetPasswordNotification $notification) use ($user, $code, $expiry) {
+        Notification::assertSentTo($user, ResetPasswordNotification::class, function (ResetPasswordNotification $notification) use ($user, $code, $expiry) {
             $mailContents = $notification->toMail($user);
+
             return str_contains($mailContents->introLines[1], $code) &&
                 str_contains($mailContents->introLines[2], $expiry);
         });
@@ -312,17 +311,26 @@ class AuthControllerTest extends TestCase
             'password' => Hash::make('old_password'),
         ]);
 
-        $resetToken = Password::broker()->createToken($user);
+        $resetCode = random_int(100000, 999999);
+        $expires_at = now()->addMinutes(30);
+
+        Cache::put('reset_code_'.$user->email, [
+            'code' => strval($resetCode),
+            'expires_at' => $expires_at,
+        ], $expires_at);
 
         $newPassword = 'new_password';
 
-        $response = $this->post(route('api.v1.reset'), [
-            'token' => $resetToken,
+        $this->post(route('api.v1.reset'), [
+            'code' => $resetCode,
             'email' => $user->email,
             'password' => $newPassword,
         ])->assertSuccessful();
 
-        $response->assertSuccessful();
+        $user->refresh();
+        $this->assertTrue(Hash::check($newPassword, $user->password));
+
+        Cache::flush();
     }
 
     public static function registrationPayloads(): array

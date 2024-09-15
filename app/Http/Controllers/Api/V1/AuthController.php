@@ -98,7 +98,7 @@ class AuthController extends Controller
         }
 
         if (! now()->lessThanOrEqualTo($cachedData['expires_at'])) {
-            return $this->error('Expired Credentials', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
+            return $this->error('Expired Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
         }
 
         Cache::forget("verification_code_{$email}");
@@ -135,23 +135,30 @@ class AuthController extends Controller
     public function reset(Request $request): JsonResponse
     {
         $request->validate([
-            'token' => 'required',
+            'code' => 'required|int',
             'email' => 'required|email',
             'password' => 'required|min:8',
         ]);
+        $email = $request->email;
+        $code = strval($request->code);
+        $password = $request->password;
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                ])->setRememberToken(Str::random(60));
-                $user->save();
-            }
-        );
+        $cachedData = Cache::get("reset_code_{$email}");
 
-        return $status === Password::PASSWORD_RESET
-            ? $this->ok($status)
-            : $this->error($status, ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
+        if (! ($cachedData && strval($cachedData['code']) === $code)) {
+            return $this->error('Invalid Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
+        }
+
+        if (! now()->lessThanOrEqualTo($cachedData['expires_at'])) {
+            return $this->error('Expired Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
+        }
+
+        Cache::forget("reset_code_{$email}");
+        $user = User::where('email', $email)->first();
+
+        $user->password = Hash::make($password);
+
+        $user->save();
+        return $this->ok('Password reset successfully.');
     }
 }
