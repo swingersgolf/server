@@ -59,7 +59,7 @@ class AuthController extends Controller
             'expires_at' => $expiration,
         ], $expiration);
 
-        $user->notify(new VerifyEmailNotification($code, 30));
+        $user->notify(new VerifyEmailNotification($code));
 
         return $this->success('User created', [], ResponseAlias::HTTP_CREATED);
     }
@@ -78,7 +78,7 @@ class AuthController extends Controller
             'expires_at' => $expiration,
         ], $expiration);
 
-        $user->notify(new VerifyEmailNotification($code, 30));
+        $user->notify(new VerifyEmailNotification($code));
 
         return $this->success('Verification Email Resent', [], ResponseAlias::HTTP_OK);
     }

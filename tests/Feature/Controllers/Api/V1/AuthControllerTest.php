@@ -102,15 +102,15 @@ class AuthControllerTest extends TestCase
         Notification::fake();
         $user = User::factory()->create([]);
         $code = 123456;
-        $expiry = 30;
-        $user->notify(new VerifyEmailNotification($code, $expiry));
+        $expiry = config('auth.passwords.users.expire');
+        $user->notify(new VerifyEmailNotification($code));
         Notification::assertSentTo($user, VerifyEmailNotification::class,
             function (VerifyEmailNotification $notification) use ($code, $expiry) {
                 $mailContents = $notification->toMail($notification);
 
                 return
-                    $mailContents->actionUrl === strval($code) &&
-                    $mailContents->outroLines[0] === 'This code will expire in '.$expiry.' minutes.';
+                    str_contains($mailContents->introLines[1], strval($code)) &&
+                    str_contains($mailContents->introLines[2], strval($expiry));
             });
     }
 
@@ -311,7 +311,7 @@ class AuthControllerTest extends TestCase
 
         $user = User::factory()->create();
         $code = 123456;
-        $expiry = 30;
+        $expiry = config('auth.passwords.users.expire');
 
         $user->notify(new ResetPasswordNotification($code, $expiry));
 

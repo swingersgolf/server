@@ -12,15 +12,12 @@ class VerifyEmailNotification extends Notification
 
     protected string $code;
 
-    protected int $expiryMinutes;
-
     /**
      * Create a new notification instance.
      */
-    public function __construct(string $code, int $expiryMinutes)
+    public function __construct(string $code)
     {
         $this->code = $code;
-        $this->expiryMinutes = $expiryMinutes;
     }
 
     /**
@@ -41,8 +38,8 @@ class VerifyEmailNotification extends Notification
         return (new MailMessage)
             ->subject('Swingers Email Address Verification')
             ->line('You are receiving this email because we received an account registration for this email.')
-            ->action('Please verify you own this email by entering the following code in your Swingers mobile application:', $this->code)
-            ->line('This code will expire in '.$this->expiryMinutes.' minutes.')
+            ->line('Please verify you own this email by entering the following code in your Swingers mobile application:'. $this->code)
+            ->line('This code will expire in '.config('auth.passwords.users.expire').' minutes.')
             ->line('If you did not request the creation of this Swingers account, no further action is required.');
     }
 
