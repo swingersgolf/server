@@ -8,7 +8,6 @@ use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Password;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
@@ -411,6 +410,42 @@ class AuthControllerTest extends TestCase
         $this->assertTrue(Hash::check($oldPassword, $user->password));
 
         Cache::flush();
+    }
+
+    #[DataProvider('resetPayloads')]
+    public function test_reset_does_not_reset_password_for_invalid_payloads($payload, $error): void
+    {
+        $this->post(route('api.v1.reset'), $payload)->assertSessionHasErrors($error);
+    }
+
+    public static function resetPayloads(): array
+    {
+        return [
+            'invalid email' => [
+                'payload' => [
+                    'email' => 'invalid email',
+                    'code' => 123456,
+                    'password' => 'password',
+                ],
+                'error' => 'email',
+            ],
+            'invalid code' => [
+                'payload' => [
+                    'email' => 'foo@bar.com',
+                    'code' => 1234567,
+                    'password' => 'password',
+                ],
+                'error' => 'code',
+            ],
+            'invalid password' => [
+                'payload' => [
+                    'email' => 'foo@bar.com',
+                    'code' => 123456,
+                    'password' => 'passwor',
+                ],
+                'error' => 'password',
+            ],
+        ];
     }
 
     public static function registrationPayloads(): array

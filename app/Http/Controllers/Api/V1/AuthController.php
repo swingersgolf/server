@@ -130,7 +130,7 @@ class AuthController extends Controller
     public function reset(Request $request): JsonResponse
     {
         $request->validate([
-            'code' => 'required|int',
+            'code' => 'required|int|digits:6',
             'email' => 'required|email',
             'password' => 'required|min:8',
         ]);
