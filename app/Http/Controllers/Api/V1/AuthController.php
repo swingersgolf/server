@@ -17,8 +17,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class AuthController extends Controller
@@ -110,13 +108,10 @@ class AuthController extends Controller
 
     public function forgot(Request $request): JsonResponse
     {
-        //        $request->validate(['email' => 'required|email']);
+        $request->validate(['email' => 'required|email|exists:users,email']);
 
-        //        try {
         $user = User::where('email', $request->input('email'))->firstOrFail();
-        //        } catch (ModelNotFoundException $e) {
-        //            return $this->error('User not found', ResponseAlias::HTTP_NOT_FOUND);
-        //        }
+
         $email = $request->input('email');
         $code = random_int(100000, 999999);
         $expiryMinutes = 30;
@@ -149,16 +144,13 @@ class AuthController extends Controller
             return $this->error('Invalid Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
         }
 
-        if (! now()->lessThanOrEqualTo($cachedData['expires_at'])) {
-            return $this->error('Expired Code', ResponseAlias::HTTP_PRECONDITION_REQUIRED);
-        }
-
         Cache::forget("reset_code_{$email}");
         $user = User::where('email', $email)->first();
 
         $user->password = Hash::make($password);
 
         $user->save();
+
         return $this->ok('Password reset successfully.');
     }
 }

@@ -283,7 +283,27 @@ class AuthControllerTest extends TestCase
         Notification::assertSentTo([$user], ResetPasswordNotification::class);
         Cache::shouldReceive('put')
             ->with('reset_code_'.$email);
+    }
 
+    public function test_forgot_does_not_send_notification_for_non_existent_user(): void
+    {
+        Notification::fake();
+
+        $email = 'test@example.com';
+        $user = User::factory()->create([
+            'email' => $email,
+        ]);
+        $anotherEmail = 'another@example.com';
+
+        $payload = [
+            'email' => $anotherEmail,
+        ];
+        $this->post(route('api.v1.forgot'), $payload)
+            ->assertSessionHasErrors('email');
+
+        Notification::assertNotSentTo([$user], ResetPasswordNotification::class);
+        Cache::shouldReceive('put')
+            ->never();
     }
 
     public function test_reset_password_notification_includes_expiry_and_code(): void
@@ -329,6 +349,36 @@ class AuthControllerTest extends TestCase
 
         $user->refresh();
         $this->assertTrue(Hash::check($newPassword, $user->password));
+
+        Cache::flush();
+    }
+
+    public function test_reset_does_not_reset_password_for_expired_code(): void
+    {
+        $oldPassword = 'old_password';
+        $user = User::factory()->create([
+            'email' => 'foo@bar.com',
+            'password' => Hash::make($oldPassword),
+        ]);
+
+        $resetCode = random_int(100000, 999999);
+        $expires_at = now()->subMinutes(5);
+
+        Cache::put('reset_code_'.$user->email, [
+            'code' => strval($resetCode),
+            'expires_at' => $expires_at,
+        ], $expires_at);
+
+        $newPassword = 'new_password';
+
+        $this->post(route('api.v1.reset'), [
+            'code' => $resetCode,
+            'email' => $user->email,
+            'password' => $newPassword,
+        ])->assertStatus(428);
+
+        $user->refresh();
+        $this->assertTrue(Hash::check($oldPassword, $user->password));
 
         Cache::flush();
     }
