@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\LoginUserRequest;
 use App\Http\Requests\Api\V1\RegisterUserRequest;
 use App\Http\Requests\Api\V1\ResendVerificationEmailRequest;
+use App\Http\Requests\Api\V1\ResetPasswordRequest;
 use App\Http\Requests\Api\V1\VerifyEmailRequest;
 use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
@@ -127,13 +128,8 @@ class AuthController extends Controller
 
     }
 
-    public function reset(Request $request): JsonResponse
+    public function reset(ResetPasswordRequest $request): JsonResponse
     {
-        $request->validate([
-            'code' => 'required|int|digits:6',
-            'email' => 'required|email',
-            'password' => 'required|min:8',
-        ]);
         $email = $request->email;
         $code = strval($request->code);
         $password = $request->password;
