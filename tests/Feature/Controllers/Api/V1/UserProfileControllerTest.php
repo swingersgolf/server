@@ -24,6 +24,7 @@ class UserProfileControllerTest extends TestCase
         $this->assertEquals($handicap, $responseData['handicap']);
         $this->assertEquals($postalCode, $responseData['postalCode']);
     }
+
     #[DataProvider('validPayloads')]
     public function test_it_updates_user_profile_payloads($payload, $expectation): void
     {
@@ -44,37 +45,37 @@ class UserProfileControllerTest extends TestCase
             ->assertSessionHasErrors($error);
     }
 
-    public static function invalidPayloads():array
+    public static function invalidPayloads(): array
     {
         return [
             'handicap over' => [
                 'payload' => ['handicap' => '55'],
-                'error' => 'handicap'
+                'error' => 'handicap',
             ],
             'handicap under' => [
                 'payload' => ['handicap' => '-55'],
-                'error' => 'handicap'
+                'error' => 'handicap',
             ],
             'handicap not a number' => [
                 'payload' => ['handicap' => 'foobar'],
-                'error' => 'handicap'
+                'error' => 'handicap',
             ],
             'invalid Canadian postal code' => [
                 'payload' => ['postalCode' => 'ABCDEF'],
-                'error' => 'postal_code'
+                'error' => 'postal_code',
             ],
             'invalid American zip code' => [
                 'payload' => ['postalCode' => '987654'],
-                'error' => 'postal_code'
+                'error' => 'postal_code',
             ],
             'invalid American long zip code' => [
                 'payload' => ['postalCode' => '90210-12345'],
-                'error' => 'postal_code'
+                'error' => 'postal_code',
             ],
         ];
     }
 
-    public static function validPayloads():array
+    public static function validPayloads(): array
     {
         return [
             'handicap' => [
@@ -92,7 +93,7 @@ class UserProfileControllerTest extends TestCase
             'American long zip' => [
                 'payload' => ['postalCode' => '90210-1234'],
                 'expectation' => ['postal_code' => '90210-1234'],
-            ]
+            ],
         ];
     }
 }

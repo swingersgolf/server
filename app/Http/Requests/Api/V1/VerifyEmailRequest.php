@@ -23,7 +23,7 @@ class VerifyEmailRequest extends FormRequest
     {
         return [
             'email' => 'required|email|exists:users,email',
-            'code' =>  'required|numeric|between:100000,999999',
+            'code' => 'required|numeric|between:100000,999999',
         ];
     }
 }
