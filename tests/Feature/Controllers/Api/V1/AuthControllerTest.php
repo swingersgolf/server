@@ -136,7 +136,7 @@ class AuthControllerTest extends TestCase
     public function test_register_validates_payload($payload, $error): void
     {
 
-        $response = $this->post(route('api.v1.register'), $payload)
+        $this->post(route('api.v1.register'), $payload)
             ->assertSessionHasErrors($error);
     }
 
@@ -146,7 +146,7 @@ class AuthControllerTest extends TestCase
         $code = '123456';
         $expires_at = now()->addMinutes(30);
 
-        $user = User::factory()->create([
+        User::factory()->create([
             'email' => $email,
             'email_verified_at' => null,
         ]);
@@ -168,7 +168,7 @@ class AuthControllerTest extends TestCase
         $code = '123456';
         $expires_at = now()->subMinutes(5);
 
-        $user = User::factory()->create([
+        User::factory()->create([
             'email' => $email,
             'email_verified_at' => null,
         ]);
@@ -190,7 +190,7 @@ class AuthControllerTest extends TestCase
         $code = '123456';
         $expires_at = now()->addMinutes(30);
 
-        $user = User::factory()->create([
+        User::factory()->create([
             'email' => $email,
             'email_verified_at' => null,
         ]);
