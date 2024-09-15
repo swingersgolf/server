@@ -383,6 +383,36 @@ class AuthControllerTest extends TestCase
         Cache::flush();
     }
 
+    public function test_reset_does_not_reset_password_for_invalid_code(): void
+    {
+        $oldPassword = 'old_password';
+        $user = User::factory()->create([
+            'email' => 'foo@bar.com',
+            'password' => Hash::make($oldPassword),
+        ]);
+
+        $resetCode = 123456;
+        $expires_at = now()->addMinutes(30);
+
+        Cache::put('reset_code_'.$user->email, [
+            'code' => strval($resetCode),
+            'expires_at' => $expires_at,
+        ], $expires_at);
+
+        $newPassword = 'new_password';
+
+        $this->post(route('api.v1.reset'), [
+            'code' => 654321,
+            'email' => $user->email,
+            'password' => $newPassword,
+        ])->assertStatus(428);
+
+        $user->refresh();
+        $this->assertTrue(Hash::check($oldPassword, $user->password));
+
+        Cache::flush();
+    }
+
     public static function registrationPayloads(): array
     {
         return [
