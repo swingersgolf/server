@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\ForgotPasswordRequest;
 use App\Http\Requests\Api\V1\LoginUserRequest;
 use App\Http\Requests\Api\V1\RegisterUserRequest;
 use App\Http\Requests\Api\V1\ResendVerificationEmailRequest;
@@ -107,10 +108,8 @@ class AuthController extends Controller
 
     }
 
-    public function forgot(Request $request): JsonResponse
+    public function forgot(ForgotPasswordRequest $request): JsonResponse
     {
-        $request->validate(['email' => 'required|email|exists:users,email']);
-
         $user = User::where('email', $request->input('email'))->firstOrFail();
 
         $email = $request->input('email');
