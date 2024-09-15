@@ -12,15 +12,12 @@ class ResetPasswordNotification extends Notification
 
     protected $code;
 
-    protected $expiryMinutes;
-
     /**
      * Create a new notification instance.
      */
-    public function __construct($code, $expiryMinutes = 30)
+    public function __construct($code)
     {
         $this->code = $code;
-        $this->expiryMinutes = $expiryMinutes;
     }
 
     /**
@@ -43,7 +40,7 @@ class ResetPasswordNotification extends Notification
             ->subject('Reset Password Notification')
             ->line('You are receiving this email because we received a password reset request for your account.')
             ->line("Reset Code: $this->code")
-            ->line("This password reset code will expire in $this->expiryMinutes minutes.")
+            ->line("This password reset code will expire in ".config('auth.passwords.users.expire')." minutes.")
             ->line('If you did not request a password reset, no further action is required.');
     }
 
