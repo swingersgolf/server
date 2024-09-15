@@ -6,9 +6,11 @@ use App\Models\User;
 use App\Notifications\CustomResetPasswordNotification;
 use App\Notifications\ResetPasswordNotification;
 use App\Notifications\VerifyEmailNotification;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
@@ -265,7 +267,7 @@ class AuthControllerTest extends TestCase
             ->assertSessionHasErrors(['email']);
     }
 
-    public function test_forgot_password_sends_customResetPasswordNotification(): void
+    public function test_forgot_password_sends_ResetPasswordNotification(): void
     {
         Notification::fake();
 
@@ -281,6 +283,46 @@ class AuthControllerTest extends TestCase
             ->assertSuccessful();
 
         Notification::assertSentTo([$user], ResetPasswordNotification::class);
+        Cache::shouldReceive('put')
+            ->with('reset_code_'.$email);
+
+    }
+
+    public function test_forgot_sends_reset_password_notification_with_expiry_and_code(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+        $code = 123456;
+        $expiry = 30;
+
+        $user->notify(new ResetPasswordNotification($code, $expiry));
+
+        Notification::assertSentTo($user, ResetPasswordNotification::class, function(ResetPasswordNotification $notification) use ($user, $code, $expiry) {
+            $mailContents = $notification->toMail($user);
+            return str_contains($mailContents->introLines[1], $code) &&
+                str_contains($mailContents->introLines[2], $expiry);
+        });
+    }
+
+    public function test_reset_resets_password(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'foo@bar.com',
+            'password' => Hash::make('old_password'),
+        ]);
+
+        $resetToken = Password::broker()->createToken($user);
+
+        $newPassword = 'new_password';
+
+        $response = $this->post(route('api.v1.reset'), [
+            'token' => $resetToken,
+            'email' => $user->email,
+            'password' => $newPassword,
+        ])->assertSuccessful();
+
+        $response->assertSuccessful();
     }
 
     public static function registrationPayloads(): array

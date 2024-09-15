@@ -16,6 +16,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class AuthController extends Controller
@@ -114,10 +117,41 @@ class AuthController extends Controller
         //        } catch (ModelNotFoundException $e) {
         //            return $this->error('User not found', ResponseAlias::HTTP_NOT_FOUND);
         //        }
+        $email = $request->input('email');
+        $code = random_int(100000, 999999);
+        $expiryMinutes = 30;
+        $expiration = now()->addMinutes($expiryMinutes);
+        Cache::put("reset_code_{$email}", [
+            'code' => strval($code),
+            'expires_at' => $expiration,
+        ], $expiration);
 
-        $user->notify(new ResetPasswordNotification);
+        $user->notify(new ResetPasswordNotification($code, 30));
 
         return $this->ok('Password reset link sent.');
 
+    }
+
+    public function reset(Request $request): JsonResponse
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->setRememberToken(Str::random(60));
+                $user->save();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? $this->ok($status)
+            : $this->error($status, ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
     }
 }
