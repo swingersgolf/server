@@ -49,7 +49,7 @@ class AuthController extends Controller
         $user = Auth::user();
 
         if ($user) {
-            $user->currentAccessToken()->delete();
+            $user->tokens()->delete();
 
             return $this->success('Logged out successfully.', []);
         }
