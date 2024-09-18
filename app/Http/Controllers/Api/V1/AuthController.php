@@ -14,6 +14,7 @@ use App\Notifications\ResetPasswordNotification;
 use App\Notifications\VerifyEmailNotification;
 use App\Traits\ApiResponses;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -41,6 +42,19 @@ class AuthController extends Controller
             [
                 'token' => $user->createToken('API Token for '.$user->email)->plainTextToken,
             ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user) {
+            $user->tokens()->delete();
+
+            return $this->success('Logged out successfully.', []);
+        }
+
+        return $this->error('Unable to log out.', 400);
     }
 
     public function register(RegisterUserRequest $request): JsonResponse

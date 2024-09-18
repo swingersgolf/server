@@ -38,7 +38,7 @@ class VerifyEmailNotification extends Notification
         return (new MailMessage)
             ->subject('Swingers Email Address Verification')
             ->line('You are receiving this email because we received an account registration for this email.')
-            ->line('Please verify you own this email by entering the following code in your Swingers mobile application:'. $this->code)
+            ->line('Please verify you own this email by entering the following code in your Swingers mobile application:'.$this->code)
             ->line('This code will expire in '.config('auth.passwords.users.expire').' minutes.')
             ->line('If you did not request the creation of this Swingers account, no further action is required.');
     }

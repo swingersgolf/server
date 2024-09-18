@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers\Api\V1;
 
+use App\Models\PersonalAccessToken;
 use App\Models\User;
 use App\Notifications\ResetPasswordNotification;
 use App\Notifications\VerifyEmailNotification;
@@ -59,6 +60,55 @@ class AuthControllerTest extends TestCase
 
         $this->post(route('api.v1.login'), $payload)
             ->assertSessionHasErrors($error);
+    }
+
+    public function test_logout_deletes_users_access_tokens(): void
+    {
+        $password = 'password';
+        $user = User::factory()->create([
+            'password' => Hash::make($password),
+        ]);
+
+        $this->post(route('api.v1.login'), [
+            'email' => $user->email,
+            'password' => $password,
+        ])->assertStatus(200);
+
+        $this->postJson(route('api.v1.logout'))->assertStatus(200);
+
+        $tokens = PersonalAccessToken::all();
+        $this->assertCount(0, $tokens);
+    }
+
+    public function test_logout_removes_only_the_users_tokens(): void
+    {
+        $password = 'password';
+
+        $otherUser = User::factory()->create([
+            'password' => Hash::make($password),
+        ]);
+
+        $user = User::factory()->create([
+            'password' => Hash::make($password),
+        ]);
+
+        $this->post(route('api.v1.login'), [
+            'email' => $otherUser->email,
+            'password' => $password,
+        ])->assertStatus(200);
+
+        $this->post(route('api.v1.login'), [
+            'email' => $user->email,
+            'password' => $password,
+        ])->assertStatus(200);
+
+        $tokens = PersonalAccessToken::all();
+        $this->assertCount(2, $tokens);
+
+        $this->postJson(route('api.v1.logout'))->assertStatus(200);
+
+        $tokens = PersonalAccessToken::all();
+        $this->assertCount(1, $tokens);
     }
 
     public function test_register_registers_a_new_user(): void
