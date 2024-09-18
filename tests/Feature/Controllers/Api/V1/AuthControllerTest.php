@@ -61,6 +61,30 @@ class AuthControllerTest extends TestCase
             ->assertSessionHasErrors($error);
     }
 
+    public function test_logout_logs_a_user_out(): void
+    {
+        $password = 'password';
+        $user = User::factory()->create([
+            'password' => Hash::make($password),
+        ]);
+
+        $loginResponse = $this->post(route('api.v1.login'), [
+            'email' => $user->email,
+            'password' => $password,
+        ])->assertStatus(200);
+
+        $token = $loginResponse->json('token'); // Assuming your login response returns a token
+
+        $this->postJson(route('api.v1.logout'), [], [
+            'Authorization' => 'Bearer '.$token,
+        ])->assertStatus(200);
+
+        // Assert that user is logged out by trying to access a protected route
+        $this->getJson(route('api.v1.user.show'), [
+            'Authorization' => 'Bearer '.$token,
+        ])->assertStatus(401);
+    }
+
     public function test_register_registers_a_new_user(): void
     {
         $userPayload = [
