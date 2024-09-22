@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\RoundController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserProfileController;
 use Illuminate\Http\Request;
@@ -29,6 +30,9 @@ Route::name('api.')->group(function () {
             Route::name('user-profile.')->group(function () {
                 Route::get('user-profile', [UserProfileController::class, 'show'])->name('show');
                 Route::patch('user-profile', [UserProfileController::class, 'update'])->name('update');
+            });
+            Route::name('round.')->group(function () {
+                Route::get('round', [RoundController::class, 'index'])->name('index');
             });
         });
     });
