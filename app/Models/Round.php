@@ -23,4 +23,9 @@ class Round extends Model
     {
         return $this->belongsToMany(Attribute::class);
     }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
+    }
 }

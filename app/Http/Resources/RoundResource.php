@@ -16,13 +16,19 @@ class RoundResource extends JsonResource
     {
         return [
             'when' => $this->when,
-            'course' => $this->course->name,
+            'course' => $this->course ? $this->course->name : null,
             'attributes' => $this->attributes->map(function ($attribute) {
                 return [
                     'id' => $attribute->id,
                     'name' => $attribute->name,
                 ];
-            })
+            }),
+            'users' => $this->users->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                ];
+            }),
         ];
     }
 }

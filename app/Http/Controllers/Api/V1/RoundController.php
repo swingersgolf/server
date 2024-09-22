@@ -11,6 +11,7 @@ class RoundController extends Controller
     public function index()
     {
         $rounds = Round::all();
+//        dd('rounds', $rounds->toArray());
         return RoundResource::collection($rounds);
     }
 }
