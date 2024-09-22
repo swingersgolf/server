@@ -17,6 +17,12 @@ class RoundResource extends JsonResource
         return [
             'when' => $this->when,
             'course' => $this->course->name,
+            'attributes' => $this->attributes->map(function ($attribute) {
+                return [
+                    'id' => $attribute->id,
+                    'name' => $attribute->name,
+                ];
+            })
         ];
     }
 }

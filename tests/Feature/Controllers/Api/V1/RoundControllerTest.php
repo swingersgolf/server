@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers\Api\V1;
 
+use App\Models\Attribute;
 use App\Models\Course;
 use App\Models\Round;
 use App\Models\User;
@@ -27,11 +28,12 @@ class RoundControllerTest extends TestCase
         $where = Course::factory()->create([
             'name' => 'Some Course Name'
         ]);
+        $attributes = Attribute::factory()->count(3)->create();
         $round = Round::factory()->create([
             'when' => now(),
             'course_id' => $where->id,
         ]);
-
+        $round->attributes()->attach($attributes);
 
         $response = $this->actingAs($user)->get(route('api.v1.round.index'))
             ->assertSuccessful();
@@ -40,5 +42,12 @@ class RoundControllerTest extends TestCase
 
         $courseName = Course::find($round->course_id)->name;
         $this->assertEquals($courseName, $responseData['course']);
+
+        $this->assertCount($attributes->count(), $responseData['attributes']);
+        $attributes->map(function($attribute) use($responseData) {
+            return in_array($attribute->name, $responseData['attributes']) &&
+                in_array($attribute->id, $responseData['attributes']);
+        });
+        $this->assertCount($attributes->count(), $responseData['attributes']);
     }
 }
