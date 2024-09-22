@@ -34,7 +34,7 @@ class RoundSeeder extends Seeder
                );
             }
 
-            $numUsers = rand(1, $userIds->count());
+            $numUsers = rand(1, 4);
             $round->users()->sync(
                 $userIds->random($numUsers)->toArray(),
             );
