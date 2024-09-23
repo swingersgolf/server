@@ -10,16 +10,16 @@ use Tests\TestCase;
 
 class RoundControllerTest extends TestCase
 {
-    public function test_it_returns_all_rounds(): void
+    public function test_index_returns_all_rounds(): void
     {
         $user = User::factory()->create();
-        Round::factory()->count(3)->create();
+        $rounds = Round::factory()->count(3)->create();
         $response = $this->actingAs($user)->get(route('api.v1.round.index'))
             ->assertSuccessful();
-        $response->assertJsonCount(3);
+        $this->assertEquals($rounds->count(),count($response->json()['data']));
     }
 
-    public function test_it_returns_a_round_with_attributes(): void
+    public function test_index_returns_rounds_with_attributes(): void
     {
         $users = User::factory()->count(3)->create();
         $where = Course::factory()->create([
@@ -53,4 +53,5 @@ class RoundControllerTest extends TestCase
 
         $this->assertCount($users->count(), $responseData['users']);
     }
+
 }
