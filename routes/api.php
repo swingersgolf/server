@@ -33,6 +33,7 @@ Route::name('api.')->group(function () {
             });
             Route::name('round.')->group(function () {
                 Route::get('round', [RoundController::class, 'index'])->name('index');
+                Route::get('round/{round}', [RoundController::class, 'show'])->name('show');
             });
         });
     });

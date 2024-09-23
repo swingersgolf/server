@@ -10,8 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Round extends Model
 {
     use HasFactory;
+
     protected $fillable = [
-        'when'
+        'when',
     ];
 
     public function course(): BelongsTo
