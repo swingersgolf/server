@@ -6,13 +6,10 @@ use App\Models\Attribute;
 use App\Models\Course;
 use App\Models\Round;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class RoundControllerTest extends TestCase
 {
-
     public function test_it_returns_all_rounds(): void
     {
         $user = User::factory()->create();
@@ -26,7 +23,7 @@ class RoundControllerTest extends TestCase
     {
         $users = User::factory()->count(3)->create();
         $where = Course::factory()->create([
-            'name' => 'Some Course Name'
+            'name' => 'Some Course Name',
         ]);
         $attributes = Attribute::factory()->count(3)->create();
 
@@ -48,7 +45,7 @@ class RoundControllerTest extends TestCase
         $this->assertEquals($courseName, $responseData['course']);
 
         $this->assertCount($attributes->count(), $responseData['attributes']);
-        $attributes->map(function($attribute) use($responseData) {
+        $attributes->map(function ($attribute) use ($responseData) {
             return in_array($attribute->name, $responseData['attributes']) &&
                 in_array($attribute->id, $responseData['attributes']);
         });
