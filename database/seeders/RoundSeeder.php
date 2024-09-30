@@ -17,9 +17,10 @@ class RoundSeeder extends Seeder
     public function run(): void
     {
         $rounds = Round::factory()->count(20)->create([
-            'when' => Carbon::now()
+            'when' => fn() => Carbon::now()
                 ->addMinutes(rand(0, 3 * 7 * 24 * 60))
                 ->format('Y-m-d H:i'),
+            'spots' => fn() => rand(2,4)
         ]);
         $attributeIds = Attribute::pluck('id');
         $userIds = User::pluck('id');
@@ -33,7 +34,7 @@ class RoundSeeder extends Seeder
                 );
             }
 
-            $numUsers = rand(1, 4);
+            $numUsers = rand(1, $round->spots);
             $round->users()->sync(
                 $userIds->random($numUsers)->toArray(),
             );
