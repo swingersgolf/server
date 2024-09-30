@@ -17,8 +17,8 @@ class RoundSeeder extends Seeder
     public function run(): void
     {
         $rounds = Round::factory()->count(20)->create([
-            'when' => Carbon::now()
-                ->addMinutes(rand(0, 3 * 7 * 24 * 60))
+            'when' => fn () => Carbon::now()
+                ->addMinutes(rand(0, 3 * 7 * 24 * 60))  // Random time within 3 weeks
                 ->format('Y-m-d H:i'),
         ]);
         $attributeIds = Attribute::pluck('id');
