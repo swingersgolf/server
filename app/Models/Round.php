@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Http\Filters\V1\RoundFilter;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +14,7 @@ class Round extends Model
 
     protected $fillable = [
         'when',
+        'spots'
     ];
 
     public function course(): BelongsTo

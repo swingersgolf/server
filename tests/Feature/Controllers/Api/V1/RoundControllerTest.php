@@ -32,6 +32,7 @@ class RoundControllerTest extends TestCase
         $round = Round::factory()->create([
             'when' => now(),
             'course_id' => $where->id,
+            'spots' => 4,
         ]);
 
         $round->attributes()->attach($attributes);
@@ -53,7 +54,8 @@ class RoundControllerTest extends TestCase
         });
         $this->assertCount($attributes->count(), $responseData['attributes']);
 
-        $this->assertCount($users->count(), $responseData['users']);
+        $this->assertEquals($users->count(), $responseData['golfer_count']);
+        $this->assertEquals($round->spots, $responseData['spots']);
     }
 
     #[DataProvider('whenScenarios')]
@@ -108,7 +110,7 @@ class RoundControllerTest extends TestCase
         });
         $this->assertCount($attributes->count(), $responseData['attributes']);
 
-        $this->assertCount($users->count(), $responseData['users']);
+        $this->assertCount($users->count(), $responseData['golfers']);
     }
 
     public static function whenScenarios(): array

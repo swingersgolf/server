@@ -23,12 +23,14 @@ class RoundResource extends JsonResource
                     'name' => $attribute->name,
                 ];
             }),
-            'users' => $this->users->map(function ($user) {
+            'golfers' => $this->users->map(function ($user) {
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
                 ];
             }),
+            'golfer_count' => $this->users->count(),
+            'spots' => $this->spots,
         ];
     }
 }
