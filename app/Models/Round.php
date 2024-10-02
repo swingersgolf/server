@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Filters\V1\RoundFilter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,7 @@ class Round extends Model
 
     protected $fillable = [
         'when',
+        'spots'
     ];
 
     public function course(): BelongsTo
@@ -22,11 +24,22 @@ class Round extends Model
 
     public function attributes(): BelongsToMany
     {
-        return $this->belongsToMany(Attribute::class);
+        return $this->belongsToMany(Attribute::class)->withPivot('preferred');
     }
 
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
+    }
+
+    public function scopeDateRange($query, $start = null, $end = null)
+    {
+        if ($start) {
+            $query->where('when', '>=', $start);
+        }
+        if ($end) {
+            $query->where('when', '<=', $end);
+        }
+        return $query;
     }
 }
