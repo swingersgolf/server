@@ -24,6 +24,7 @@ class RoundResource extends JsonResource
             return (bool)$attribute['pivot']['preferred'] === false;
         })->values();
         $dislikedIds = $disliked->pluck('id')->toArray();
+
         $mergedIds = array_merge($preferredIds, $dislikedIds);
         $indifferent = Attribute::whereNotIn('id', $mergedIds)->get();
 
@@ -33,12 +34,6 @@ class RoundResource extends JsonResource
             'preferred' => $preferred,
             'disliked' => $disliked,
             'indifferent' => $indifferent,
-            'attributes' => $this->attributes->map(function ($attribute) {
-                return [
-                    'id' => $attribute->id,
-                    'name' => $attribute->name,
-                ];
-            }),
             'golfers' => $this->users->map(function ($user) {
                 return [
                     'id' => $user->id,
