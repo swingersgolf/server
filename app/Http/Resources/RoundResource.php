@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Attribute;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,9 +15,24 @@ class RoundResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $preferred = $this->attributes->filter(function ($attribute) {
+            return (bool)$attribute['pivot']['preferred'] === true;
+        })->values();
+        $preferredIds = $preferred->pluck('id')->toArray();
+
+        $disliked = $this->attributes->filter(function ($attribute) {
+            return (bool)$attribute['pivot']['preferred'] === false;
+        })->values();
+        $dislikedIds = $disliked->pluck('id')->toArray();
+        $mergedIds = array_merge($preferredIds, $dislikedIds);
+        $indifferent = Attribute::whereNotIn('id', $mergedIds)->get();
+
         return [
             'when' => $this->when,
             'course' => $this->course ? $this->course->name : null,
+            'preferred' => $preferred,
+            'disliked' => $disliked,
+            'indifferent' => $indifferent,
             'attributes' => $this->attributes->map(function ($attribute) {
                 return [
                     'id' => $attribute->id,

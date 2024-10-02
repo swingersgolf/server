@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('attribute_id');
             $table->unsignedBigInteger('round_id');
+            $table->boolean('preferred');
             $table->timestamps();
         });
     }

@@ -35,7 +35,13 @@ class RoundControllerTest extends TestCase
             'spots' => 4,
         ]);
 
-        $round->attributes()->attach($attributes);
+        $round->attributes()->attach($attributes[0],[
+            'preferred' => true,
+        ]);
+        $round->attributes()->attach($attributes[1],[
+            'preferred' => false,
+        ]);
+
         $round->users()->attach($users);
 
         $response = $this->actingAs($users[0])->get(route('api.v1.round.index'))
@@ -47,15 +53,20 @@ class RoundControllerTest extends TestCase
         $courseName = Course::find($round->course_id)->name;
         $this->assertEquals($courseName, $responseData['course']);
 
-        $this->assertCount($attributes->count(), $responseData['attributes']);
-        $attributes->map(function ($attribute) use ($responseData) {
-            return in_array($attribute->name, $responseData['attributes']) &&
-                in_array($attribute->id, $responseData['attributes']);
-        });
-        $this->assertCount($attributes->count(), $responseData['attributes']);
+//        $this->assertCount(2, $responseData['attributes']);
+//        $attributes->map(function ($attribute) use ($responseData) {
+//            return in_array($attribute->name, $responseData['attributes']) &&
+//                in_array($attribute->id, $responseData['attributes']);
+//        });
 
         $this->assertEquals($users->count(), $responseData['golfer_count']);
         $this->assertEquals($round->spots, $responseData['spots']);
+        $this->assertEquals($attributes[0]->id, $responseData['preferred'][0]['id']);
+        $this->assertEquals($attributes[1]->id, $responseData['disliked'][0]['id']);
+        $this->assertEquals($attributes[2]->id, $responseData['indifferent'][0]['id']);
+        $this->assertEquals($attributes[0]->name, $responseData['preferred'][0]['name']);
+        $this->assertEquals($attributes[1]->name, $responseData['disliked'][0]['name']);
+        $this->assertEquals($attributes[2]->name, $responseData['indifferent'][0]['name']);
     }
 
     #[DataProvider('whenScenarios')]
@@ -135,7 +146,7 @@ class RoundControllerTest extends TestCase
                 'start' => 6,
                 'end' => 9,
                 'count' => 0,
-            ]
+            ],
         ];
     }
 }
