@@ -22,17 +22,27 @@ class RoundSeeder extends Seeder
                 ->format('Y-m-d H:i'),
             'spots' => fn() => rand(2,4)
         ]);
+
         $attributeIds = Attribute::pluck('id');
         $userIds = User::pluck('id');
         $courseIds = Course::pluck('id');
 
         $rounds->each(function ($round) use ($attributeIds, $userIds, $courseIds) {
-            $numAttributes = rand(0, $attributeIds->count());
-            if ($numAttributes > 0) {
-                $round->attributes()->attach(
-                    $attributeIds->random($numAttributes)->toArray(),
-                );
-            }
+            $attributeIds->each(function ($attributeId) use ($round) {
+                $option = rand(1, 3);
+                switch ($option) {
+                    case 1:
+                        $round->attributes()->attach($attributeId, [
+                            'preferred' => true
+                        ]);
+                        break;
+                    case 2:
+                        $round->attributes()->attach($attributeId, [
+                            'preferred' => false
+                        ]);
+                    case 3:
+                }
+            });
 
             $numUsers = rand(1, $round->spots);
             $round->users()->sync(
