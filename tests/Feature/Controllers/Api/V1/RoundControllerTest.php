@@ -55,12 +55,12 @@ class RoundControllerTest extends TestCase
 
         $this->assertEquals($users->count(), $responseData['golfer_count']);
         $this->assertEquals($round->spots, $responseData['spots']);
-        $this->assertEquals($attributes[0]->id, $responseData['preferred'][0]['id']);
-        $this->assertEquals($attributes[1]->id, $responseData['disliked'][0]['id']);
-        $this->assertEquals($attributes[2]->id, $responseData['indifferent'][0]['id']);
-        $this->assertEquals($attributes[0]->name, $responseData['preferred'][0]['name']);
-        $this->assertEquals($attributes[1]->name, $responseData['disliked'][0]['name']);
-        $this->assertEquals($attributes[2]->name, $responseData['indifferent'][0]['name']);
+        $this->assertEquals($attributes[0]->id, $responseData['preferences']['preferred'][0]['id']);
+        $this->assertEquals($attributes[1]->id, $responseData['preferences']['disliked'][0]['id']);
+        $this->assertEquals($attributes[2]->id, $responseData['preferences']['indifferent'][0]['id']);
+        $this->assertEquals($attributes[0]->name, $responseData['preferences']['preferred'][0]['name']);
+        $this->assertEquals($attributes[1]->name, $responseData['preferences']['disliked'][0]['name']);
+        $this->assertEquals($attributes[2]->name, $responseData['preferences']['indifferent'][0]['name']);
     }
 
     #[DataProvider('whenScenarios')]
@@ -121,12 +121,12 @@ class RoundControllerTest extends TestCase
             $this->assertTrue(in_array($golfer['name'], $names));
         }, $responseData['golfers']);
 
-        $this->assertEquals($attributes[0]->id, $responseData['preferred'][0]['id']);
-        $this->assertEquals($attributes[1]->id, $responseData['disliked'][0]['id']);
-        $this->assertEquals($attributes[2]->id, $responseData['indifferent'][0]['id']);
-        $this->assertEquals($attributes[0]->name, $responseData['preferred'][0]['name']);
-        $this->assertEquals($attributes[1]->name, $responseData['disliked'][0]['name']);
-        $this->assertEquals($attributes[2]->name, $responseData['indifferent'][0]['name']);
+        $this->assertEquals($attributes[0]->id, $responseData['preferences']['preferred'][0]['id']);
+        $this->assertEquals($attributes[1]->id, $responseData['preferences']['disliked'][0]['id']);
+        $this->assertEquals($attributes[2]->id, $responseData['preferences']['indifferent'][0]['id']);
+        $this->assertEquals($attributes[0]->name, $responseData['preferences']['preferred'][0]['name']);
+        $this->assertEquals($attributes[1]->name, $responseData['preferences']['disliked'][0]['name']);
+        $this->assertEquals($attributes[2]->name, $responseData['preferences']['indifferent'][0]['name']);
     }
 
     public static function whenScenarios(): array
