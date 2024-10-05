@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api\V1;
 
 use App\Models\Attribute;
 use Illuminate\Http\Request;
@@ -50,9 +50,11 @@ class RoundResource extends JsonResource
             'id' => $this->id,
             'when' => $this->when,
             'course' => $this->course ? $this->course->name : null,
-            'preferred' => $preferred,
-            'disliked' => $disliked,
-            'indifferent' => $indifferent,
+            'preferences' => [
+                'preferred' => $preferred,
+                'disliked' => $disliked,
+                'indifferent' => $indifferent,
+            ],
             'golfers' => $this->users->map(function ($user) {
                 return [
                     'id' => $user->id,
