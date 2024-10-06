@@ -21,6 +21,7 @@ class RoundResource extends JsonResource
             return [
                 'id' => $attribute['id'],
                 'name' => $attribute['name'],
+                'status' => 'preferred',
             ];
         });
 
@@ -32,6 +33,7 @@ class RoundResource extends JsonResource
             return [
                 'id' => $attribute['id'],
                 'name' => $attribute['name'],
+                'status' => 'disliked',
             ];
         });
         $dislikedIds = $disliked->pluck('id')->toArray();
@@ -43,6 +45,7 @@ class RoundResource extends JsonResource
                 return [
                     'id' => $attribute['id'],
                     'name' => $attribute['name'],
+                    'status' => 'indifferent',
                 ];
             });
 
@@ -50,11 +53,7 @@ class RoundResource extends JsonResource
             'id' => $this->id,
             'when' => $this->when,
             'course' => $this->course ? $this->course->name : null,
-            'preferences' => [
-                'preferred' => $preferred,
-                'disliked' => $disliked,
-                'indifferent' => $indifferent,
-            ],
+            'preferences' => $preferred->merge($disliked)->merge($indifferent),
             'golfers' => $this->users->map(function ($user) {
                 return [
                     'id' => $user->id,
