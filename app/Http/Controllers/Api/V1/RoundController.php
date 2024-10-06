@@ -16,7 +16,8 @@ class RoundController extends Controller
         $end = $request->query('end');
 
         $rounds = Round::dateRange($start, $end)->get();
-        return RoundResource::collection($rounds);
+        $foo = RoundResource::collection($rounds);
+        return $foo;
     }
 
     public function show(Round $round): RoundResource

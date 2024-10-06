@@ -48,12 +48,11 @@ class RoundResource extends JsonResource
                     'status' => 'indifferent',
                 ];
             });
-
         return [
             'id' => $this->id,
             'when' => $this->when,
             'course' => $this->course ? $this->course->name : null,
-            'preferences' => $preferred->merge($disliked)->merge($indifferent),
+            'preferences' => array_merge($preferred->toArray(), $disliked->toArray(), $indifferent->toArray()),
             'golfers' => $this->users->map(function ($user) {
                 return [
                     'id' => $user->id,
