@@ -14,14 +14,19 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $foo = true;
-
         return [
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
             'birthdate' => $this->birthdate,
             'expo_push_token' => $this->expo_push_token,
+            'preferences' => $this->preferences->map(function ($preference) {
+                return [
+                    'id' => $preference->id,
+                    'name' => $preference->name,
+                    'status' => $preference->pivot->status,
+                ];
+            }),
         ];
     }
 }
