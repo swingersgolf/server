@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Attribute;
 use App\Models\Course;
+use App\Models\Preference;
 use App\Models\Round;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -17,33 +18,36 @@ class RoundSeeder extends Seeder
     public function run(): void
     {
         $rounds = Round::factory()->count(20)->create([
-            'when' => fn() => Carbon::now()
+            'when' => fn () => Carbon::now()
                 ->addMinutes(rand(0, 3 * 7 * 24 * 60))
                 ->format('Y-m-d H:i'),
-            'spots' => fn() => rand(2,4)
+            'spots' => fn () => rand(2, 4),
         ]);
 
-        $attributeIds = Attribute::pluck('id');
+        $preferenceIds = Preference::pluck('id');
         $userIds = User::pluck('id');
         $courseIds = Course::pluck('id');
 
-        $rounds->each(function ($round) use ($attributeIds, $userIds, $courseIds) {
-            $attributeIds->each(function ($attributeId) use ($round) {
+        $rounds->each(function ($round) use ($preferenceIds, $userIds, $courseIds) {
+            $preferenceIds->each(function ($preferenceId) use ($round) {
                 $option = rand(1, 3);
                 switch ($option) {
                     case 1:
-                        $round->attributes()->attach($attributeId, [
-                            'preferred' => true
+                        $round->preferences()->attach($preferenceId, [
+                            'status' => Preference::STATUS_PREFERRED,
                         ]);
                         break;
                     case 2:
-                        $round->attributes()->attach($attributeId, [
-                            'preferred' => false
+                        $round->preferences()->attach($preferenceId, [
+                            'status' => Preference::STATUS_DISLIKED,
                         ]);
+                        break;
                     case 3:
+                        $round->preferences()->attach($preferenceId, [
+                            'status' => Preference::STATUS_INDIFFERENT,
+                        ]);
                 }
             });
-
             $numUsers = rand(1, $round->spots);
             $round->users()->sync(
                 $userIds->random($numUsers)->toArray(),

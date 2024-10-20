@@ -4,6 +4,7 @@ namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\Attribute;
 use App\Models\Course;
+use App\Models\Preference;
 use App\Models\Round;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -21,13 +22,13 @@ class RoundControllerTest extends TestCase
         $this->assertEquals($rounds->count(), count($response->json()['data']));
     }
 
-    public function test_index_returns_rounds_with_attributes(): void
+    public function test_index_returns_rounds_with_preferences(): void
     {
         $users = User::factory()->count(3)->create();
         $where = Course::factory()->create([
             'name' => 'Some Course Name',
         ]);
-        $attributes = Attribute::factory()->count(3)->create();
+        $preferences = Preference::factory()->count(3)->create();
 
         $round = Round::factory()->create([
             'when' => now(),
@@ -35,11 +36,14 @@ class RoundControllerTest extends TestCase
             'spots' => 4,
         ]);
 
-        $round->attributes()->attach($attributes[0],[
-            'preferred' => true,
+        $round->preferences()->attach($preferences[0], [
+            'status' => Preference::STATUS_PREFERRED,
         ]);
-        $round->attributes()->attach($attributes[1],[
-            'preferred' => false,
+        $round->preferences()->attach($preferences[1], [
+            'status' => Preference::STATUS_DISLIKED,
+        ]);
+        $round->preferences()->attach($preferences[2], [
+            'status' => Preference::STATUS_INDIFFERENT,
         ]);
 
         $round->users()->attach($users);
@@ -52,17 +56,17 @@ class RoundControllerTest extends TestCase
 
         $courseName = Course::find($round->course_id)->name;
         $this->assertEquals($courseName, $responseData['course']);
-
         $this->assertEquals($users->count(), $responseData['golfer_count']);
         $this->assertEquals($round->spots, $responseData['spots']);
-        $this->assertEquals($attributes[0]->name, $responseData['preferences'][0]['name']);
-        $this->assertEquals($attributes[0]->id, $responseData['preferences'][0]['id']);
+
+        $this->assertEquals($preferences[0]->name, $responseData['preferences'][0]['name']);
+        $this->assertEquals($preferences[0]->id, $responseData['preferences'][0]['id']);
         $this->assertEquals('preferred', $responseData['preferences'][0]['status']);
-        $this->assertEquals($attributes[1]->name, $responseData['preferences'][1]['name']);
-        $this->assertEquals($attributes[1]->id, $responseData['preferences'][1]['id']);
+        $this->assertEquals($preferences[1]->name, $responseData['preferences'][1]['name']);
+        $this->assertEquals($preferences[1]->id, $responseData['preferences'][1]['id']);
         $this->assertEquals('disliked', $responseData['preferences'][1]['status']);
-        $this->assertEquals($attributes[2]->name, $responseData['preferences'][2]['name']);
-        $this->assertEquals($attributes[2]->id, $responseData['preferences'][2]['id']);
+        $this->assertEquals($preferences[2]->name, $responseData['preferences'][2]['name']);
+        $this->assertEquals($preferences[2]->id, $responseData['preferences'][2]['id']);
         $this->assertEquals('indifferent', $responseData['preferences'][2]['status']);
     }
 
@@ -86,13 +90,13 @@ class RoundControllerTest extends TestCase
         $this->assertEquals($count, count($response->json()['data']));
     }
 
-    public function test_show_returns_round(): void
+    public function test_show_returns_round_with_preferences(): void
     {
         $users = User::factory()->count(3)->create();
         $where = Course::factory()->create([
             'name' => 'Some Course Name',
         ]);
-        $attributes = Attribute::factory()->count(3)->create();
+        $preferences = Preference::factory()->count(3)->create();
 
         $round = Round::factory()->create([
             'when' => now(),
@@ -100,11 +104,14 @@ class RoundControllerTest extends TestCase
             'spots' => 4,
         ]);
 
-        $round->attributes()->attach($attributes[0],[
-            'preferred' => true,
+        $round->preferences()->attach($preferences[0], [
+            'status' => Preference::STATUS_PREFERRED,
         ]);
-        $round->attributes()->attach($attributes[1],[
-            'preferred' => false,
+        $round->preferences()->attach($preferences[1], [
+            'status' => Preference::STATUS_DISLIKED,
+        ]);
+        $round->preferences()->attach($preferences[2], [
+            'status' => Preference::STATUS_INDIFFERENT,
         ]);
 
         $round->users()->attach($users);
@@ -120,18 +127,18 @@ class RoundControllerTest extends TestCase
 
         $this->assertCount($users->count(), $responseData['golfers']);
         $names = $users->pluck('name')->toArray();
-        array_map(function($golfer) use ($names) {
+        array_map(function ($golfer) use ($names) {
             $this->assertTrue(in_array($golfer['name'], $names));
         }, $responseData['golfers']);
 
-        $this->assertEquals($attributes[0]->name, $responseData['preferences'][0]['name']);
-        $this->assertEquals($attributes[0]->id, $responseData['preferences'][0]['id']);
+        $this->assertEquals($preferences[0]->name, $responseData['preferences'][0]['name']);
+        $this->assertEquals($preferences[0]->id, $responseData['preferences'][0]['id']);
         $this->assertEquals('preferred', $responseData['preferences'][0]['status']);
-        $this->assertEquals($attributes[1]->name, $responseData['preferences'][1]['name']);
-        $this->assertEquals($attributes[1]->id, $responseData['preferences'][1]['id']);
+        $this->assertEquals($preferences[1]->name, $responseData['preferences'][1]['name']);
+        $this->assertEquals($preferences[1]->id, $responseData['preferences'][1]['id']);
         $this->assertEquals('disliked', $responseData['preferences'][1]['status']);
-        $this->assertEquals($attributes[2]->name, $responseData['preferences'][2]['name']);
-        $this->assertEquals($attributes[2]->id, $responseData['preferences'][2]['id']);
+        $this->assertEquals($preferences[2]->name, $responseData['preferences'][2]['name']);
+        $this->assertEquals($preferences[2]->id, $responseData['preferences'][2]['id']);
         $this->assertEquals('indifferent', $responseData['preferences'][2]['status']);
     }
 

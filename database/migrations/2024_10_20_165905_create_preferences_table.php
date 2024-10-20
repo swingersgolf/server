@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('attribute_round', function (Blueprint $table) {
+        Schema::create('preferences', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('attribute_id');
-            $table->unsignedBigInteger('round_id');
-            $table->boolean('preferred');
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attribute_round');
+        Schema::dropIfExists('preferences');
     }
 };

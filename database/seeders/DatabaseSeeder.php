@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             UserSeeder::class,
-            AttributeSeeder::class,
+            PreferenceSeeder::class,
             CourseSeeder::class,
             RoundSeeder::class,
         ]);
