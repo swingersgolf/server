@@ -37,7 +37,7 @@ class ResetPasswordNotification extends Notification
     {
 
         return (new MailMessage)
-            ->subject('Reset Password Notification')
+            ->subject('Swingers Reset Password Notification')
             ->line('You are receiving this email because we received a password reset request for your account.')
             ->line("Reset Code: $this->code")
             ->line('This password reset code will expire in '.config('auth.passwords.users.expire').' minutes.')
