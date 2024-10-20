@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Http\Filters\V1\RoundFilter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +13,7 @@ class Round extends Model
 
     protected $fillable = [
         'when',
-        'spots'
+        'spots',
     ];
 
     public function course(): BelongsTo
@@ -22,9 +21,9 @@ class Round extends Model
         return $this->belongsTo(Course::class);
     }
 
-    public function attributes(): BelongsToMany
+    public function preferences(): BelongsToMany
     {
-        return $this->belongsToMany(Attribute::class)->withPivot('preferred');
+        return $this->belongsToMany(Preference::class)->withPivot('status');
     }
 
     public function users(): BelongsToMany
@@ -40,6 +39,7 @@ class Round extends Model
         if ($end) {
             $query->where('when', '<=', $end);
         }
+
         return $query;
     }
 }
