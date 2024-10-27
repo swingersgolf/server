@@ -12,18 +12,22 @@ class CourseSeeder extends Seeder
      */
     public function run(): void
     {
-        $courses = collect([
-            'Abitibi Golf Club',
-            'Bay of Quinte Country Club',
-            'Dragon Hills Golf Course & Driving Range',
-            'Lionhead Golf Club',
-            'Tyandaga Golf Course',
-            'Pembroke Golf Club',
-        ]);
-        $courses->each(function ($course) {
+        // Define an associative array with course names and their corresponding city names
+        $courses = [
+            ['course_name' => 'Abitibi Golf Club', 'city_name' => 'Abitibi'],
+            ['course_name' => 'Bay of Quinte Country Club', 'city_name' => 'Belleville'],
+            ['course_name' => 'Dragon Hills Golf Course & Driving Range', 'city_name' => 'Dragon Hills'],
+            ['course_name' => 'Lionhead Golf Club', 'city_name' => 'Brampton'],
+            ['course_name' => 'Tyandaga Golf Course', 'city_name' => 'Burlington'],
+            ['course_name' => 'Pembroke Golf Club', 'city_name' => 'Pembroke'],
+        ];
+
+        // Loop through the courses array and create each course in the database
+        foreach ($courses as $course) {
             Course::factory()->create([
-                'name' => $course,
+                'course_name' => $course['course_name'],
+                'city_name' => $course['city_name'],
             ]);
-        });
+        }
     }
 }
