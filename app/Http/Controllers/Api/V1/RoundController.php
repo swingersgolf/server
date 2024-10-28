@@ -34,7 +34,6 @@ class RoundController extends Controller
         return new RoundResource($round);
     }
     
-    // Request to join the round - sets status to pending
     public function join(Round $round)
     {
         $userId = Auth::id();
@@ -42,6 +41,17 @@ class RoundController extends Controller
         $round->users()->syncWithoutDetaching([
             $userId => ['status' => 'pending']
         ]);
+
+        // Send notification to the round host
+        $host = $round->host; // Assuming the Round model has a `host` relation or `host_id` field
+        if ($host && $host->expo_push_token) {
+
+            $this->notificationService->sendNotification(
+                $host->expo_push_token,
+                'Join Request',
+                '' . Auth::user()->name . ' has requested to join your round.'
+            );
+        }
 
         return response()->json(['message' => 'Join request submitted.']);
     }

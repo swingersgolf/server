@@ -14,6 +14,7 @@ class Round extends Model
     protected $fillable = [
         'when',
         'spots',
+        'host_id',
     ];
 
     public function course(): BelongsTo
@@ -31,6 +32,12 @@ class Round extends Model
         return $this->belongsToMany(User::class)
             ->withPivot('status')  // Include 'status' on the pivot
             ->withTimestamps();    // Adds created_at and updated_at for the pivot
+    }
+
+    // Relationship with the host user
+    public function host(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'host_id');
     }
 
     public function scopeDateRange($query, $start = null, $end = null)

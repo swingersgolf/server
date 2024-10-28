@@ -54,6 +54,9 @@ class RoundSeeder extends Seeder
             );
 
             $round->course_id = rand(1, $courseIds->count());
+
+            $round->host_id = $userIds->random();
+
             $round->save();
         });
 
