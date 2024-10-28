@@ -30,9 +30,13 @@ class RoundResource extends JsonResource
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
+                    'status' => $user->pivot->status,
                 ];
             }),
-            'golfer_count' => $this->users->count(),
+            // Count only the golfers with accepted status
+            'golfer_count' => $this->users->filter(function ($user) {
+                return $user->pivot->status === 'accepted'; // Adjust 'accepted' to your specific status value
+            })->count(),
             'spots' => $this->spots,
             'host_id' => $this->host ? $this->host->id : null,
         ];

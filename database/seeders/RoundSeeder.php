@@ -52,9 +52,14 @@ class RoundSeeder extends Seeder
             // Determine the number of users for the round
             $numUsers = rand(1, $round->spots);
 
-            // Get random users and sync them
+            // Get random users and sync them with an 'accepted' status
             $selectedUsers = $userIds->random($numUsers)->toArray();
-            $round->users()->sync($selectedUsers);
+            $round->users()->sync(array_map(function ($userId) {
+                return [
+                    'user_id' => $userId, // Include user_id here
+                    'status' => 'accepted',  // Set all users to 'accepted'
+                ];
+            }, $selectedUsers));            
 
             // Set a random course ID
             $round->course_id = $courseIds->random();
