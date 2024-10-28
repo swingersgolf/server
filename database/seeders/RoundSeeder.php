@@ -48,15 +48,21 @@ class RoundSeeder extends Seeder
                         ]);
                 }
             });
+
+            // Determine the number of users for the round
             $numUsers = rand(1, $round->spots);
-            $round->users()->sync(
-                $userIds->random($numUsers)->toArray(),
-            );
 
-            $round->course_id = rand(1, $courseIds->count());
+            // Get random users and sync them
+            $selectedUsers = $userIds->random($numUsers)->toArray();
+            $round->users()->sync($selectedUsers);
 
-            $round->host_id = $userIds->random();
+            // Set a random course ID
+            $round->course_id = $courseIds->random();
 
+            // Assign the host_id from the selected users
+            $round->host_id = $selectedUsers[array_rand($selectedUsers)];
+
+            // Save the round
             $round->save();
         });
 

@@ -34,6 +34,7 @@ class RoundResource extends JsonResource
             }),
             'golfer_count' => $this->users->count(),
             'spots' => $this->spots,
+            'host_id' => $this->host ? $this->host->id : null,
         ];
     }
 }
