@@ -28,6 +28,7 @@ class User extends Authenticatable
         'password',
         'birthdate',
         'email_verified_at',
+        'expo_push_token',
     ];
 
     protected $casts = [

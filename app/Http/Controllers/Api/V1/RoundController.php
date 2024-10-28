@@ -8,9 +8,17 @@ use App\Models\Round;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Services\PushNotificationService;
 
 class RoundController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(PushNotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $start = $request->query('start');
@@ -41,24 +49,46 @@ class RoundController extends Controller
     public function accept(Request $request, Round $round)
     {
         $userId = $request->input('user_id');
-        
+    
         if ($round->users()->where('user_id', $userId)->first()) {
             $round->users()->updateExistingPivot($userId, ['status' => 'accepted']);
+    
+            // Send notification
+            $user = $round->users()->find($userId);
+            if ($user && $user->expo_push_token) {
+                $this->notificationService->sendNotification(
+                    $user->expo_push_token,
+                    'Round Accepted',
+                    'Your request to join the round has been accepted.'
+                );
+            }
+    
             return response()->json(['message' => 'User accepted.']);
         }
     
         return response()->json(['message' => 'User has not requested to join.'], 404);
-    }
+    }    
 
     public function reject(Request $request, Round $round)
     {
         $userId = $request->input('user_id');
-        
+
         if ($round->users()->where('user_id', $userId)->first()) {
             $round->users()->updateExistingPivot($userId, ['status' => 'rejected']);
+
+            // Send notification
+            $user = $round->users()->find($userId);
+            if ($user && $user->expo_push_token) {
+                $this->notificationService->sendNotification(
+                    $user->expo_push_token,
+                    'Round Rejected',
+                    'Your request to join the round has been rejected.'
+                );
+            }
+
             return response()->json(['message' => 'User rejected.']);
         }
-    
+
         return response()->json(['message' => 'User has not requested to join.'], 404);
     }
 }
