@@ -28,7 +28,9 @@ class Round extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)
+            ->withPivot('status')  // Include 'status' on the pivot
+            ->withTimestamps();    // Adds created_at and updated_at for the pivot
     }
 
     public function scopeDateRange($query, $start = null, $end = null)

@@ -61,4 +61,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserProfile::class);
     }
+
+    public function rounds(): BelongsToMany
+    {
+        return $this->belongsToMany(Round::class)
+            ->withPivot('status')  // Include 'status' on the pivot
+            ->withTimestamps();    // Adds created_at and updated_at for the pivot
+    }
 }

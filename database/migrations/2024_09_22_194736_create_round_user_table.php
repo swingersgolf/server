@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('round_id');
             $table->uuid('user_id');
+            $table->enum('status', ['accepted', 'rejected', 'pending'])->nullable()->default(null);
             $table->timestamps();
         });
     }
