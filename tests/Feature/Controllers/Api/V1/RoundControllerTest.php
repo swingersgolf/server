@@ -46,7 +46,7 @@ class RoundControllerTest extends TestCase
             'status' => Preference::STATUS_INDIFFERENT,
         ]);
 
-        $round->users()->attach($users);
+        $round->users()->attach($users->pluck('id'), ['status' => 'accepted']);
 
         $response = $this->actingAs($users[0])->get(route('api.v1.round.index'))
             ->assertSuccessful();
@@ -144,7 +144,7 @@ class RoundControllerTest extends TestCase
 
     public function test_join_submits_request(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->withExpoPushToken()->create();
         $round = Round::factory()->create();
 
         $response = $this->actingAs($user)->post(route('api.v1.round.join', $round->id));
@@ -159,7 +159,7 @@ class RoundControllerTest extends TestCase
 
     public function test_accept_user_request(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->withExpoPushToken()->create();
         $round = Round::factory()->create();
         $round->users()->attach($user->id, ['status' => 'pending']);
 
@@ -178,7 +178,7 @@ class RoundControllerTest extends TestCase
 
     public function test_reject_user_request(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->withExpoPushToken()->create();
         $round = Round::factory()->create();
         $round->users()->attach($user->id, ['status' => 'pending']);
 

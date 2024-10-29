@@ -16,7 +16,7 @@ return new class extends Migration
             $table->dateTime('when')->nullable();
             $table->tinyInteger('spots')->default(0);
             $table->unsignedBigInteger('course_id')->nullable();
-            $table->uuid('host_id')->nullable();
+            $table->uuid('host_id');
             $table->timestamps();
         });
     }

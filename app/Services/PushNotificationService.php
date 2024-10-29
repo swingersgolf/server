@@ -27,7 +27,6 @@ class PushNotificationService
             'body' => $body,
             'data' => (object) [
                 // You can include additional data here
-                'customKey' => 'customValue', // Example custom data
             ],
             // TODO: Add sound, badge, logo/icon, etc.
         ];

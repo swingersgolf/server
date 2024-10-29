@@ -38,7 +38,7 @@ class RoundResource extends JsonResource
                 return $user->pivot->status === 'accepted'; // Adjust 'accepted' to your specific status value
             })->count(),
             'spots' => $this->spots,
-            'host_id' => $this->host ? $this->host->id : null,
+            'host_id' => $this->host_id,
         ];
     }
 }
