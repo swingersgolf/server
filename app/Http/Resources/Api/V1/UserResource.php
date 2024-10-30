@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'birthdate' => $this->birthdate,
+            'expo_push_token' => $this->expo_push_token,
         ];
     }
 }

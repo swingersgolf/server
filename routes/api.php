@@ -25,6 +25,7 @@ Route::name('api.')->group(function () {
         Route::name('v1.')->prefix('v1')->group(function () {
             Route::name('user.')->group(function () {
                 Route::get('user', [UserController::class, 'show'])->name('show');
+                Route::patch('user', [UserController::class, 'update'])->name('update');
             });
             Route::post('logout', [AuthController::class, 'logout'])->name('logout');
             Route::name('user-profile.')->group(function () {
