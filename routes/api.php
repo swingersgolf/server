@@ -34,6 +34,9 @@ Route::name('api.')->group(function () {
             });
                 Route::name('round.')->group(function () {
                     Route::get('round', [RoundController::class, 'index'])->name('index');
+                    Route::post('round', [RoundController::class, 'store'])->name('store');
+                    Route::patch('round/{round}', [RoundController::class, 'update'])->name('update');
+                    Route::delete('round/{round}', [RoundController::class, 'destroy'])->name('destroy');
                     Route::get('round/{round}', [RoundController::class, 'show'])->name('show');
                     Route::post('round/{round}/join', [RoundController::class, 'join'])->name('join');
                     Route::post('round/{round}/accept', [RoundController::class, 'accept'])->name('accept');
