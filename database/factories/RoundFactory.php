@@ -17,7 +17,7 @@ class RoundFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'host_id' => \App\Models\User::factory(),
         ];
     }
 }

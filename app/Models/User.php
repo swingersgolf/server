@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 
 #[ObservedBy([UserObserver::class])]
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'password',
         'birthdate',
         'email_verified_at',
+        'expo_push_token',
     ];
 
     protected $casts = [
@@ -60,5 +62,12 @@ class User extends Authenticatable
     public function userProfile()
     {
         return $this->hasOne(UserProfile::class);
+    }
+
+    public function rounds(): BelongsToMany
+    {
+        return $this->belongsToMany(Round::class)
+            ->withPivot('status')  // Include 'status' on the pivot
+            ->withTimestamps();    // Adds created_at and updated_at for the pivot
     }
 }

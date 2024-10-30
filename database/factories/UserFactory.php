@@ -30,6 +30,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'expo_push_token' => config('expo.push_token') ?? 'ExponentPushToken[' . Str::random(22) . ']',
         ];
     }
 
@@ -40,6 +41,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Define a state to generate a random expo push token in the required format.
+     */
+    public function withExpoPushToken(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'expo_push_token' => 'ExponentPushToken[' . Str::random(22) . ']',
         ]);
     }
 }

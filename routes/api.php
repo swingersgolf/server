@@ -31,10 +31,13 @@ Route::name('api.')->group(function () {
                 Route::get('user-profile', [UserProfileController::class, 'show'])->name('show');
                 Route::patch('user-profile', [UserProfileController::class, 'update'])->name('update');
             });
-            Route::name('round.')->group(function () {
-                Route::get('round', [RoundController::class, 'index'])->name('index');
-                Route::get('round/{round}', [RoundController::class, 'show'])->name('show');
-            });
+                Route::name('round.')->group(function () {
+                    Route::get('round', [RoundController::class, 'index'])->name('index');
+                    Route::get('round/{round}', [RoundController::class, 'show'])->name('show');
+                    Route::post('round/{round}/join', [RoundController::class, 'join'])->name('join');
+                    Route::post('round/{round}/accept', [RoundController::class, 'accept'])->name('accept');
+                    Route::post('round/{round}/reject', [RoundController::class, 'reject'])->name('reject');
+                });
         });
     });
 });

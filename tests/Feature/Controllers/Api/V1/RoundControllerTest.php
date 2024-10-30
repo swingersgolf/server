@@ -46,7 +46,7 @@ class RoundControllerTest extends TestCase
             'status' => Preference::STATUS_INDIFFERENT,
         ]);
 
-        $round->users()->attach($users);
+        $round->users()->attach($users->pluck('id'), ['status' => 'accepted']);
 
         $response = $this->actingAs($users[0])->get(route('api.v1.round.index'))
             ->assertSuccessful();
@@ -140,6 +140,59 @@ class RoundControllerTest extends TestCase
         $this->assertEquals($preferences[2]->name, $responseData['preferences'][2]['name']);
         $this->assertEquals($preferences[2]->id, $responseData['preferences'][2]['id']);
         $this->assertEquals('indifferent', $responseData['preferences'][2]['status']);
+    }
+
+    public function test_join_submits_request(): void
+    {
+        $user = User::factory()->withExpoPushToken()->create();
+        $round = Round::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('api.v1.round.join', $round->id));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $user->id,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_accept_user_request(): void
+    {
+        $user = User::factory()->withExpoPushToken()->create();
+        $round = Round::factory()->create();
+        $round->users()->attach($user->id, ['status' => 'pending']);
+
+        $response = $this->actingAs($user)->post(route('api.v1.round.accept', [
+            'round' => $round->id,
+            'user_id' => $user->id,
+        ]));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $user->id,
+            'status' => 'accepted',
+        ]);
+    }
+
+    public function test_reject_user_request(): void
+    {
+        $user = User::factory()->withExpoPushToken()->create();
+        $round = Round::factory()->create();
+        $round->users()->attach($user->id, ['status' => 'pending']);
+
+        $response = $this->actingAs($user)->post(route('api.v1.round.reject', [
+            'round' => $round->id,
+            'user_id' => $user->id,
+        ]));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $user->id,
+            'status' => 'rejected',
+        ]);
     }
 
     public static function whenScenarios(): array
