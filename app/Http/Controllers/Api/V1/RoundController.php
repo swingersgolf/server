@@ -33,6 +33,58 @@ class RoundController extends Controller
     {
         return new RoundResource($round);
     }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'when' => 'required|date', // Ensure it is a valid date
+            'spots' => 'required|integer',
+            'course_id' => 'required|exists:courses,id',
+        ]);
+    
+        // Convert 'when' to the correct format
+        $data['when'] = (new \DateTime($data['when']))->format('Y-m-d H:i:s');
+    
+        // Set the host_id to the authenticated user's ID
+        $data['host_id'] = Auth::id();
+    
+        // Increment spots by 1 to account for the host
+        $data['spots'] += 1;
+    
+        // Create the round
+        $round = Round::create($data);
+    
+        // Automatically add the host as a golfer to the round
+        $userId = Auth::id();
+        $round->users()->attach($userId, ['status' => 'accepted']); // Use 'attach' to add the golfer
+    
+        return new RoundResource($round);
+    }
+    
+    
+    public function update(Request $request, Round $round)
+    {
+        $data = $request->validate([
+            'when' => 'required|date', // Ensure it is a valid date
+            'spots' => 'required|integer',
+            'course_id' => 'required|exists:courses,id',
+        ]);
+    
+        // Convert 'when' to the correct format
+        $data['when'] = (new \DateTime($data['when']))->format('Y-m-d H:i:s');
+    
+        $round->update($data);
+    
+        return new RoundResource($round);
+    }
+    
+
+    public function destroy(Round $round)
+    {
+        $round->delete();
+
+        return response()->json(['message' => 'Round deleted.']);
+    }
     
     public function join(Round $round)
     {

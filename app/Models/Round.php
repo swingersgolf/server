@@ -15,6 +15,7 @@ class Round extends Model
         'when',
         'spots',
         'host_id',
+        'course_id',
     ];
 
     public function course(): BelongsTo
