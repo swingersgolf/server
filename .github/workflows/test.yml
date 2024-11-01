@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:  # Allows for manual triggering of the workflow
 
 jobs:
   test:
