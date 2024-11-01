@@ -45,6 +45,13 @@ jobs:
     - name: Create .env file
       run: cp .env.example .env
 
+    - name: Set up database environment variables
+      run: |
+        echo "DB_CONNECTION=mysql" >> .env
+        echo "DB_DATABASE=test_database" >> .env
+        echo "DB_USERNAME=root" >> .env
+        echo "DB_PASSWORD=root" >> .env
+
     - name: Generate application key
       run: php artisan key:generate
 
@@ -52,17 +59,7 @@ jobs:
       run: php artisan config:cache
 
     - name: Run migrations
-      env:
-        DB_CONNECTION: mysql
-        DB_DATABASE: test_database
-        DB_USERNAME: root
-        DB_PASSWORD: root
       run: php artisan migrate --force
 
     - name: Run tests
-      env:
-        DB_CONNECTION: mysql
-        DB_DATABASE: test_database
-        DB_USERNAME: root
-        DB_PASSWORD: root
       run: composer run test
