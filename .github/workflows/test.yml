@@ -1,65 +1,34 @@
-name: Run Tests
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
-
+on: push
+name: CI
 jobs:
-  test:
+  phpunit:
     runs-on: ubuntu-latest
-
+    container:
+      image: kirschbaumdevelopment/laravel-test-runner:7.3
+ 
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_database
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: test
         ports:
-          - 3306:3306
-
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+ 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
+    - uses: actions/checkout@v1
       with:
-        php-version: '8.3'  # Update to 8.3 if needed
-        extensions: mbstring, exif, pcntl, bcmath
-        ini-values: post_max_size=256M, upload_max_filesize=256M
-        coverage: none
-
-    - name: Install Composer dependencies
-      run: composer install --prefer-dist --no-progress
-
-    - name: Create .env file
-      run: cp .env.example .env
-
-    - name: Set up database environment variables
+        fetch-depth: 1
+ 
+    - name: Install composer dependencies
       run: |
-        echo "DB_CONNECTION=mysql" >> .env
-        echo "DB_DATABASE=test_database" >> .env
-        echo "DB_USERNAME=root" >> .env
-        echo "DB_PASSWORD=root" >> .env
-
-    - name: Generate application key
-      run: php artisan key:generate
-
-    - name: Set up environment file
-      run: php artisan config:cache
-
-    - name: Run migrations
-      run: php artisan migrate --force
-
-    - name: Run tests
-      run: composer run test
+        composer install --no-scripts
+ 
+    - name: Prepare Laravel Application
+      run: |
+        cp .env.ci .env
+        php artisan key:generate
+ 
+    - name: Run Testsuite
+      run: vendor/bin/phpunit tests/
