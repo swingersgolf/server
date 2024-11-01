@@ -7,14 +7,13 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:  # Allows for manual triggering of the workflow
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     services:
-      # This sets up the MySQL service, you can adjust based on your database
       mysql:
         image: mysql:8.0
         env:
@@ -35,21 +34,22 @@ jobs:
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'  # Set this to your PHP version
+        php-version: '8.3'
         extensions: mbstring, exif, pcntl, bcmath
         ini-values: post_max_size=256M, upload_max_filesize=256M
         coverage: none
 
     - name: Install Composer dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+      run: composer install --prefer-dist --no-progress
+
+    - name: Create .env file
+      run: cp .env.example .env
 
     - name: Generate application key
       run: php artisan key:generate
 
     - name: Set up environment file
-      run: |
-        cp .env.example .env
-        php artisan config:cache
+      run: php artisan config:cache
 
     - name: Run migrations
       env:
