@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
+use App\Http\Requests\UserUpdateRequest;
 
 class UserController extends Controller
 {
@@ -15,10 +15,13 @@ class UserController extends Controller
         return new UserResource(User::find(Auth::id()));
     }
 
-    public function update(Request $request) 
+    public function update(UserUpdateRequest $request) 
     {
         $user = User::find(Auth::id());
-        $user->update($request->all());
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+        $user->update($request->validated());
         return new UserResource($user);
     }
 }
