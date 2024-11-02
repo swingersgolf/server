@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RoundRequest;
 use App\Http\Resources\Api\V1\RoundResource;
 use App\Models\Round;
 use Illuminate\Http\Request;
@@ -34,23 +35,14 @@ class RoundController extends Controller
         return new RoundResource($round);
     }
 
-    public function store(Request $request)
+    public function store(RoundRequest $request)
     {
-        $data = $request->validate([
-            'when' => 'required|date', // Ensure it is a valid date
-            'spots' => 'required|integer',
-            'course_id' => 'required|exists:courses,id',
-        ]);
-    
+        $data = $request->validated();
         // Convert 'when' to the correct format
         $data['when'] = (new \DateTime($data['when']))->format('Y-m-d H:i:s');
     
         // Set the host_id to the authenticated user's ID
-        $data['host_id'] = Auth::id();
-    
-        // Increment spots by 1 to account for the host
-        $data['spots'] += 1;
-    
+        $data['host_id'] = Auth::id();    
         // Create the round
         $round = Round::create($data);
     
@@ -62,13 +54,9 @@ class RoundController extends Controller
     }
     
     
-    public function update(Request $request, Round $round)
+    public function update(RoundRequest $request, Round $round)
     {
-        $data = $request->validate([
-            'when' => 'required|date', // Ensure it is a valid date
-            'spots' => 'required|integer',
-            'course_id' => 'required|exists:courses,id',
-        ]);
+        $data = $request->validated();
     
         // Convert 'when' to the correct format
         $data['when'] = (new \DateTime($data['when']))->format('Y-m-d H:i:s');
