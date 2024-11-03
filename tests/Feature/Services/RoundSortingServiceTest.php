@@ -38,6 +38,7 @@ class RoundSortingServiceTest extends TestCase
         $this->assertEquals($sortedRounds[2]->id, $round2->id);
     }
 
+    // TODO: Add data provider to cover all preference combinations once there's a general agreement this approach is what we want to keep
     public function test_it_sorts_rounds_by_preference_match(): void
     {
         $sortingStrategy = new SortByPreferencesStrategy;
