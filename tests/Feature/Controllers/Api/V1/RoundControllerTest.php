@@ -33,7 +33,7 @@ class RoundControllerTest extends TestCase
         $round = Round::factory()->create([
             'when' => now(),
             'course_id' => $where->id,
-            'spots' => 4,
+            'group_size' => 4,
         ]);
 
         $round->preferences()->attach($preferences[0], [
@@ -57,7 +57,7 @@ class RoundControllerTest extends TestCase
         $courseName = Course::find($round->course_id)->name;
         $this->assertEquals($courseName, $responseData['course']);
         $this->assertEquals($users->count(), $responseData['golfer_count']);
-        $this->assertEquals($round->spots, $responseData['spots']);
+        $this->assertEquals($round->group_size, $responseData['group_size']);
 
         $this->assertEquals($preferences[0]->name, $responseData['preferences'][0]['name']);
         $this->assertEquals($preferences[0]->id, $responseData['preferences'][0]['id']);
@@ -101,7 +101,7 @@ class RoundControllerTest extends TestCase
         $round = Round::factory()->create([
             'when' => now(),
             'course_id' => $where->id,
-            'spots' => 4,
+            'group_size' => 4,
         ]);
 
         $round->preferences()->attach($preferences[0], [
@@ -192,6 +192,58 @@ class RoundControllerTest extends TestCase
             'round_id' => $round->id,
             'user_id' => $user->id,
             'status' => 'rejected',
+        ]);
+    }
+
+    public function test_create_round(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('api.v1.round.store'), [
+            'when' => "2021-10-10 10:00:00",
+            'course_id' => $course->id,
+            'group_size' => 4,
+        ]);
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('rounds', [
+            'when' => "2021-10-10 10:00:00",
+            'course_id' => $course->id,
+            'group_size' => 4,
+        ]);
+    }
+
+    public function test_update_round(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::factory()->create();
+        $round = Round::factory()->create();
+
+        $response = $this->actingAs($user)->patch(route('api.v1.round.update', $round->id), [
+            'when' => "2021-10-10 10:00:00",
+            'course_id' => $course->id,
+            'group_size' => 4,
+        ]);
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('rounds', [
+            'id' => $round->id,
+            'when' => "2021-10-10 10:00:00",
+            'course_id' => $course->id,
+            'group_size' => 4,
+        ]);
+    }
+
+    public function test_delete_round(): void
+    {
+        $user = User::factory()->create();
+        $round = Round::factory()->create();
+
+        $response = $this->actingAs($user)->delete(route('api.v1.round.destroy', $round->id));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseMissing('rounds', [
+            'id' => $round->id,
         ]);
     }
 

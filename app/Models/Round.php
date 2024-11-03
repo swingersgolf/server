@@ -13,8 +13,9 @@ class Round extends Model
 
     protected $fillable = [
         'when',
-        'spots',
+        'group_size',
         'host_id',
+        'course_id',
     ];
 
     public function course(): BelongsTo

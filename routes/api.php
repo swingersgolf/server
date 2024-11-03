@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\RoundController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserProfileController;
@@ -25,19 +26,26 @@ Route::name('api.')->group(function () {
         Route::name('v1.')->prefix('v1')->group(function () {
             Route::name('user.')->group(function () {
                 Route::get('user', [UserController::class, 'show'])->name('show');
+                Route::patch('user', [UserController::class, 'update'])->name('update');
             });
             Route::post('logout', [AuthController::class, 'logout'])->name('logout');
             Route::name('user-profile.')->group(function () {
                 Route::get('user-profile', [UserProfileController::class, 'show'])->name('show');
                 Route::patch('user-profile', [UserProfileController::class, 'update'])->name('update');
             });
-                Route::name('round.')->group(function () {
-                    Route::get('round', [RoundController::class, 'index'])->name('index');
-                    Route::get('round/{round}', [RoundController::class, 'show'])->name('show');
-                    Route::post('round/{round}/join', [RoundController::class, 'join'])->name('join');
-                    Route::post('round/{round}/accept', [RoundController::class, 'accept'])->name('accept');
-                    Route::post('round/{round}/reject', [RoundController::class, 'reject'])->name('reject');
-                });
+            Route::name('round.')->group(function () {
+                Route::get('round', [RoundController::class, 'index'])->name('index');
+                Route::post('round', [RoundController::class, 'store'])->name('store');
+                Route::patch('round/{round}', [RoundController::class, 'update'])->name('update');
+                Route::delete('round/{round}', [RoundController::class, 'destroy'])->name('destroy');
+                Route::get('round/{round}', [RoundController::class, 'show'])->name('show');
+                Route::post('round/{round}/join', [RoundController::class, 'join'])->name('join');
+                Route::post('round/{round}/accept', [RoundController::class, 'accept'])->name('accept');
+                Route::post('round/{round}/reject', [RoundController::class, 'reject'])->name('reject');
+            });
+            Route::name('course.')->group(function () {
+                Route::get('course', [CourseController::class, 'index'])->name('index');
+            });
         });
     });
 });

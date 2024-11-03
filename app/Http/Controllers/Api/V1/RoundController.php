@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\RoundRequest;
 use App\Http\Resources\Api\V1\RoundResource;
 use App\Models\Round;
 use Illuminate\Http\Request;
@@ -32,6 +33,59 @@ class RoundController extends Controller
     public function show(Round $round): RoundResource
     {
         return new RoundResource($round);
+    }
+
+    public function store(RoundRequest $request)
+    {
+        // Validate request
+        $validatedData = $request->validated();
+    
+        // Convert 'when' to the correct format
+        $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
+    
+        // Set the host_id to the authenticated user's ID
+        $validatedData['host_id'] = Auth::id();
+    
+        // Create the round with specific fields
+        $round = Round::create([
+            'when' => $validatedData['when'],
+            'group_size' => $validatedData['group_size'],
+            'course_id' => $validatedData['course_id'],
+            'host_id' => $validatedData['host_id'],
+        ]);
+    
+        // Automatically add the host as a golfer to the round
+        $userId = Auth::id();
+        $round->users()->attach($userId, ['status' => 'accepted']); // Use 'attach' to add the golfer
+    
+        return new RoundResource($round);
+    }
+    
+    public function update(RoundRequest $request, Round $round)
+    {    
+        // Validate request
+        $validatedData = $request->validated();
+    
+        // Convert 'when' to the correct format if it's being updated
+        if (isset($validatedData['when'])) {
+            $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
+        }
+    
+        // Update the round with only the relevant fields
+        $round->update([
+            'when' => $validatedData['when'] ?? $round->when, // Keep current value if not provided
+            'group_size' => $validatedData['group_size'] ?? $round->group_size,
+            'course_id' => $validatedData['course_id'] ?? $round->course_id,
+        ]);
+    
+        return new RoundResource($round);
+    }    
+
+    public function destroy(Round $round)
+    {
+        $round->delete();
+
+        return response()->json(['message' => 'Round deleted.']);
     }
     
     public function join(Round $round)
