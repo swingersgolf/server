@@ -13,7 +13,7 @@ class SortByPreferencesStrategy implements RoundSortingStrategyInterface
         $user = Auth::user();
         $userPreferences = $user->preferences()->pluck('preference_user.status', 'preferences.id');
 
-        $rounds = Round::with('preferences')->get()->map(function ($round) use ($userPreferences) {
+        $rounds->map(function ($round) use ($userPreferences) {
             $score = 0;
 
             foreach ($round->preferences as $preference) {

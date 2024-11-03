@@ -6,15 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\RoundRequest;
 use App\Http\Resources\Api\V1\RoundResource;
 use App\Models\Round;
+use App\Services\PushNotificationService;
 use App\Services\RoundSorting\RoundSortingStrategyInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use App\Services\PushNotificationService;
+use Illuminate\Support\Facades\Auth;
 
 class RoundController extends Controller
 {
     protected PushNotificationService $notificationService;
+
     protected RoundSortingStrategyInterface $roundSortingStrategy;
 
     public function __construct(PushNotificationService $notificationService, RoundSortingStrategyInterface $roundSortingStrategy)
@@ -98,7 +99,7 @@ class RoundController extends Controller
         $userId = Auth::id();
 
         $round->users()->syncWithoutDetaching([
-            $userId => ['status' => 'pending']
+            $userId => ['status' => 'pending'],
         ]);
 
         // Send notification to the round host
@@ -108,7 +109,7 @@ class RoundController extends Controller
             $this->notificationService->sendNotification(
                 $host->expo_push_token,
                 'Join Request',
-                '' . Auth::user()->name . ' has requested to join your round.'
+                ''.Auth::user()->name.' has requested to join your round.'
             );
         }
 

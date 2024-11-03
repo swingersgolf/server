@@ -18,6 +18,8 @@ class Round extends Model
         'course_id',
     ];
 
+    protected $with = ['preferences'];
+
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
