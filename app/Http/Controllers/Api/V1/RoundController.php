@@ -14,7 +14,7 @@ use App\Services\PushNotificationService;
 
 class RoundController extends Controller
 {
-    protected $notificationService;
+    protected PushNotificationService $notificationService;
     protected RoundSortingStrategyInterface $roundSortingStrategy;
 
     public function __construct(PushNotificationService $notificationService, RoundSortingStrategyInterface $roundSortingStrategy)
@@ -32,7 +32,7 @@ class RoundController extends Controller
 
         $sortedRounds = $this->roundSortingStrategy->sort($rounds);
 
-        return RoundResource::collection($rounds);
+        return RoundResource::collection($sortedRounds);
     }
 
     public function show(Round $round): RoundResource
