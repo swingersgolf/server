@@ -2,7 +2,7 @@
 
 namespace App\Services\RoundSorting;
 
-class BasicRoundSortingStrategy implements RoundSortingStrategyInterface
+class SortByCreateStrategy implements RoundSortingStrategyInterface
 {
     public function sort($rounds)
     {

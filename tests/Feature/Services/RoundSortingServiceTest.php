@@ -3,7 +3,7 @@
 namespace Tests\Feature\Services;
 
 use App\Models\Round;
-use App\Services\RoundSorting\BasicRoundSortingStrategy;
+use App\Services\RoundSorting\SortByCreateStrategy;
 use App\Services\RoundSorting\RoundSortingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -13,7 +13,7 @@ class RoundSortingServiceTest extends TestCase
 {
     public function test_it_sorts_rounds(): void
     {
-        $sortingStrategy = new BasicRoundSortingStrategy();
+        $sortingStrategy = new SortByCreateStrategy();
         $roundSortingService = new RoundSortingService($sortingStrategy);
 
         $round1 = Round::factory()->create([
