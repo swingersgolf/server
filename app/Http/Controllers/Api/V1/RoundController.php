@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\RoundRequest;
 use App\Http\Requests\Api\V1\RoundUpdateRequest;
 use App\Http\Requests\Api\V1\RoundStoreRequest;
 use App\Http\Resources\Api\V1\RoundResource;
@@ -36,7 +37,7 @@ class RoundController extends Controller
         return new RoundResource($round);
     }
 
-    public function store(RoundStoreRequest $request)
+    public function store(RoundRequest $request)
     {
         // Validate request
         $validatedData = $request->validated();
@@ -62,7 +63,7 @@ class RoundController extends Controller
         return new RoundResource($round);
     }
     
-    public function update(RoundUpdateRequest $request, Round $round)
+    public function update(RoundRequest $request, Round $round)
     {    
         // Validate request
         $validatedData = $request->validated();

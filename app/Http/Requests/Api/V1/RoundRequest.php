@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RoundUpdateRequest extends FormRequest
+class RoundRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,9 @@ class RoundUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'when' => 'nullable|date|date_format:Y-m-d H:i:s', // Nullable for updates
-            'group_size' => 'nullable|integer|between:2,4', // Nullable for updates
-            'course_id' => 'nullable|exists:courses,id', // Nullable for updates
+            'when' => 'required|date|date_format:Y-m-d H:i:s', // Ensure it's a valid datetime
+            'group_size' => 'required|integer|between:2,4', // Adjust the range as necessary
+            'course_id' => 'required|exists:courses,id', // Ensure it exists in the courses table
         ];
     }
 }
