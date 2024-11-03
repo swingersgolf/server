@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\NotificationResource;
-use Illuminate\Http\Request;
 use App\Models\Notification;
 
 class NotificationController extends Controller
@@ -15,63 +14,39 @@ class NotificationController extends Controller
         return NotificationResource::collection($Notifications);
     }
 
-    public function show($id)
+    public function show(Notification $notification)
     {
-        $Notification = Notification::find($id);
-        return new NotificationResource($Notification);
+        return new NotificationResource($notification);
     }
 
-    public function store(Request $request)
+    public function userNotifications()
     {
-        $Notification = Notification::create($request->all());
-        return new NotificationResource($Notification);
+        $user = auth()->user();
+        $notifications = $user->notifications;
+
+        return NotificationResource::collection($notifications);
     }
 
-    public function update(Request $request, $id)
+    public function read(Notification $notification)
     {
-        $Notification = Notification::find($id);
-        $Notification->update($request->all());
-        return new NotificationResource($Notification);
+        $notification->read = true;
+        $notification->save();
+
+        return response()->json(['message' => 'Notification marked as read.']);
     }
 
-    public function destroy($id)
+    public function unread(Notification $notification)
     {
-        $Notification = Notification::find($id);
-        $Notification->delete();
-        return new NotificationResource($Notification);
+        $notification->read = false;
+        $notification->save();
+
+        return response()->json(['message' => 'Notification marked as unread.']);
     }
 
-    public function markAsRead($id)
+    public function destroy(Notification $notification)
     {
-        $Notification = Notification::find($id);
-        $Notification->read_at = now();
-        $Notification->save();
-        return new NotificationResource($Notification);
-    }
+        $notification->delete();
 
-    public function markAsUnread($id)
-    {
-        $Notification = Notification::find($id);
-        $Notification->read_at = null;
-        $Notification->save();
-        return new NotificationResource($Notification);
-    }
-
-    public function markAllAsRead()
-    {
-        Notification::where('read_at', null)->update(['read_at' => now()]);
-        return response()->json(['message' => 'All notifications marked as read']);
-    }
-
-    public function markAllAsUnread()
-    {
-        Notification::where('read_at', '!=', null)->update(['read_at' => null]);
-        return response()->json(['message' => 'All notifications marked as unread']);
-    }
-
-    public function destroyAll()
-    {
-        Notification::truncate();
-        return response()->json(['message' => 'All notifications deleted']);
+        return response()->json(['message' => 'Notification deleted.']);
     }
 }

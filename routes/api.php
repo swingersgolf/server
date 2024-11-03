@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\RoundController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserProfileController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,14 @@ Route::name('api.')->group(function () {
             });
             Route::name('course.')->group(function () {
                 Route::get('course', [CourseController::class, 'index'])->name('index');
+            });
+            Route::name('notification.')->group(function () {
+                Route::get('notification', [NotificationController::class, 'index'])->name('index');
+                Route::get('notification/{notification}', [NotificationController::class, 'show'])->name('show');
+                Route::get('notification/user', [NotificationController::class, 'userNotifications'])->name('user');
+                Route::patch('notification/{notification}/read', [NotificationController::class, 'read'])->name('read');
+                Route::patch('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread');
+                Route::delete('notification/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
             });
         });
     });
