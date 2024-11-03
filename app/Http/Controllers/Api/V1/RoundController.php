@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\RoundRequest;
 use App\Http\Resources\Api\V1\RoundResource;
 use App\Models\Round;
+use App\Services\RoundSorting\RoundSortingStrategyInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -14,10 +15,12 @@ use App\Services\PushNotificationService;
 class RoundController extends Controller
 {
     protected $notificationService;
+    protected RoundSortingStrategyInterface $roundSortingStrategy;
 
-    public function __construct(PushNotificationService $notificationService)
+    public function __construct(PushNotificationService $notificationService, RoundSortingStrategyInterface $roundSortingStrategy)
     {
         $this->notificationService = $notificationService;
+        $this->roundSortingStrategy = $roundSortingStrategy;
     }
 
     public function index(Request $request): AnonymousResourceCollection
@@ -26,6 +29,8 @@ class RoundController extends Controller
         $end = $request->query('end');
 
         $rounds = Round::dateRange($start, $end)->get();
+
+        $sortedRounds = $this->roundSortingStrategy->sort($rounds);
 
         return RoundResource::collection($rounds);
     }
