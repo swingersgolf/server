@@ -38,6 +38,14 @@ Route::name('api.')->group(function () {
                     Route::post('round/{round}/accept', [RoundController::class, 'accept'])->name('accept');
                     Route::post('round/{round}/reject', [RoundController::class, 'reject'])->name('reject');
                 });
+            Route::name('notification.')->group(function () {
+                Route::get('notification', [RoundController::class, 'index'])->name('index');
+                Route::get('notification/{notification}', [RoundController::class, 'show'])->name('show');
+                Route::get('notification/user', [RoundController::class, 'userNotifications'])->name('user');
+                Route::post('notification/{notification}/read', [RoundController::class, 'read'])->name('read');
+                Route::post('notification/{notification}/unread', [RoundController::class, 'unread'])->name('unread');
+                Route::delete('notification/{notification}', [RoundController::class, 'destroy'])->name('destroy');
+            });
         });
     });
 });
