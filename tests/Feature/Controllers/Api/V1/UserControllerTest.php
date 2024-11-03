@@ -25,7 +25,7 @@ class UserControllerTest extends TestCase
 
         $preference = Preference::factory()->count(3)->create();
         $preferenceNames = $preference->pluck('name');
-        $user->preferences()->attach($preference, ['status'=>Preference::STATUS_PREFERRED]);
+        $user->preferences()->attach($preference, ['status' => Preference::STATUS_PREFERRED]);
 
         $response = $this->actingAs($user)->get(route('api.v1.user.show'));
         $responseData = $response->json('data');

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Preference;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('preference_id');
             $table->uuid('user_id');
-            $table->enum('status', ['disliked', 'preferred', 'indifferent'])->default('indifferent');
+            $table->enum('status', [Preference::STATUS_DISLIKED, Preference::STATUS_PREFERRED, Preference::STATUS_INDIFFERENT])->default(Preference::STATUS_INDIFFERENT);
             $table->timestamps();
         });
     }

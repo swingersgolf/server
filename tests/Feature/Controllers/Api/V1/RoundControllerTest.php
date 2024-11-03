@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Controllers\Api\V1;
 
-use App\Models\Attribute;
 use App\Models\Course;
 use App\Models\Preference;
 use App\Models\Round;
@@ -67,7 +66,7 @@ class RoundControllerTest extends TestCase
         $this->assertEquals('disliked', $responseData['preferences'][1]['status']);
         $this->assertEquals($preferences[2]->name, $responseData['preferences'][2]['name']);
         $this->assertEquals($preferences[2]->id, $responseData['preferences'][2]['id']);
-        $this->assertEquals('indifferent', $responseData['preferences'][2]['status']);
+        $this->assertEquals(Preference::STATUS_INDIFFERENT, $responseData['preferences'][2]['status']);
     }
 
     #[DataProvider('whenScenarios')]
@@ -139,7 +138,7 @@ class RoundControllerTest extends TestCase
         $this->assertEquals('disliked', $responseData['preferences'][1]['status']);
         $this->assertEquals($preferences[2]->name, $responseData['preferences'][2]['name']);
         $this->assertEquals($preferences[2]->id, $responseData['preferences'][2]['id']);
-        $this->assertEquals('indifferent', $responseData['preferences'][2]['status']);
+        $this->assertEquals(Preference::STATUS_INDIFFERENT, $responseData['preferences'][2]['status']);
     }
 
     public function test_join_submits_request(): void

@@ -5,19 +5,16 @@ namespace Tests\Feature\Services;
 use App\Models\Preference;
 use App\Models\Round;
 use App\Models\User;
-use App\Services\RoundSorting\SortByCreateStrategy;
 use App\Services\RoundSorting\RoundSortingService;
+use App\Services\RoundSorting\SortByCreateStrategy;
 use App\Services\RoundSorting\SortByPreferencesStrategy;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class RoundSortingServiceTest extends TestCase
 {
     public function test_it_sorts_rounds_by_create_dated(): void
     {
-        $sortingStrategy = new SortByCreateStrategy();
+        $sortingStrategy = new SortByCreateStrategy;
         $roundSortingService = new RoundSortingService($sortingStrategy);
 
         $round1 = Round::factory()->create([
@@ -43,22 +40,33 @@ class RoundSortingServiceTest extends TestCase
 
     public function test_it_sorts_rounds_by_preference_match(): void
     {
-        $sortingStrategy = new SortByPreferencesStrategy();
+        $sortingStrategy = new SortByPreferencesStrategy;
         $roundSortingService = new RoundSortingService($sortingStrategy);
 
-        $preference = Preference::factory()->create([
-            'name' => 'one',
+        $drinking = Preference::factory()->create([
+            'name' => 'drinking',
         ]);
+        $dancing = Preference::factory()->create([
+            'name' => 'dancing',
+        ]);
+
         $round1 = Round::factory()->create([]);
-        $round1->preferences()->attach($preference,['status'=>'disliked']);
+        $round1->preferences()->attach($drinking, ['status' => Preference::STATUS_INDIFFERENT]);
+        $round1->preferences()->attach($dancing, ['status' => Preference::STATUS_INDIFFERENT]);
+
         $round2 = Round::factory()->create([]);
-        $round2->preferences()->attach($preference,['status'=>'preferred']);
+        $round2->preferences()->attach($drinking, ['status' => Preference::STATUS_PREFERRED]);
+        $round2->preferences()->attach($dancing, ['status' => Preference::STATUS_DISLIKED]);
+
         $round3 = Round::factory()->create([]);
-        $round3->preferences()->attach($preference,['status'=>'indifferent']);
+        $round3->preferences()->attach($drinking, ['status' => Preference::STATUS_PREFERRED]);
+        $round3->preferences()->attach($dancing, ['status' => Preference::STATUS_INDIFFERENT]);
 
         $rounds = collect([$round1, $round2, $round3]);
 
         $user = User::factory()->create();
+        $user->preferences()->attach($drinking, ['status' => Preference::STATUS_PREFERRED]);
+        $user->preferences()->attach($dancing, ['status' => Preference::STATUS_DISLIKED]);
         $this->actingAs($user);
 
         $sortedRounds = $roundSortingService->sortRounds($rounds);

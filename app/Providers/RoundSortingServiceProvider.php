@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Services\RoundSorting\SortByCreateStrategy;
 use App\Services\RoundSorting\RoundSortingStrategyInterface;
+use App\Services\RoundSorting\SortByCreateStrategy;
 use Illuminate\Support\ServiceProvider;
 
 class RoundSortingServiceProvider extends ServiceProvider
