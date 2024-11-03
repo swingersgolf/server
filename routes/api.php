@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+<<<<<<< HEAD
 use App\Http\Controllers\Api\V1\CourseController;
+=======
+use App\Http\Controllers\Api\V1\NotificationController;
+>>>>>>> 389472dafe074fee2efc272bc6e27f364ba3efcc
 use App\Http\Controllers\Api\V1\RoundController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserProfileController;
@@ -36,23 +40,34 @@ Route::name('api.')->group(function () {
             });
             Route::name('round.')->group(function () {
                 Route::get('round', [RoundController::class, 'index'])->name('index');
+<<<<<<< HEAD
                 Route::post('round', [RoundController::class, 'store'])->name('store');
                 Route::patch('round/{round}', [RoundController::class, 'update'])->name('update');
                 Route::delete('round/{round}', [RoundController::class, 'destroy'])->name('destroy');
+=======
+>>>>>>> 389472dafe074fee2efc272bc6e27f364ba3efcc
                 Route::get('round/{round}', [RoundController::class, 'show'])->name('show');
                 Route::post('round/{round}/join', [RoundController::class, 'join'])->name('join');
                 Route::post('round/{round}/accept', [RoundController::class, 'accept'])->name('accept');
                 Route::post('round/{round}/reject', [RoundController::class, 'reject'])->name('reject');
             });
+<<<<<<< HEAD
             Route::name('course.')->group(function () {
                 Route::get('course', [CourseController::class, 'index'])->name('index');
             });
+=======
+>>>>>>> 389472dafe074fee2efc272bc6e27f364ba3efcc
             Route::name('notification.')->group(function () {
                 Route::get('notification', [NotificationController::class, 'index'])->name('index');
                 Route::get('notification/{notification}', [NotificationController::class, 'show'])->name('show');
                 Route::get('notification/user', [NotificationController::class, 'userNotifications'])->name('user');
+<<<<<<< HEAD
                 Route::patch('notification/{notification}/read', [NotificationController::class, 'read'])->name('read');
                 Route::patch('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread');
+=======
+                Route::post('notification/{notification}/read', [NotificationController::class, 'read'])->name('read');
+                Route::post('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread');
+>>>>>>> 389472dafe074fee2efc272bc6e27f364ba3efcc
                 Route::delete('notification/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
             });
         });

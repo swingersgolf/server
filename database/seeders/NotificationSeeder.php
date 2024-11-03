@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use App\Enums\NotificationType;
-use Faker\Factory as Faker;
 
 class NotificationSeeder extends Seeder
 {
@@ -24,7 +23,7 @@ class NotificationSeeder extends Seeder
             Notification::factory()->count(5)->create([
                 'user_id' => $userId,
                 'type' => $this->randomNotificationType(),
-                'data' => $this->generateRandomData($userId),
+                'data' => $this->generateRandomData(),
                 'read_at' => $this->randomReadAt(),
             ]);
         }
@@ -43,18 +42,13 @@ class NotificationSeeder extends Seeder
     /**
      * Generate random data for the notification.
      *
-     * @param int $userId
      * @return array
      */
-    private function generateRandomData(string $userId): array
+    private function generateRandomData(): array
     {
-        $faker = Faker::create();
-
         return [
-            'to' => User::find($userId)->expo_push_token ?? 'ExponentPushToken[XXXXXXXXXXXXXXXXXXXXXXXX]', // Use an existing user's Expo push token or a default value
-            'title' => $faker->sentence(rand(3, 6)), // A random title with 3 to 6 words
-            'body' => $faker->paragraph(rand(1, 3)), // A random body with 1 to 3 sentences
-            'data' => [], // Additional random data can be added here if needed
+            'message' => fake()->sentence(),  // Use Laravel's Faker for a random message
+            'details' => fake()->paragraph(),  // Add additional details if needed
         ];
     }
 
