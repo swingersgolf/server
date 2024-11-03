@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\RoundUpdateRequest;
+use App\Http\Requests\Api\V1\RoundStoreRequest;
 use App\Http\Resources\Api\V1\RoundResource;
 use App\Models\Round;
 use Illuminate\Http\Request;
@@ -34,17 +36,24 @@ class RoundController extends Controller
         return new RoundResource($round);
     }
 
-    public function store(Request $request)
+    public function store(RoundStoreRequest $request)
     {
+        // Validate request
+        $validatedData = $request->validated();
+    
         // Convert 'when' to the correct format
-        $requestData = $request->all();
-        $requestData['when'] = (new \DateTime($requestData['when']))->format('Y-m-d H:i:s');
+        $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
     
         // Set the host_id to the authenticated user's ID
-        $requestData['host_id'] = Auth::id();
+        $validatedData['host_id'] = Auth::id();
     
-        // Create the round
-        $round = Round::create($requestData);
+        // Create the round with specific fields
+        $round = Round::create([
+            'when' => $validatedData['when'],
+            'group_size' => $validatedData['group_size'],
+            'course_id' => $validatedData['course_id'],
+            'host_id' => $validatedData['host_id'],
+        ]);
     
         // Automatically add the host as a golfer to the round
         $userId = Auth::id();
@@ -52,17 +61,26 @@ class RoundController extends Controller
     
         return new RoundResource($round);
     }
-   
-    public function update(Request $request, Round $round)
-    {    
-        // Convert 'when' to the correct format
-        $request['when'] = (new \DateTime($request['when']))->format('Y-m-d H:i:s');
     
-        $round->update($request -> all());
+    public function update(RoundUpdateRequest $request, Round $round)
+    {    
+        // Validate request
+        $validatedData = $request->validated();
+    
+        // Convert 'when' to the correct format if it's being updated
+        if (isset($validatedData['when'])) {
+            $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
+        }
+    
+        // Update the round with only the relevant fields
+        $round->update([
+            'when' => $validatedData['when'] ?? $round->when, // Keep current value if not provided
+            'group_size' => $validatedData['group_size'] ?? $round->group_size,
+            'course_id' => $validatedData['course_id'] ?? $round->course_id,
+        ]);
     
         return new RoundResource($round);
-    }
-    
+    }    
 
     public function destroy(Round $round)
     {

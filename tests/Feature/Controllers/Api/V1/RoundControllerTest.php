@@ -220,7 +220,7 @@ class RoundControllerTest extends TestCase
         $round = Round::factory()->create();
 
         $response = $this->actingAs($user)->patch(route('api.v1.round.update', $round->id), [
-            'when' => now()->addDays(1)->format('Y-m-d H:i'),
+            'when' => "2021-10-10 10:00:00",
             'course_id' => $course->id,
             'group_size' => 4,
         ]);
@@ -228,7 +228,7 @@ class RoundControllerTest extends TestCase
         $response->assertSuccessful();
         $this->assertDatabaseHas('rounds', [
             'id' => $round->id,
-            'when' => now()->addDays(1)->format('Y-m-d H:i'),
+            'when' => "2021-10-10 10:00:00",
             'course_id' => $course->id,
             'group_size' => 4,
         ]);
