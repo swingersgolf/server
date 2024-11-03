@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RoundRequest;
 use App\Http\Resources\Api\V1\RoundResource;
 use App\Models\Round;
 use Illuminate\Http\Request;
@@ -35,16 +34,17 @@ class RoundController extends Controller
         return new RoundResource($round);
     }
 
-    public function store(RoundRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->validated();
         // Convert 'when' to the correct format
-        $data['when'] = (new \DateTime($data['when']))->format('Y-m-d H:i:s');
+        $requestData = $request->all();
+        $requestData['when'] = (new \DateTime($requestData['when']))->format('Y-m-d H:i:s');
     
         // Set the host_id to the authenticated user's ID
-        $data['host_id'] = Auth::id();    
+        $requestData['host_id'] = Auth::id();
+    
         // Create the round
-        $round = Round::create($data);
+        $round = Round::create($requestData);
     
         // Automatically add the host as a golfer to the round
         $userId = Auth::id();
@@ -52,16 +52,13 @@ class RoundController extends Controller
     
         return new RoundResource($round);
     }
-    
-    
-    public function update(RoundRequest $request, Round $round)
-    {
-        $data = $request->validated();
-    
+   
+    public function update(Request $request, Round $round)
+    {    
         // Convert 'when' to the correct format
-        $data['when'] = (new \DateTime($data['when']))->format('Y-m-d H:i:s');
+        $request['when'] = (new \DateTime($request['when']))->format('Y-m-d H:i:s');
     
-        $round->update($data);
+        $round->update($request -> all());
     
         return new RoundResource($round);
     }

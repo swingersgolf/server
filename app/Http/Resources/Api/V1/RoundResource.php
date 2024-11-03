@@ -37,7 +37,7 @@ class RoundResource extends JsonResource
             'golfer_count' => $this->users->filter(function ($user) {
                 return $user->pivot->status === 'accepted'; // Adjust 'accepted' to your specific status value
             })->count(),
-            'spots' => $this->spots,
+            'group_size' => $this->group_size,
             'host_id' => $this->host_id,
         ];
     }

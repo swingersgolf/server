@@ -21,7 +21,7 @@ class RoundSeeder extends Seeder
             'when' => fn () => Carbon::now()
                 ->addMinutes(rand(0, 3 * 7 * 24 * 60))
                 ->format('Y-m-d H:i'),
-            'spots' => fn () => rand(2, 4),
+            'group_size' => fn () => rand(2, 4),
         ]);
 
         $preferenceIds = Preference::pluck('id');
@@ -50,7 +50,7 @@ class RoundSeeder extends Seeder
             });
 
             // Determine the number of users for the round
-            $numUsers = rand(1, $round->spots);
+            $numUsers = rand(1, $round->group_size);
 
             // Get random users and sync them with an 'accepted' status
             $selectedUsers = $userIds->random($numUsers)->toArray();
