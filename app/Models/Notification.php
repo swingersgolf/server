@@ -27,49 +27,7 @@ class Notification extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    public function scopeUnread($query)
-    {
-        return $query->whereNull('read_at');
-    }
-
-    public function scopeRead($query)
-    {
-        return $query->whereNotNull('read_at');
-    }
-
-    public function markAsRead()
-    {
-        $this->read_at = now();
-        $this->save();
-    }
-
-    public function markAsUnread()
-    {
-        $this->read_at = null;
-        $this->save();
-    }
-
-    public function isRead()
-    {
-        return $this->read_at !== null;
-    }
-
-    public function isUnread()
-    {
-        return $this->read_at === null;
-    }
-
-    public function isType($type)
-    {
-        return $this->type === $type;
-    }
-
-    public function isForUser($user)
-    {
-        return $this->user_id === $user->id;
-    }
-
+    
     public function scopeOfType($query, NotificationType $type)
     {
         return $query->where('type', $type->value);

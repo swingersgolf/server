@@ -41,6 +41,7 @@ Route::name('api.')->group(function () {
                 Route::delete('round/{round}', [RoundController::class, 'destroy'])->name('destroy');
                 Route::get('round/{round}', [RoundController::class, 'show'])->name('show');
                 Route::post('round/{round}/join', [RoundController::class, 'join'])->name('join');
+                Route::delete('round/{round}/leave', [RoundController::class, 'leave'])->name('leave');
                 Route::post('round/{round}/accept', [RoundController::class, 'accept'])->name('accept');
                 Route::post('round/{round}/reject', [RoundController::class, 'reject'])->name('reject');
             });
@@ -49,13 +50,10 @@ Route::name('api.')->group(function () {
             });
             Route::name('notification.')->group(function () {
                 Route::get('notification', [NotificationController::class, 'index'])->name('index');
-                Route::get('notification/{notification}', [NotificationController::class, 'show'])->name('show');
-                Route::get('notification/user', [NotificationController::class, 'userNotifications'])->name('user');
-                Route::patch('notification/{notification}/read', [NotificationController::class, 'read'])->name('read');
-                Route::patch('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread');
-                Route::post('notification/{notification}/read', [NotificationController::class, 'read'])->name('read');
-                Route::post('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread');
-                Route::delete('notification/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
+                Route::get('notification/user', [NotificationController::class, 'user'])->name('user');
+                Route::patch('notification/{notification}/read', [NotificationController::class, 'read'])->name('read'); 
+                Route::patch('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread'); 
+                Route::delete('notification/{notification}', [NotificationController::class, 'destroy'])->name('delete'); 
             });
         });
     });

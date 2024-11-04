@@ -70,4 +70,9 @@ class User extends Authenticatable
             ->withPivot('status')  // Include 'status' on the pivot
             ->withTimestamps();    // Adds created_at and updated_at for the pivot
     }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

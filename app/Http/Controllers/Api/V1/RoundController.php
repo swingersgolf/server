@@ -110,6 +110,19 @@ class RoundController extends Controller
         return response()->json(['message' => 'Join request submitted.']);
     }
 
+    public function leave(Round $round)
+    {
+        $userId = Auth::id();
+
+        if ($round->host_id === $userId) {
+            return response()->json(['message' => 'Host cannot leave the round.'], 403);
+        }
+
+        $round->users()->detach($userId);
+
+        return response()->json(['message' => 'User left round.']);
+    }
+
     public function accept(Request $request, Round $round)
     {
         $userId = $request->input('user_id');
