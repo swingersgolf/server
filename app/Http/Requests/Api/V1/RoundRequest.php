@@ -22,7 +22,7 @@ class RoundRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'when' => 'required|date|date_format:Y-m-d H:i:s', // Ensure it's a valid datetime
+            'when' => 'required|date', // Ensure it's a valid datetime
             'group_size' => 'required|integer|between:2,4', // Adjust the range as necessary
             'course_id' => 'required|exists:courses,id', // Ensure it exists in the courses table
         ];

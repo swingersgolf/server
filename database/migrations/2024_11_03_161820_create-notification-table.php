@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Enums\NotificationType;
 
 return new class extends Migration
 {
@@ -16,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('user_id'); // Change to match `users.id` type (UUID/string)
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->enum('type', array_column(NotificationType::cases(), 'value')); // Extract values from the enum
             $table->json('data');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();

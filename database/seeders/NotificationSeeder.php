@@ -6,7 +6,6 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
-use App\Enums\NotificationType;
 
 class NotificationSeeder extends Seeder
 {
@@ -22,21 +21,10 @@ class NotificationSeeder extends Seeder
         foreach ($userIds as $userId) {
             Notification::factory()->count(5)->create([
                 'user_id' => $userId,
-                'type' => $this->randomNotificationType(),
                 'data' => $this->generateRandomData(),
                 'read_at' => $this->randomReadAt(),
             ]);
         }
-    }
-
-    /**
-     * Generate a random notification type.
-     *
-     * @return string
-     */
-    private function randomNotificationType(): string
-    {
-        return NotificationType::cases()[array_rand(NotificationType::cases())]->value;
     }
 
     /**
@@ -47,8 +35,12 @@ class NotificationSeeder extends Seeder
     private function generateRandomData(): array
     {
         return [
-            'message' => fake()->sentence(),  // Use Laravel's Faker for a random message
-            'details' => fake()->paragraph(),  // Add additional details if needed
+            'to' => 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]',
+            'title' => fake()->sentence(),
+            'body' => fake()->paragraph(),
+            'data' => (object) [
+                'key' => 'value',
+            ],
         ];
     }
 

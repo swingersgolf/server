@@ -101,9 +101,9 @@ class RoundController extends Controller
         if ($host && $host->expo_push_token) {
 
             $this->notificationService->sendNotification(
-                $host->expo_push_token,
                 'Join Request',
-                '' . Auth::user()->name . ' has requested to join your round.'
+                '' . Auth::user()->name . ' has requested to join your round.',
+                $host->id
             );
         }
 
@@ -134,9 +134,9 @@ class RoundController extends Controller
             $user = $round->users()->find($userId);
             if ($user && $user->expo_push_token) {
                 $this->notificationService->sendNotification(
-                    $user->expo_push_token,
                     'Round Accepted',
-                    'Your request to join the round has been accepted.'
+                    'Your request to join the round has been accepted.',
+                    $user->id
                 );
             }
     
@@ -157,9 +157,9 @@ class RoundController extends Controller
             $user = $round->users()->find($userId);
             if ($user && $user->expo_push_token) {
                 $this->notificationService->sendNotification(
-                    $user->expo_push_token,
                     'Round Rejected',
-                    'Your request to join the round has been rejected.'
+                    'Your request to join the round has been rejected.',
+                    $user->id
                 );
             }
 
