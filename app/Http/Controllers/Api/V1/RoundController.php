@@ -69,24 +69,36 @@ class RoundController extends Controller
 
     
     public function update(RoundRequest $request, Round $round)
-    {    
+    {
         // Validate request
         $validatedData = $request->validated();
-    
+
         // Convert 'when' to the correct format if it's being updated
         if (isset($validatedData['when'])) {
             $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
         }
-    
+
         // Update the round with only the relevant fields
         $round->update([
             'when' => $validatedData['when'] ?? $round->when, // Keep current value if not provided
             'group_size' => $validatedData['group_size'] ?? $round->group_size,
             'course_id' => $validatedData['course_id'] ?? $round->course_id,
         ]);
-    
+
+        // Update preferences
+        if (isset($validatedData['preferences'])) {
+            // Detach all existing preferences
+            $round->preferences()->detach();
+
+            // Reattach preferences with new statuses
+            foreach ($validatedData['preferences'] as $preferenceId => $status) {
+                $round->preferences()->attach((int) $preferenceId, ['status' => $status]);
+            }
+        }
+
         return new RoundResource($round);
-    }    
+    }
+ 
 
     public function destroy(Round $round)
     {
