@@ -6,18 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\RoundRequest;
 use App\Http\Resources\Api\V1\RoundResource;
 use App\Models\Round;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Services\PushNotificationService;
+use App\Services\RoundSorting\RoundSortingStrategyInterface;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Auth;
 
 class RoundController extends Controller
 {
-    protected $notificationService;
+    protected PushNotificationService $notificationService;
 
-    public function __construct(PushNotificationService $notificationService)
+    protected RoundSortingStrategyInterface $roundSortingStrategy;
+
+    public function __construct(PushNotificationService $notificationService, RoundSortingStrategyInterface $roundSortingStrategy)
     {
         $this->notificationService = $notificationService;
+        $this->roundSortingStrategy = $roundSortingStrategy;
     }
 
     public function index(Request $request): AnonymousResourceCollection
@@ -26,8 +30,10 @@ class RoundController extends Controller
         $end = $request->query('end');
 
         $rounds = Round::dateRange($start, $end)->get();
-        $foo = RoundResource::collection($rounds);
-        return $foo;
+
+        $sortedRounds = $this->roundSortingStrategy->sort($rounds);
+
+        return RoundResource::collection($sortedRounds);
     }
 
     public function show(Round $round): RoundResource
@@ -62,21 +68,24 @@ class RoundController extends Controller
         foreach ($validatedData['preferences'] as $preferenceId => $status) {
             $round->preferences()->attach((int) $preferenceId, ['status' => $status]);
         }
+      
+        $round->users()->attach($userId, ['status' => 'accepted']); // Use 'attach' to add the golfer
 
         return new RoundResource($round);
     }
 
-
-    
     public function update(RoundRequest $request, Round $round)
+    {
     {
         // Validate request
         $validatedData = $request->validated();
+
 
         // Convert 'when' to the correct format if it's being updated
         if (isset($validatedData['when'])) {
             $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
         }
+
 
         // Update the round with only the relevant fields
         $round->update([
@@ -106,8 +115,8 @@ class RoundController extends Controller
 
         return response()->json(['message' => 'Round deleted.']);
     }
-    
-    public function join(Round $round)
+
+        public function join(Round $round)
     {
         $userId = Auth::id();
 
@@ -145,10 +154,10 @@ class RoundController extends Controller
     public function accept(Request $request, Round $round)
     {
         $userId = $request->input('user_id');
-    
+
         if ($round->users()->where('user_id', $userId)->first()) {
             $round->users()->updateExistingPivot($userId, ['status' => 'accepted']);
-    
+
             // Send notification
             $user = $round->users()->find($userId);
             if ($user && $user->expo_push_token) {
@@ -158,12 +167,12 @@ class RoundController extends Controller
                     $user->id
                 );
             }
-    
+
             return response()->json(['message' => 'User accepted.']);
         }
-    
+
         return response()->json(['message' => 'User has not requested to join.'], 404);
-    }    
+    }
 
     public function reject(Request $request, Round $round)
     {

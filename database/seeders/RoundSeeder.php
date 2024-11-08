@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Attribute;
 use App\Models\Course;
 use App\Models\Preference;
 use App\Models\Round;
