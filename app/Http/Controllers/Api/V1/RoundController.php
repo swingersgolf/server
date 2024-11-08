@@ -39,13 +39,13 @@ class RoundController extends Controller
     {
         // Validate request
         $validatedData = $request->validated();
-    
+
         // Convert 'when' to the correct format
         $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
-    
+
         // Set the host_id to the authenticated user's ID
         $validatedData['host_id'] = Auth::id();
-    
+
         // Create the round with specific fields
         $round = Round::create([
             'when' => $validatedData['when'],
@@ -53,13 +53,25 @@ class RoundController extends Controller
             'course_id' => $validatedData['course_id'],
             'host_id' => $validatedData['host_id'],
         ]);
-    
+
         // Automatically add the host as a golfer to the round
         $userId = Auth::id();
         $round->users()->attach($userId, ['status' => 'accepted']); // Use 'attach' to add the golfer
-    
+
+        // Save each preference to the preference_round table
+        foreach ($validatedData['preferences'] as $preferenceName => $status) {
+            // Find the preference ID by name
+            $preference = \App\Models\Preference::where('name', $preferenceName)->first();
+            
+            if ($preference) {
+                // Attach the preference to the round with the specified status
+                $round->preferences()->attach($preference->id, ['status' => $status]);
+            }
+        }
+
         return new RoundResource($round);
     }
+
     
     public function update(RoundRequest $request, Round $round)
     {    

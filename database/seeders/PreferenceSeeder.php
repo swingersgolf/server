@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Preference;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PreferenceSeeder extends Seeder
@@ -13,7 +12,7 @@ class PreferenceSeeder extends Seeder
      */
     public function run(): void
     {
-        $preferences = collect(['Drinking', 'Walking', 'Betting', 'Music']);
+        $preferences = collect(['drinking', 'walking', 'betting', 'music']);
         $preferences->each(function ($preference) {
             Preference::factory()->create([
                 'name' => $preference,
