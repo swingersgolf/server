@@ -69,8 +69,6 @@ class RoundController extends Controller
             $round->preferences()->attach((int) $preferenceId, ['status' => $status]);
         }
       
-        $round->users()->attach($userId, ['status' => 'accepted']); // Use 'attach' to add the golfer
-
         return new RoundResource($round);
     }
 
