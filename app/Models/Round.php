@@ -32,7 +32,8 @@ class Round extends Model
     {
         return $this->belongsToMany(User::class)
             ->withPivot('status')  // Include 'status' on the pivot
-            ->withTimestamps();    // Adds created_at and updated_at for the pivot
+            ->withTimestamps()    // Adds created_at and updated_at for the pivot
+            ->onDelete('cascade'); // Delete the pivot when the round is deleted
     }
 
     // Relationship with the host user
