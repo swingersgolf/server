@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\RoundController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserProfileController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\PreferenceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,9 @@ Route::name('api.')->group(function () {
                 Route::patch('notification/{notification}/read', [NotificationController::class, 'read'])->name('read'); 
                 Route::patch('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread'); 
                 Route::delete('notification/{notification}', [NotificationController::class, 'destroy'])->name('delete'); 
+            });
+            Route::name('preference.')->group(function () {
+                Route::get('preference', [PreferenceController::class, 'index'])->name('index');
             });
         });
     });
