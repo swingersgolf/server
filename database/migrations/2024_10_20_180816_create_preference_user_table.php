@@ -12,10 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('preference_round', function (Blueprint $table) {
+        Schema::create('preference_user', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('preference_id');
-            $table->unsignedBigInteger('round_id');
+            $table->uuid('user_id');
             $table->enum('status', [Preference::STATUS_DISLIKED, Preference::STATUS_PREFERRED, Preference::STATUS_INDIFFERENT])->default(Preference::STATUS_INDIFFERENT);
             $table->timestamps();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('preference_round');
+        Schema::dropIfExists('preference_user');
     }
 };
