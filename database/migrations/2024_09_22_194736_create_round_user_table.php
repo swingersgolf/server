@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('round_user', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('round_id');
-            $table->uuid('user_id');
+            $table->foreignId('round_id')->constrained()->onDelete('cascade');;
+            $table->uuid('user_id')->constrained()->onDelete('cascade');;
             $table->enum('status', ['accepted', 'rejected', 'pending'])->nullable()->default(null);
             $table->timestamps();
         });
