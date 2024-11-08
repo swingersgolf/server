@@ -76,7 +76,6 @@ class RoundController extends Controller
 
     public function update(RoundRequest $request, Round $round)
     {
-    {
         // Validate request
         $validatedData = $request->validated();
 
