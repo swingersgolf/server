@@ -37,7 +37,7 @@ class RoundController extends Controller
 
     public function store(RoundRequest $request)
     {
-        // Validate request
+        // Validate and retrieve the request data
         $validatedData = $request->validated();
 
         // Convert 'when' to the correct format
@@ -56,21 +56,16 @@ class RoundController extends Controller
 
         // Automatically add the host as a golfer to the round
         $userId = Auth::id();
-        $round->users()->attach($userId, ['status' => 'accepted']); // Use 'attach' to add the golfer
+        $round->users()->attach($userId, ['status' => 'accepted']);
 
-        // Save each preference to the preference_round table
-        foreach ($validatedData['preferences'] as $preferenceName => $status) {
-            // Find the preference ID by name
-            $preference = \App\Models\Preference::where('name', $preferenceName)->first();
-            
-            if ($preference) {
-                // Attach the preference to the round with the specified status
-                $round->preferences()->attach($preference->id, ['status' => $status]);
-            }
+        // Attach each preference to the round with the specified status
+        foreach ($validatedData['preferences'] as $preferenceId => $status) {
+            $round->preferences()->attach((int) $preferenceId, ['status' => $status]);
         }
 
         return new RoundResource($round);
     }
+
 
     
     public function update(RoundRequest $request, Round $round)
