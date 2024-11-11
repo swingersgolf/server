@@ -9,14 +9,6 @@ use App\Models\PreferenceUser;
 
 class PreferenceUserController extends Controller
 {
-
-    public function index()
-    {
-        $preferences = PreferenceUser::all();
-    
-        return PreferenceUserResource::collection($preferences);
-    }
-
     public function show()
     {
         $user = auth()->user();
@@ -26,23 +18,4 @@ class PreferenceUserController extends Controller
     
         return PreferenceUserResource::collection($preferences);
     }    
-
-    public function update(PreferenceUserUpdateRequest $request)
-    {
-        $user = auth()->user();
-        $preferences = $request->input('preferences', []);
-    
-        foreach ($preferences as $preference) {
-            PreferenceUser::where('user_id', $user->id)
-                ->where('id', $preference['id'])
-                ->update([
-                    'name' => $preference['name'],
-                    'status' => $preference['status'],
-                ]);
-        }
-    
-        $updatedPreferences = PreferenceUser::where('user_id', $user->id)->get();
-    
-        return PreferenceUserResource::collection($updatedPreferences);
-    }
 }
