@@ -24,14 +24,8 @@ class PreferenceUserSeeder extends Seeder
 
         // Iterate over each user
         foreach ($users as $user) {
-            // Generate a random number of PreferenceUser entries between 1 and the count of preferences
-            $numberOfPreferences = rand(1, $preferences->count());
-
-            // Pick a random set of unique preferences for this user
-            $userPreferences = $preferences->random($numberOfPreferences);
-
-            // Create a PreferenceUser entry for each preference assigned to the user
-            foreach ($userPreferences as $preference) {
+            // Iterate over each preference and create a PreferenceUser entry for each one
+            foreach ($preferences as $preference) {
                 PreferenceUser::create([
                     'user_id' => $user->id,
                     'preference_id' => $preference->id,  // Ensure unique preference_id

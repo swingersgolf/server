@@ -16,7 +16,7 @@ class PreferenceUserFactory extends Factory
         return [
             'user_id' => User::factory(),  // Generate a user using the User factory
             'preference_id' => Preference::factory(),  // Generate a preference using the Preference factory
-            'status' => $this->faker->randomElement(['indifferent', 'disliked', 'preferred']),
+            'status' => $this->faker->randomElement(['indifferent', 'disliked', 'preferred', null]),  // Include null status
         ];
     }
 }
