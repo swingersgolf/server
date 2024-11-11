@@ -16,6 +16,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('preference_id');
             $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('preference_id')->references('id')->on('preferences')->onDelete('cascade');
             $table->enum('status', [Preference::STATUS_DISLIKED, Preference::STATUS_PREFERRED, Preference::STATUS_INDIFFERENT])->default(Preference::STATUS_INDIFFERENT);
             $table->timestamps();
         });

@@ -128,7 +128,11 @@ class RoundController extends Controller
             $this->notificationService->sendNotification(
                 'Join Request',
                 '' . Auth::user()->name . ' has requested to join your round.',
-                $host->id
+                $host->id,
+                [
+                    'type' => 'join_request',
+                    'route' => 'rounds/' . $round->id,
+                ]
             );
         }
 
@@ -161,7 +165,11 @@ class RoundController extends Controller
                 $this->notificationService->sendNotification(
                     'Round Accepted',
                     'Your request to join the round has been accepted.',
-                    $user->id
+                    $user->id,
+                    [
+                        'type' => 'round_accepted',
+                        'route' => 'rounds/' . $round->id,
+                    ]
                 );
             }
 
@@ -184,7 +192,11 @@ class RoundController extends Controller
                 $this->notificationService->sendNotification(
                     'Round Rejected',
                     'Your request to join the round has been rejected.',
-                    $user->id
+                    $user->id,
+                    [
+                        'type' => 'round_rejected',
+                        'route' => 'rounds/' . $round->id,
+                    ]
                 );
             }
 
@@ -192,5 +204,21 @@ class RoundController extends Controller
         }
 
         return response()->json(['message' => 'User has not requested to join.'], 404);
+    }
+
+    public function removeUser (Request $request, Round $round)
+    {
+        if ($round->host_id !== Auth::id()) {
+            return response()->json(['message' => 'You are not the host of this round.'], 403);
+        }
+        $userId = $request->input('user_id');
+
+        if ($round->users()->where('user_id', $userId)->first()) {
+            $round->users()->detach($userId);
+
+            return response()->json(['message' => 'User removed.']);
+        }
+
+        return response()->json(['message' => 'User not found.'], 404);
     }
 }

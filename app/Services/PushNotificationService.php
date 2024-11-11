@@ -16,7 +16,7 @@ class PushNotificationService
         $this->client = new Client();
     }
 
-    public function sendNotification($title, $body, $userId)
+    public function sendNotification($title, $body, $userId, $data = [])
     {
         // Retrieve the user by userId and get their Expo push token
         $user = User::find($userId);
@@ -33,9 +33,7 @@ class PushNotificationService
             'to' => $expoPushToken,
             'title' => $title,
             'body' => $body,
-            'data' => (object) [
-                // You can include additional data here
-            ],
+            'data' => $data,
             // TODO: Add sound, badge, logo/icon, etc.
         ];
 

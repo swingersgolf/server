@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserProfileController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PreferenceController;
+use App\Http\Controllers\Api\V1\PreferenceUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +47,9 @@ Route::name('api.')->group(function () {
                 Route::post('round/{round}/accept', [RoundController::class, 'accept'])->name('accept');
                 Route::post('round/{round}/reject', [RoundController::class, 'reject'])->name('reject');
             });
+            Route::name('round-user.')->group(function () {
+                Route::delete('round-user/{round}', [RoundController::class, 'removeUser'])->name('remove-user');
+            });            
             Route::name('course.')->group(function () {
                 Route::get('course', [CourseController::class, 'index'])->name('index');
             });
@@ -58,6 +62,10 @@ Route::name('api.')->group(function () {
             });
             Route::name('preference.')->group(function () {
                 Route::get('preference', [PreferenceController::class, 'index'])->name('index');
+            });
+            Route::name('preference-user.')->group(function () {
+                Route::get('preference-user', [PreferenceUserController::class, 'show'])->name('show');
+                Route::patch('preference-user', [PreferenceUserController::class, 'update'])->name('update');
             });
         });
     });

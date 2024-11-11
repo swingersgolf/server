@@ -39,7 +39,11 @@ class NotificationSeeder extends Seeder
             'title' => fake()->sentence(),
             'body' => fake()->paragraph(),
             'data' => (object) [
-                'key' => 'value',
+                'type' => fake()->randomElement(['round_accepted', 'round_rejected', 'round_requested']),
+                'route' => '(round)/details',
+                'params' => (object) [
+                    'roundId' => fake()->numberBetween(1, 10),
+                ],
             ],
         ];
     }

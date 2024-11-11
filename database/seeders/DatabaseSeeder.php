@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             CourseSeeder::class,
             RoundSeeder::class,
             NotificationSeeder::class,
+            PreferenceUserSeeder::class,
         ]);
     }
 }
