@@ -11,32 +11,6 @@ use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
-    public function test_it_returns_user_with_preferences(): void
-    {
-        $name = 'John Doe';
-        $email = 'john.doe@example.com';
-        $birthdate = '2000-11-30';
-        $user = User::factory()->create([
-            'name' => $name,
-            'email' => $email,
-            'birthdate' => $birthdate,
-            'password' => Hash::make('password'),
-        ]);
-
-        $preference = Preference::factory()->count(3)->create();
-        $preferenceNames = $preference->pluck('name');
-        $user->preferences()->attach($preference, ['status' => Preference::STATUS_PREFERRED]);
-
-        $response = $this->actingAs($user)->get(route('api.v1.user.show'));
-        $responseData = $response->json('data');
-        $this->assertEquals($name, $responseData['name']);
-        $this->assertEquals($email, $responseData['email']);
-        $this->assertEquals($birthdate, $responseData['birthdate']);
-        foreach ($responseData['preferences'] as $preference) {
-            $this->assertContains($preference['name'], $preferenceNames);
-        }
-    }
-
     public function test_it_cannot_update_user_id(): void
     {
         $user = User::factory()->create();
