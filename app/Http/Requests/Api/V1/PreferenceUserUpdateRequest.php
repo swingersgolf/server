@@ -17,7 +17,7 @@ class PreferenceUserUpdateRequest extends FormRequest
         return [
             'preferences' => 'required|array',
             'preferences.*.preference_id' => 'required|integer|exists:preferences,id',
-            'preferences.*.preference_name' => 'required|string',
+            'preferences.*.preference_name' => 'string',
             'preferences.*.status' => 'required|string|in:preferred,disliked,indifferent',  // Adjust allowed status values as needed
         ];
     }
@@ -30,7 +30,6 @@ class PreferenceUserUpdateRequest extends FormRequest
             'preferences.*.preference_id.required' => 'Preference ID is required.',
             'preferences.*.preference_id.integer' => 'Preference ID must be an integer.',
             'preferences.*.preference_id.exists' => 'Preference ID must exist in the preferences table.',
-            'preferences.*.preference_name.required' => 'Preference name is required.',
             'preferences.*.preference_name.string' => 'Preference name must be a string.',
             'preferences.*.status.required' => 'Status is required.',
             'preferences.*.status.in' => 'Status must be one of the following: preferred, disliked, indifferent.',
