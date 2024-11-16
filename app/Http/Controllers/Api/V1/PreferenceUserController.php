@@ -9,13 +9,39 @@ use App\Models\PreferenceUser;
 
 class PreferenceUserController extends Controller
 {
+    // Show user preferences
     public function show()
     {
         $user = auth()->user();
-    
-        // Use the PreferenceUser model to get preferences for the authenticated user
+        
+        // Fetch preferences associated with the authenticated user
         $preferences = PreferenceUser::where('user_id', $user->id)->get();
-    
+        
         return PreferenceUserResource::collection($preferences);
-    }    
+    }
+
+    // Update user preferences
+    public function update(PreferenceUserUpdateRequest $request)
+    {
+        $user = auth()->user();
+        $preferences = $request->preferences;
+        
+        foreach ($preferences as $preference) {
+            // Update or create preferences based on preference_id and user_id
+            PreferenceUser::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'preference_id' => $preference['preference_id']
+                ],
+                [
+                    'status' => $preference['status']
+                ]
+            );
+        }
+
+        // Fetch updated preferences
+        $updatedPreferences = PreferenceUser::where('user_id', $user->id)->get();
+        
+        return PreferenceUserResource::collection($updatedPreferences);
+    }
 }
