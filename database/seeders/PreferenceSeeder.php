@@ -12,7 +12,7 @@ class PreferenceSeeder extends Seeder
      */
     public function run(): void
     {
-        $preferences = collect(['Drinking', 'Walking', 'Betting', 'Music']);
+        $preferences = collect(['drinking', 'riding', 'betting', 'music']);
         $preferences->each(function ($preference) {
             Preference::factory()->create([
                 'name' => $preference,

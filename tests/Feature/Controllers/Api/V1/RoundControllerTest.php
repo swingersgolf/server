@@ -198,32 +198,49 @@ class RoundControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $course = Course::factory()->create();
-
+        // Create a preference to use in the test
+        $preference = Preference::factory()->create();
+    
         $response = $this->actingAs($user)->post(route('api.v1.round.store'), [
             'when' => "2021-10-10 10:00:00",
             'course_id' => $course->id,
             'group_size' => 4,
+            'preferences' => [
+                $preference->id => 'preferred',  // Add a valid preference with status
+            ],
         ]);
+    
         $response->assertSuccessful();
         $this->assertDatabaseHas('rounds', [
             'when' => "2021-10-10 10:00:00",
             'course_id' => $course->id,
             'group_size' => 4,
         ]);
+        // Ensure that the preference was attached correctly
+        $this->assertDatabaseHas('preference_round', [
+            'round_id' => Round::first()->id,
+            'preference_id' => $preference->id,
+            'status' => 'preferred', // Ensure the status is set properly
+        ]);
     }
-
+    
     public function test_update_round(): void
     {
         $user = User::factory()->create();
         $course = Course::factory()->create();
         $round = Round::factory()->create();
-
+        // Create a preference to use in the test
+        $preference = Preference::factory()->create();
+    
         $response = $this->actingAs($user)->patch(route('api.v1.round.update', $round->id), [
             'when' => "2021-10-10 10:00:00",
             'course_id' => $course->id,
             'group_size' => 4,
+            'preferences' => [
+                $preference->id => 'preferred',  // Add a valid preference with status
+            ],
         ]);
-
+    
         $response->assertSuccessful();
         $this->assertDatabaseHas('rounds', [
             'id' => $round->id,
@@ -231,8 +248,14 @@ class RoundControllerTest extends TestCase
             'course_id' => $course->id,
             'group_size' => 4,
         ]);
+        // Ensure that the preference was updated correctly
+        $this->assertDatabaseHas('preference_round', [
+            'round_id' => $round->id,
+            'preference_id' => $preference->id,
+            'status' => 'preferred', // Ensure the status is set properly
+        ]);
     }
-
+    
     public function test_delete_round(): void
     {
         $user = User::factory()->create();

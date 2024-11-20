@@ -43,7 +43,7 @@ class RoundController extends Controller
 
     public function store(RoundRequest $request)
     {
-        // Validate request
+        // Validate and retrieve the request data
         $validatedData = $request->validated();
 
         // Convert 'when' to the correct format
@@ -62,8 +62,13 @@ class RoundController extends Controller
 
         // Automatically add the host as a golfer to the round
         $userId = Auth::id();
-        $round->users()->attach($userId, ['status' => 'accepted']); // Use 'attach' to add the golfer
+        $round->users()->attach($userId, ['status' => 'accepted']);
 
+        // Attach each preference to the round with the specified status
+        foreach ($validatedData['preferences'] as $preferenceId => $status) {
+            $round->preferences()->attach((int) $preferenceId, ['status' => $status]);
+        }
+      
         return new RoundResource($round);
     }
 
@@ -72,10 +77,12 @@ class RoundController extends Controller
         // Validate request
         $validatedData = $request->validated();
 
+
         // Convert 'when' to the correct format if it's being updated
         if (isset($validatedData['when'])) {
             $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
         }
+
 
         // Update the round with only the relevant fields
         $round->update([
@@ -84,8 +91,20 @@ class RoundController extends Controller
             'course_id' => $validatedData['course_id'] ?? $round->course_id,
         ]);
 
+        // Update preferences
+        if (isset($validatedData['preferences'])) {
+            // Detach all existing preferences
+            $round->preferences()->detach();
+
+            // Reattach preferences with new statuses
+            foreach ($validatedData['preferences'] as $preferenceId => $status) {
+                $round->preferences()->attach((int) $preferenceId, ['status' => $status]);
+            }
+        }
+
         return new RoundResource($round);
     }
+ 
 
     public function destroy(Round $round)
     {
@@ -94,12 +113,12 @@ class RoundController extends Controller
         return response()->json(['message' => 'Round deleted.']);
     }
 
-    public function join(Round $round)
+        public function join(Round $round)
     {
         $userId = Auth::id();
 
         $round->users()->syncWithoutDetaching([
-            $userId => ['status' => 'pending'],
+            $userId => ['status' => 'pending']
         ]);
 
         // Send notification to the round host
@@ -107,13 +126,30 @@ class RoundController extends Controller
         if ($host && $host->expo_push_token) {
 
             $this->notificationService->sendNotification(
-                $host->expo_push_token,
                 'Join Request',
-                ''.Auth::user()->name.' has requested to join your round.'
+                '' . Auth::user()->name . ' has requested to join your round.',
+                $host->id,
+                [
+                    'type' => 'join_request',
+                    'route' => 'rounds/' . $round->id,
+                ]
             );
         }
 
         return response()->json(['message' => 'Join request submitted.']);
+    }
+
+    public function leave(Round $round)
+    {
+        $userId = Auth::id();
+
+        if ($round->host_id === $userId) {
+            return response()->json(['message' => 'Host cannot leave the round.'], 403);
+        }
+
+        $round->users()->detach($userId);
+
+        return response()->json(['message' => 'User left round.']);
     }
 
     public function accept(Request $request, Round $round)
@@ -127,9 +163,13 @@ class RoundController extends Controller
             $user = $round->users()->find($userId);
             if ($user && $user->expo_push_token) {
                 $this->notificationService->sendNotification(
-                    $user->expo_push_token,
                     'Round Accepted',
-                    'Your request to join the round has been accepted.'
+                    'Your request to join the round has been accepted.',
+                    $user->id,
+                    [
+                        'type' => 'round_accepted',
+                        'route' => 'rounds/' . $round->id,
+                    ]
                 );
             }
 
@@ -150,9 +190,13 @@ class RoundController extends Controller
             $user = $round->users()->find($userId);
             if ($user && $user->expo_push_token) {
                 $this->notificationService->sendNotification(
-                    $user->expo_push_token,
                     'Round Rejected',
-                    'Your request to join the round has been rejected.'
+                    'Your request to join the round has been rejected.',
+                    $user->id,
+                    [
+                        'type' => 'round_rejected',
+                        'route' => 'rounds/' . $round->id,
+                    ]
                 );
             }
 
@@ -160,5 +204,21 @@ class RoundController extends Controller
         }
 
         return response()->json(['message' => 'User has not requested to join.'], 404);
+    }
+
+    public function removeUser (Request $request, Round $round)
+    {
+        if ($round->host_id !== Auth::id()) {
+            return response()->json(['message' => 'You are not the host of this round.'], 403);
+        }
+        $userId = $request->input('user_id');
+
+        if ($round->users()->where('user_id', $userId)->first()) {
+            $round->users()->detach($userId);
+
+            return response()->json(['message' => 'User removed.']);
+        }
+
+        return response()->json(['message' => 'User not found.'], 404);
     }
 }

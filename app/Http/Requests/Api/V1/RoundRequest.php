@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RoundRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class RoundRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Change to true to allow authorized users to make this request
+        return true;
     }
 
     /**
@@ -22,9 +23,22 @@ class RoundRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'when' => 'required|date|date_format:Y-m-d H:i:s', // Ensure it's a valid datetime
-            'group_size' => 'required|integer|between:2,4', // Adjust the range as necessary
-            'course_id' => 'required|exists:courses,id', // Ensure it exists in the courses table
+            'when' => 'required|date',
+            'group_size' => 'required|integer|between:2,4',
+            'course_id' => 'required|exists:courses,id',
+    
+            // Validate preferences
+            'preferences' => 'required|array',
+            
+            // Ensure each preference_id exists in the preferences table
+            'preferences.*' => 'exists:preferences,id',  // Validates the preference id
+    
+            // Validate the status of each preference
+            'preferences.*' => [
+                'required',
+                'string',
+                Rule::in(['indifferent', 'preferred', 'disliked']), // Ensure valid status values
+            ],
         ];
-    }
+    }    
 }

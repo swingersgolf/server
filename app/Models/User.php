@@ -71,6 +71,11 @@ class User extends Authenticatable
             ->withTimestamps();    // Adds created_at and updated_at for the pivot
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+  
     public function preferences(): BelongsToMany
     {
         return $this->belongsToMany(Preference::class)->withPivot('status');
