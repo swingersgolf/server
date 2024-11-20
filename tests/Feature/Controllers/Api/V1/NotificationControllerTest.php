@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class NotificationControllerTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function test_index()
     {
@@ -20,7 +19,6 @@ class NotificationControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('api.v1.notification.index'))
             ->assertOk();
 
-        $response->assertStatus(200);
         $response->assertJsonCount(3, 'data');
     }
 
@@ -32,7 +30,6 @@ class NotificationControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('api.v1.notification.user'))
             ->assertOk();
 
-        $response->assertStatus(200);
         $response->assertJsonCount(3, 'data');
         $response->assertJsonFragment(['user_id' => $user->id]);
     }
@@ -45,8 +42,6 @@ class NotificationControllerTest extends TestCase
 
         $response = $this->actingAs($user)->patch(route('api.v1.notification.read', $notification->id))
             ->assertOk();
-
-        $response->assertStatus(200);
 
         $notification->refresh();
         $this->assertNotNull($notification->read_at);
@@ -65,8 +60,6 @@ class NotificationControllerTest extends TestCase
         $response = $this->actingAs($user)->patch(route('api.v1.notification.unread', $notification->id))
             ->assertOk();
 
-        $response->assertStatus(200);
-
         $notification->refresh();
         $this->assertNull($notification->read_at);
 
@@ -81,8 +74,6 @@ class NotificationControllerTest extends TestCase
 
         $response = $this->actingAs($user)->delete(route('api.v1.notification.delete', $notification->id))
             ->assertOk();
-
-        $response->assertStatus(200);
 
         $this->assertDatabaseMissing('notifications', ['id' => $notification->id]);
 
