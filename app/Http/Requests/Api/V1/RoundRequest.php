@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Models\Round;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,7 +24,12 @@ class RoundRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'when' => 'required|date',
+            'date' => 'required|date',
+            'time_range' => [
+                'required',
+                'string',
+                Rule::in(Round::getTimeRanges()), // Validate that time_range is one of the enum values
+            ],
             'group_size' => 'required|integer|between:2,4',
             'course_id' => 'required|exists:courses,id',
     
