@@ -16,7 +16,8 @@ class RoundResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'when' => $this->when,
+            'date' => $this->date,
+            'time_range' => $this->time_range,
             'course' => $this->course ? $this->course->name : null,
             'preferences' => $this->preferences->map(function ($preference) {
                 return [

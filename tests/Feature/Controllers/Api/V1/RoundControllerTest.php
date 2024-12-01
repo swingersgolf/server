@@ -30,7 +30,8 @@ class RoundControllerTest extends TestCase
         $preferences = Preference::factory()->count(3)->create();
 
         $round = Round::factory()->create([
-            'when' => now(),
+            'date' => now(),
+            'time_range' => 'morning',
             'course_id' => $where->id,
             'group_size' => 4,
         ]);
@@ -51,7 +52,12 @@ class RoundControllerTest extends TestCase
             ->assertSuccessful();
         $responseData = $response->json()['data'][0];
 
-        $this->assertEquals($round->when, $responseData['when']);
+        // Format the round date to 'Y-m-d' before comparing
+        $formattedRoundDate = $round->date->format('Y-m-d');
+        $formattedResponseDate = Carbon::parse($responseData['date'])->format('Y-m-d');
+
+        // Compare the dates only (ignore time)
+        $this->assertEquals($formattedRoundDate, $formattedResponseDate);
 
         $courseName = Course::find($round->course_id)->name;
         $this->assertEquals($courseName, $responseData['course']);
@@ -69,16 +75,16 @@ class RoundControllerTest extends TestCase
         $this->assertEquals(Preference::STATUS_INDIFFERENT, $responseData['preferences'][2]['status']);
     }
 
-    #[DataProvider('whenScenarios')]
+    #[DataProvider('dateScenarios')]
     public function test_index_returns_rounds_filtered_by_dates($start, $end, $count): void
     {
         Carbon::setTestNow(now());
         $user = User::factory()->create();
         Round::factory()->create([
-            'when' => now()->addDays(2)->format('Y-m-d H:i'),
+            'date' => now()->addDays(2)->format('Y-m-d H:i'),
         ]);
         Round::factory()->create([
-            'when' => now()->addDays(4)->format('Y-m-d H:i'),
+            'date' => now()->addDays(4)->format('Y-m-d H:i'),
         ]);
         $response = $this->actingAs($user)->getJson(
             route('api.v1.round.index', [
@@ -98,7 +104,8 @@ class RoundControllerTest extends TestCase
         $preferences = Preference::factory()->count(3)->create();
 
         $round = Round::factory()->create([
-            'when' => now(),
+            'date' => now()->format('Y-m-d'),
+            'time_range' => 'morning',
             'course_id' => $where->id,
             'group_size' => 4,
         ]);
@@ -119,7 +126,7 @@ class RoundControllerTest extends TestCase
             ->assertSuccessful();
         $responseData = $response->json()['data'];
 
-        $this->assertEquals($round->when, $responseData['when']);
+        $this->assertEquals($round->date, $responseData['date']);
 
         $courseName = Course::find($round->course_id)->name;
         $this->assertEquals($courseName, $responseData['course']);
@@ -202,7 +209,8 @@ class RoundControllerTest extends TestCase
         $preference = Preference::factory()->create();
     
         $response = $this->actingAs($user)->post(route('api.v1.round.store'), [
-            'when' => "2021-10-10 10:00:00",
+            'date' => "2021-10-10",
+            'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
             'preferences' => [
@@ -212,7 +220,8 @@ class RoundControllerTest extends TestCase
     
         $response->assertSuccessful();
         $this->assertDatabaseHas('rounds', [
-            'when' => "2021-10-10 10:00:00",
+            'date' => "2021-10-10",
+            'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
         ]);
@@ -233,7 +242,8 @@ class RoundControllerTest extends TestCase
         $preference = Preference::factory()->create();
     
         $response = $this->actingAs($user)->patch(route('api.v1.round.update', $round->id), [
-            'when' => "2021-10-10 10:00:00",
+            'date' => "2021-10-10",
+            'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
             'preferences' => [
@@ -244,7 +254,8 @@ class RoundControllerTest extends TestCase
         $response->assertSuccessful();
         $this->assertDatabaseHas('rounds', [
             'id' => $round->id,
-            'when' => "2021-10-10 10:00:00",
+            'date' => "2021-10-10",
+            'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
         ]);
@@ -269,7 +280,7 @@ class RoundControllerTest extends TestCase
         ]);
     }
 
-    public static function whenScenarios(): array
+    public static function dateScenarios(): array
     {
         return [
             'all rounds' => [

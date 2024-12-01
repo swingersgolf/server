@@ -46,15 +46,19 @@ class RoundController extends Controller
         // Validate and retrieve the request data
         $validatedData = $request->validated();
 
-        // Convert 'when' to the correct format
-        $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
+        // Convert 'date' to the correct format
+        $validatedData['date'] = (new \DateTime($validatedData['date']))->format('Y-m-d');
+
+        // Time range
+        $validatedData['time_range'] = $validatedData['time_range'];
 
         // Set the host_id to the authenticated user's ID
         $validatedData['host_id'] = Auth::id();
 
         // Create the round with specific fields
         $round = Round::create([
-            'when' => $validatedData['when'],
+            'date' => $validatedData['date'],
+            'time_range' => $validatedData['time_range'],
             'group_size' => $validatedData['group_size'],
             'course_id' => $validatedData['course_id'],
             'host_id' => $validatedData['host_id'],
@@ -78,15 +82,16 @@ class RoundController extends Controller
         $validatedData = $request->validated();
 
 
-        // Convert 'when' to the correct format if it's being updated
-        if (isset($validatedData['when'])) {
-            $validatedData['when'] = (new \DateTime($validatedData['when']))->format('Y-m-d H:i:s');
+        // Convert 'date' to the correct format if it's being updated
+        if (isset($validatedData['date'])) {
+            $validatedData['date'] = (new \DateTime($validatedData['date']))->format('Y-m-d');
         }
 
 
         // Update the round with only the relevant fields
         $round->update([
-            'when' => $validatedData['when'] ?? $round->when, // Keep current value if not provided
+            'date' => $validatedData['date'] ?? $round->date, // Keep current value if not provided
+            'time_range' => $validatedData['time_range'] ?? $round->time_range,
             'group_size' => $validatedData['group_size'] ?? $round->group_size,
             'course_id' => $validatedData['course_id'] ?? $round->course_id,
         ]);
