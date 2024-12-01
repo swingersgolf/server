@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Controllers\Api\V1;
 
-use App\Models\Attribute;
 use App\Models\Course;
 use App\Models\Preference;
 use App\Models\Round;
@@ -31,9 +30,10 @@ class RoundControllerTest extends TestCase
         $preferences = Preference::factory()->count(3)->create();
 
         $round = Round::factory()->create([
-            'when' => now(),
+            'date' => now(),
+            'time_range' => 'morning',
             'course_id' => $where->id,
-            'spots' => 4,
+            'group_size' => 4,
         ]);
 
         $round->preferences()->attach($preferences[0], [
@@ -46,18 +46,23 @@ class RoundControllerTest extends TestCase
             'status' => Preference::STATUS_INDIFFERENT,
         ]);
 
-        $round->users()->attach($users);
+        $round->users()->attach($users->pluck('id'), ['status' => 'accepted']);
 
         $response = $this->actingAs($users[0])->get(route('api.v1.round.index'))
             ->assertSuccessful();
         $responseData = $response->json()['data'][0];
 
-        $this->assertEquals($round->when, $responseData['when']);
+        // Format the round date to 'Y-m-d' before comparing
+        $formattedRoundDate = $round->date->format('Y-m-d');
+        $formattedResponseDate = Carbon::parse($responseData['date'])->format('Y-m-d');
+
+        // Compare the dates only (ignore time)
+        $this->assertEquals($formattedRoundDate, $formattedResponseDate);
 
         $courseName = Course::find($round->course_id)->course_name;
         $this->assertEquals($courseName, $responseData['course']);
         $this->assertEquals($users->count(), $responseData['golfer_count']);
-        $this->assertEquals($round->spots, $responseData['spots']);
+        $this->assertEquals($round->group_size, $responseData['group_size']);
 
         $this->assertEquals($preferences[0]->name, $responseData['preferences'][0]['name']);
         $this->assertEquals($preferences[0]->id, $responseData['preferences'][0]['id']);
@@ -67,19 +72,19 @@ class RoundControllerTest extends TestCase
         $this->assertEquals('disliked', $responseData['preferences'][1]['status']);
         $this->assertEquals($preferences[2]->name, $responseData['preferences'][2]['name']);
         $this->assertEquals($preferences[2]->id, $responseData['preferences'][2]['id']);
-        $this->assertEquals('indifferent', $responseData['preferences'][2]['status']);
+        $this->assertEquals(Preference::STATUS_INDIFFERENT, $responseData['preferences'][2]['status']);
     }
 
-    #[DataProvider('whenScenarios')]
+    #[DataProvider('dateScenarios')]
     public function test_index_returns_rounds_filtered_by_dates($start, $end, $count): void
     {
         Carbon::setTestNow(now());
         $user = User::factory()->create();
         Round::factory()->create([
-            'when' => now()->addDays(2)->format('Y-m-d H:i'),
+            'date' => now()->addDays(2)->format('Y-m-d H:i'),
         ]);
         Round::factory()->create([
-            'when' => now()->addDays(4)->format('Y-m-d H:i'),
+            'date' => now()->addDays(4)->format('Y-m-d H:i'),
         ]);
         $response = $this->actingAs($user)->getJson(
             route('api.v1.round.index', [
@@ -99,9 +104,10 @@ class RoundControllerTest extends TestCase
         $preferences = Preference::factory()->count(3)->create();
 
         $round = Round::factory()->create([
-            'when' => now(),
+            'date' => now()->format('Y-m-d'),
+            'time_range' => 'morning',
             'course_id' => $where->id,
-            'spots' => 4,
+            'group_size' => 4,
         ]);
 
         $round->preferences()->attach($preferences[0], [
@@ -120,7 +126,7 @@ class RoundControllerTest extends TestCase
             ->assertSuccessful();
         $responseData = $response->json()['data'];
 
-        $this->assertEquals($round->when, $responseData['when']);
+        $this->assertEquals($round->date, $responseData['date']);
 
         $courseName = Course::find($round->course_id)->course_name;
         $this->assertEquals($courseName, $responseData['course']);
@@ -139,10 +145,142 @@ class RoundControllerTest extends TestCase
         $this->assertEquals('disliked', $responseData['preferences'][1]['status']);
         $this->assertEquals($preferences[2]->name, $responseData['preferences'][2]['name']);
         $this->assertEquals($preferences[2]->id, $responseData['preferences'][2]['id']);
-        $this->assertEquals('indifferent', $responseData['preferences'][2]['status']);
+        $this->assertEquals(Preference::STATUS_INDIFFERENT, $responseData['preferences'][2]['status']);
     }
 
-    public static function whenScenarios(): array
+    public function test_join_submits_request(): void
+    {
+        $user = User::factory()->withExpoPushToken()->create();
+        $round = Round::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('api.v1.round.join', $round->id));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $user->id,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_accept_user_request(): void
+    {
+        $user = User::factory()->withExpoPushToken()->create();
+        $round = Round::factory()->create();
+        $round->users()->attach($user->id, ['status' => 'pending']);
+
+        $response = $this->actingAs($user)->post(route('api.v1.round.accept', [
+            'round' => $round->id,
+            'user_id' => $user->id,
+        ]));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $user->id,
+            'status' => 'accepted',
+        ]);
+    }
+
+    public function test_reject_user_request(): void
+    {
+        $user = User::factory()->withExpoPushToken()->create();
+        $round = Round::factory()->create();
+        $round->users()->attach($user->id, ['status' => 'pending']);
+
+        $response = $this->actingAs($user)->post(route('api.v1.round.reject', [
+            'round' => $round->id,
+            'user_id' => $user->id,
+        ]));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $user->id,
+            'status' => 'rejected',
+        ]);
+    }
+
+    public function test_create_round(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::factory()->create();
+        // Create a preference to use in the test
+        $preference = Preference::factory()->create();
+    
+        $response = $this->actingAs($user)->post(route('api.v1.round.store'), [
+            'date' => "2021-10-10",
+            'time_range' => 'morning',
+            'course_id' => $course->id,
+            'group_size' => 4,
+            'preferences' => [
+                $preference->id => 'preferred',  // Add a valid preference with status
+            ],
+        ]);
+    
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('rounds', [
+            'date' => "2021-10-10",
+            'time_range' => 'morning',
+            'course_id' => $course->id,
+            'group_size' => 4,
+        ]);
+        // Ensure that the preference was attached correctly
+        $this->assertDatabaseHas('preference_round', [
+            'round_id' => Round::first()->id,
+            'preference_id' => $preference->id,
+            'status' => 'preferred', // Ensure the status is set properly
+        ]);
+    }
+    
+    public function test_update_round(): void
+    {
+        $user = User::factory()->create();
+        $course = Course::factory()->create();
+        $round = Round::factory()->create();
+        // Create a preference to use in the test
+        $preference = Preference::factory()->create();
+    
+        $response = $this->actingAs($user)->patch(route('api.v1.round.update', $round->id), [
+            'date' => "2021-10-10",
+            'time_range' => 'morning',
+            'course_id' => $course->id,
+            'group_size' => 4,
+            'preferences' => [
+                $preference->id => 'preferred',  // Add a valid preference with status
+            ],
+        ]);
+    
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('rounds', [
+            'id' => $round->id,
+            'date' => "2021-10-10",
+            'time_range' => 'morning',
+            'course_id' => $course->id,
+            'group_size' => 4,
+        ]);
+        // Ensure that the preference was updated correctly
+        $this->assertDatabaseHas('preference_round', [
+            'round_id' => $round->id,
+            'preference_id' => $preference->id,
+            'status' => 'preferred', // Ensure the status is set properly
+        ]);
+    }
+    
+    public function test_delete_round(): void
+    {
+        $user = User::factory()->create();
+        $round = Round::factory()->create();
+
+        $response = $this->actingAs($user)->delete(route('api.v1.round.destroy', $round->id));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseMissing('rounds', [
+            'id' => $round->id,
+        ]);
+    }
+
+    public static function dateScenarios(): array
     {
         return [
             'all rounds' => [

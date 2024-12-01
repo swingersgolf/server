@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('round_user', function (Blueprint $table) {
+        Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('round_id')->constrained()->onDelete('cascade');;
-            $table->uuid('user_id')->constrained()->onDelete('cascade');;
-            $table->enum('status', ['accepted', 'rejected', 'pending'])->nullable()->default(null);
+            $table->string('user_id'); // Change to match `users.id` type (UUID/string)
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->json('data');
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('round_user');
+        Schema::dropIfExists('notifications');
     }
 };

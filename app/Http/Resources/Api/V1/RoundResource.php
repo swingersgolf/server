@@ -45,7 +45,8 @@ class RoundResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'when' => $this->when,
+            'date' => $this->date,
+            'time_range' => $this->time_range,
             'course' => $this->course ? $this->course->course_name : null,
             'preferences' => $this->preferences->map(function ($preference) {
                 return [
@@ -58,10 +59,15 @@ class RoundResource extends JsonResource
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
+                    'status' => $user->pivot->status,
                 ];
             }),
-            'golfer_count' => $this->users->count(),
-            'spots' => $this->spots,
+            // Count only the golfers with accepted status
+            'golfer_count' => $this->users->filter(function ($user) {
+                return $user->pivot->status === 'accepted'; // Adjust 'accepted' to your specific status value
+            })->count(),
+            'group_size' => $this->group_size,
+            'host_id' => $this->host_id,
             'distance' => $distance, // Include the calculated distance
         ];
     }

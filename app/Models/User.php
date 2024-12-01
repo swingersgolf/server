@@ -8,6 +8,7 @@ use App\Traits\UpdatesFillablesOnly;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'password',
         'birthdate',
         'email_verified_at',
+        'expo_push_token',
     ];
 
     protected $casts = [
@@ -60,5 +62,22 @@ class User extends Authenticatable
     public function userProfile()
     {
         return $this->hasOne(UserProfile::class);
+    }
+
+    public function rounds(): BelongsToMany
+    {
+        return $this->belongsToMany(Round::class)
+            ->withPivot('status')  // Include 'status' on the pivot
+            ->withTimestamps();    // Adds created_at and updated_at for the pivot
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+  
+    public function preferences(): BelongsToMany
+    {
+        return $this->belongsToMany(Preference::class)->withPivot('status');
     }
 }

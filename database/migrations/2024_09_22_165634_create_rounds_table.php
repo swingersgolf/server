@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('rounds', function (Blueprint $table) {
             $table->id();
             $table->dateTime('when')->nullable();
-            $table->tinyInteger('spots')->default(0);
+            $table->tinyInteger('group_size')->default(0);
             $table->unsignedBigInteger('course_id')->nullable();
+            $table->uuid('host_id');
             $table->timestamps();
         });
     }
