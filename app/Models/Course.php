@@ -9,6 +9,6 @@ class Course extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['course_name', 'city_name'];
+    protected $fillable = ['course_name', 'city_name', 'postal_code', 'latitude', 'longitude'];
 
 }
