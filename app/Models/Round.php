@@ -11,10 +11,21 @@ class Round extends Model
 {
     use HasFactory;
 
+    // Enum values for time ranges
+    const TIME_RANGE_EARLY_BIRD = 'early_bird';
+    const TIME_RANGE_MORNING = 'morning';
+    const TIME_RANGE_AFTERNOON = 'afternoon';
+    const TIME_RANGE_TWILIGHT = 'twilight';
+
     protected $fillable = [
-        'when',
-        'spots',
+        'date',
+        'time_range',
+        'group_size',
+        'host_id',
+        'course_id',
     ];
+
+    protected $with = ['preferences'];
 
     public function course(): BelongsTo
     {
@@ -28,18 +39,37 @@ class Round extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)
+            ->withPivot('status')  // Include 'status' on the pivot
+            ->withTimestamps();    // Adds created_at and updated_at for the pivot
+    }
+
+    // Relationship with the host user
+    public function host(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'host_id');
     }
 
     public function scopeDateRange($query, $start = null, $end = null)
     {
         if ($start) {
-            $query->where('when', '>=', $start);
+            $query->where('date', '>=', $start);
         }
         if ($end) {
-            $query->where('when', '<=', $end);
+            $query->where('date', '<=', $end);
         }
 
         return $query;
+    }
+
+    // Get all possible time range values
+    public static function getTimeRanges()
+    {
+        return [
+            self::TIME_RANGE_EARLY_BIRD,
+            self::TIME_RANGE_MORNING,
+            self::TIME_RANGE_AFTERNOON,
+            self::TIME_RANGE_TWILIGHT,
+        ];
     }
 }

@@ -18,13 +18,16 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
+            'expo_push_token' => config('expo.push_token'),
         ]);
 
         $this->call([
-            UserSeeder::class,
             PreferenceSeeder::class,
+            UserSeeder::class,
             CourseSeeder::class,
             RoundSeeder::class,
+            NotificationSeeder::class,
+            PreferenceUserSeeder::class,
         ]);
     }
 }
