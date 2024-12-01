@@ -29,8 +29,11 @@ class RoundController extends Controller
         $start = $request->query('start');
         $end = $request->query('end');
 
+<<<<<<< HEAD
         $rounds = Round::dateRange($start, $end)->get();
 
+=======
+>>>>>>> 401883b04e9fcdcd44adc1838cbfd6b8fc853d32
         $sortedRounds = $this->roundSortingStrategy->sort($rounds);
 
         return RoundResource::collection($sortedRounds);
