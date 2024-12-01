@@ -13,7 +13,13 @@ class UserProfile extends Model
     protected $fillable = [
         'user_id',
         'handicap',
-        'dob',
         'postal_code',
+        'latitude',
+        'longitude',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
