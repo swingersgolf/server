@@ -23,9 +23,11 @@ class RoundResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // Get the latitude and longitude for user and course
-        $userLatitude = $this->users->first()->userProfile->latitude ?? null;
-        $userLongitude = $this->users->first()->userProfile->longitude ?? null;
+        $authUser = $request->user();
+        
+        $userLatitude = $authUser?->userProfile?->latitude;
+        $userLongitude = $authUser?->userProfile?->longitude;
+
         $courseLatitude = $this->course->latitude ?? null;
         $courseLongitude = $this->course->longitude ?? null;
 
