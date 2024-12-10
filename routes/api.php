@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\UserProfileController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PreferenceController;
 use App\Http\Controllers\Api\V1\PreferenceUserController;
+use App\Http\Controllers\Api\V1\PublicAccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +67,9 @@ Route::name('api.')->group(function () {
             Route::name('preference-user.')->group(function () {
                 Route::get('preference-user', [PreferenceUserController::class, 'show'])->name('show');
                 Route::patch('preference-user', [PreferenceUserController::class, 'update'])->name('update');
+            });
+            Route::name('public-account.')->group(function () {
+                Route::get('public-account/{userId}', [PublicAccountController::class, 'show'])->name('show');
             });
         });
     });
