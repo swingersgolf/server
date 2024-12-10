@@ -17,6 +17,8 @@ class UserProfileResource extends JsonResource
         return [
             'handicap' => $this->handicap,
             'postalCode' => $this->postal_code,
+            'latitude' => $this->latitude,  // Add latitude to the response
+            'longitude' => $this->longitude,  // Add longitude to the response
         ];
     }
 }

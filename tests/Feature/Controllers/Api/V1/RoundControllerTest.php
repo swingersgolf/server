@@ -25,7 +25,7 @@ class RoundControllerTest extends TestCase
     {
         $users = User::factory()->count(3)->create();
         $where = Course::factory()->create([
-            'name' => 'Some Course Name',
+            'course_name' => 'Some Course Name',
         ]);
         $preferences = Preference::factory()->count(3)->create();
 
@@ -59,7 +59,7 @@ class RoundControllerTest extends TestCase
         // Compare the dates only (ignore time)
         $this->assertEquals($formattedRoundDate, $formattedResponseDate);
 
-        $courseName = Course::find($round->course_id)->name;
+        $courseName = Course::find($round->course_id)->course_name;
         $this->assertEquals($courseName, $responseData['course']);
         $this->assertEquals($users->count(), $responseData['golfer_count']);
         $this->assertEquals($round->group_size, $responseData['group_size']);
@@ -99,7 +99,7 @@ class RoundControllerTest extends TestCase
     {
         $users = User::factory()->count(3)->create();
         $where = Course::factory()->create([
-            'name' => 'Some Course Name',
+            'course_name' => 'Some Course Name',
         ]);
         $preferences = Preference::factory()->count(3)->create();
 
@@ -128,7 +128,7 @@ class RoundControllerTest extends TestCase
 
         $this->assertEquals($round->date, $responseData['date']);
 
-        $courseName = Course::find($round->course_id)->name;
+        $courseName = Course::find($round->course_id)->course_name;
         $this->assertEquals($courseName, $responseData['course']);
 
         $this->assertCount($users->count(), $responseData['golfers']);
