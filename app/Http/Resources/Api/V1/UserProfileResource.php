@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class UserProfileResource extends JsonResource
 {
@@ -19,6 +20,7 @@ class UserProfileResource extends JsonResource
             'postalCode' => $this->postal_code,
             'latitude' => $this->latitude,  // Add latitude to the response
             'longitude' => $this->longitude,  // Add longitude to the response
+            'profile_photo_url' => $this->profile_photo_path ? Storage::disk('s3')->url($this->profile_photo_path) : null,
         ];
     }
 }

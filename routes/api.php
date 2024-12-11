@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
+use App\Http\Controllers\Api\V1\ProfilePhotoController;
 use App\Http\Controllers\Api\V1\RoundController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserProfileController;
@@ -37,6 +38,10 @@ Route::name('api.')->group(function () {
                 Route::get('user-profile', [UserProfileController::class, 'show'])->name('show');
                 Route::patch('user-profile', [UserProfileController::class, 'update'])->name('update');
             });
+            Route::name('profile-photo.')->group(function () {
+                Route::post('profile-photo', [ProfilePhotoController::class, 'store'])->name('store');
+                Route::delete('profile-photo', [ProfilePhotoController::class, 'destroy'])->name('destroy');
+            });
             Route::name('round.')->group(function () {
                 Route::get('round', [RoundController::class, 'index'])->name('index');
                 Route::post('round', [RoundController::class, 'store'])->name('store');
@@ -50,16 +55,16 @@ Route::name('api.')->group(function () {
             });
             Route::name('round-user.')->group(function () {
                 Route::delete('round-user/{round}', [RoundController::class, 'removeUser'])->name('remove-user');
-            });            
+            });
             Route::name('course.')->group(function () {
                 Route::get('course', [CourseController::class, 'index'])->name('index');
             });
             Route::name('notification.')->group(function () {
                 Route::get('notification', [NotificationController::class, 'index'])->name('index');
                 Route::get('notification/user', [NotificationController::class, 'user'])->name('user');
-                Route::patch('notification/{notification}/read', [NotificationController::class, 'read'])->name('read'); 
-                Route::patch('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread'); 
-                Route::delete('notification/{notification}', [NotificationController::class, 'destroy'])->name('delete'); 
+                Route::patch('notification/{notification}/read', [NotificationController::class, 'read'])->name('read');
+                Route::patch('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread');
+                Route::delete('notification/{notification}', [NotificationController::class, 'destroy'])->name('delete');
             });
             Route::name('preference.')->group(function () {
                 Route::get('preference', [PreferenceController::class, 'index'])->name('index');
