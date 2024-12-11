@@ -39,6 +39,7 @@ Route::name('api.')->group(function () {
                 Route::patch('user-profile', [UserProfileController::class, 'update'])->name('update');
             });
             Route::name('profile-photo.')->group(function () {
+                Route::get('profile-photo/upload-url', [ProfilePhotoController::class, 'generateUploadUrl'])->name('upload-url');
                 Route::post('profile-photo', [ProfilePhotoController::class, 'store'])->name('store');
                 Route::delete('profile-photo', [ProfilePhotoController::class, 'destroy'])->name('destroy');
             });
