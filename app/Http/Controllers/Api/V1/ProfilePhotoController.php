@@ -36,7 +36,7 @@ class ProfilePhotoController extends Controller
     public function store(Request $request): JsonResponse
     {
         $user = $request->user();
-        $userProfile = $user->profile;
+        $userProfile = $user->userProfile;
 
         $request->validate([
             'file_path' => 'required|string', // Validate the file path returned by the client
