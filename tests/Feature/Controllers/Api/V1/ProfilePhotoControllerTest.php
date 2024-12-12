@@ -23,6 +23,8 @@ class ProfilePhotoControllerTest extends TestCase
     }
     public function test_user_can_upload_profile_photo()
     {
+        Storage::fake('s3');
+
         $user = User::factory()->create();
         $filePath = 'profile-photos/' . $user->id . '/dummy.jpg';
 
