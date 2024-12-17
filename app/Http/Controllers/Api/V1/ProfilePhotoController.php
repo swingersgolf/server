@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\ProfilePhotoRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
@@ -17,14 +15,14 @@ class ProfilePhotoController extends Controller
         $user = $request->user();
 
         // Define the S3 file path for the user's photo
-        $fileName = "profile-photos/{$user->id}/" . uniqid() . '.jpg';
+        $fileName = "profile-photos/{$user->id}/".uniqid().'.jpg';
         $disk = Storage::disk('s3');
 
         // Generate a pre-signed URL for upload
         $uploadUrl = $disk->temporaryUrl(
             $fileName,
             now()->addMinutes(15), // URL validity
-            ['ContentType' => 'image/jpeg']
+            ['ResponseContentType' => 'image/jpeg']
         );
 
         return response()->json([
@@ -67,5 +65,16 @@ class ProfilePhotoController extends Controller
         $userProfile->save();
 
         return response()->json(['message' => 'Profile photo deleted successfully.'], ResponseAlias::HTTP_OK);
+    }
+
+    private function getExtensionFromContentType(string $contentType): string
+    {
+        return match ($contentType) {
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+            'image/webp' => 'webp',
+            default => throw new \InvalidArgumentException('Unsupported content type: '.$contentType),
+        };
     }
 }
