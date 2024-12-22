@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;  // Make sure to import this one
+use Illuminate\Support\Carbon;
 
 class NotificationSeeder extends Seeder
 {
@@ -24,6 +24,7 @@ class NotificationSeeder extends Seeder
                 Notification::factory()->count(3)->create([
                     'user_id' => $userId,
                     'created_at' => $this->getRandomDateForRange($range),
+                    'updated_at' => $this->getRandomDateForRange($range),
                     'data' => $this->generateRandomData(),
                     'read_at' => $this->randomReadAt(),
                 ]);
@@ -41,15 +42,15 @@ class NotificationSeeder extends Seeder
     {
         switch ($range) {
             case 'today':
-                return Carbon::today();
+                return Carbon::now();
             case '1-6_days':
-                return Carbon::now()->subDays(rand(1, 6));
+                return Carbon::now()->subDays(rand(1, 6))->setTime(rand(0, 23), rand(0, 59));
             case '7-31_days':
-                return Carbon::now()->subDays(rand(7, 31));
+                return Carbon::now()->subDays(rand(7, 31))->setTime(rand(0, 23), rand(0, 59));
             case '31-364_days':
-                return Carbon::now()->subDays(rand(31, 364));
+                return Carbon::now()->subDays(rand(31, 364))->setTime(rand(0, 23), rand(0, 59));
             case '365_plus_days':
-                return Carbon::now()->subDays(rand(365, 730)); // 1-2 years ago
+                return Carbon::now()->subDays(rand(365, 730))->setTime(rand(0, 23), rand(0, 59)); // 1-2 years ago
             default:
                 return Carbon::now();
         }
@@ -83,6 +84,6 @@ class NotificationSeeder extends Seeder
      */
     private function randomReadAt(): ?\Illuminate\Support\Carbon
     {
-        return rand(0, 1) ? Carbon::now()->subMinutes(rand(0, 10080)) : null; // 10080 minutes = 7 days
+        return rand(0, 1) ? Carbon::now()->subMinutes(rand(0, 10080))->setTime(rand(0, 23), rand(0, 59)) : null; // 10080 minutes = 7 days
     }
 }
