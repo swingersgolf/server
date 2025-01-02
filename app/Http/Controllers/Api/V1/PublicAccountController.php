@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\PublicAccountResource;
 use App\Models\User;
+use App\Services\ProfilePhotoService;
 use Illuminate\Http\JsonResponse;
 
 class PublicAccountController extends Controller
 {
     public function show($userId): JsonResponse|PublicAccountResource
     {
+
         // Find the user by ID
         $user = User::find($userId);
 
@@ -22,6 +24,7 @@ class PublicAccountController extends Controller
         }
 
         // Return the public profile resource
-        return new PublicAccountResource($user);
+        $profilePhotoService = app(ProfilePhotoService::class);
+        return new PublicAccountResource($user, $profilePhotoService);
     }
 }
