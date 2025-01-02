@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\RoundRequest;
+use App\Http\Resources\Api\V1\RoundDetailResource;
 use App\Http\Resources\Api\V1\RoundResource;
 use App\Models\Round;
 use App\Services\PushNotificationService;
@@ -36,9 +37,9 @@ class RoundController extends Controller
         return RoundResource::collection($sortedRounds);
     }
 
-    public function show(Round $round): RoundResource
+    public function show(Round $round): RoundDetailResource
     {
-        return new RoundResource($round);
+        return new RoundDetailResource($round);
     }
 
     public function store(RoundRequest $request)
@@ -72,7 +73,7 @@ class RoundController extends Controller
         foreach ($validatedData['preferences'] as $preferenceId => $status) {
             $round->preferences()->attach((int) $preferenceId, ['status' => $status]);
         }
-      
+
         return new RoundResource($round);
     }
 
@@ -109,7 +110,7 @@ class RoundController extends Controller
 
         return new RoundResource($round);
     }
- 
+
 
     public function destroy(Round $round)
     {
