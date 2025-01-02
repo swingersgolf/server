@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use App\Services\ProfilePhotoService;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PublicAccountResource extends JsonResource
+class PublicUserProfileResource extends JsonResource
 {
     protected ProfilePhotoService $profilePhotoService;
 

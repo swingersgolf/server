@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\PublicAccountResource;
+use App\Http\Resources\Api\V1\PublicUserProfileResource;
 use App\Models\User;
 use App\Services\ProfilePhotoService;
 use Illuminate\Http\JsonResponse;
 
-class PublicAccountController extends Controller
+class PublicUserProfileController extends Controller
 {
-    public function show($userId): JsonResponse|PublicAccountResource
+    public function show($userId): JsonResponse|PublicUserProfileResource
     {
 
         // Find the user by ID
@@ -23,8 +23,8 @@ class PublicAccountController extends Controller
             ], 404);
         }
 
-        // Return the public profile resource
         $profilePhotoService = app(ProfilePhotoService::class);
-        return new PublicAccountResource($user, $profilePhotoService);
+        // Return the public profile resource
+        return new PublicUserProfileResource($user, $profilePhotoService);
     }
 }
