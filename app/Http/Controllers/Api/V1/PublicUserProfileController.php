@@ -13,7 +13,7 @@ class PublicUserProfileController extends Controller
     private ProfilePhotoServiceInterface $profilePhotoService;
     public function __construct(ProfilePhotoServiceInterface $profilePhotoService)
     {
-        $this->$profilePhotoService = $profilePhotoService;
+        $this->profilePhotoService = $profilePhotoService;
     }
 
     public function show($userId): JsonResponse|PublicUserProfileResource
