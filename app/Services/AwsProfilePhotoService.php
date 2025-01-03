@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Aws\S3\S3Client;
 
-class ProfilePhotoService implements ProfilePhotoServiceInterface
+class AwsProfilePhotoService implements ProfilePhotoServiceInterface
 {
     private S3Client $s3Client;
 

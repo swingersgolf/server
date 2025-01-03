@@ -6,7 +6,7 @@ use App\Models\Course;
 use App\Models\Preference;
 use App\Models\Round;
 use App\Models\User;
-use App\Services\ProfilePhotoService;
+use App\Services\AwsProfilePhotoService;
 use App\Services\ProfilePhotoServiceInterface;
 use Illuminate\Support\Carbon;
 use Mockery;
