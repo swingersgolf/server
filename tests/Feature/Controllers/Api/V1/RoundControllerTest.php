@@ -6,7 +6,6 @@ use App\Models\Course;
 use App\Models\Preference;
 use App\Models\Round;
 use App\Models\User;
-use App\Services\AwsProfilePhotoService;
 use App\Services\ProfilePhotoServiceInterface;
 use Illuminate\Support\Carbon;
 use Mockery;
@@ -17,6 +16,7 @@ class RoundControllerTest extends TestCase
 {
     public function test_index_returns_all_rounds(): void
     {
+
         $user = User::factory()->create();
         $rounds = Round::factory()->count(3)->create();
         $response = $this->actingAs($user)->get(route('api.v1.round.index'))
@@ -218,7 +218,7 @@ class RoundControllerTest extends TestCase
         $preference = Preference::factory()->create();
 
         $response = $this->actingAs($user)->post(route('api.v1.round.store'), [
-            'date' => "2021-10-10",
+            'date' => '2021-10-10',
             'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
@@ -229,7 +229,7 @@ class RoundControllerTest extends TestCase
 
         $response->assertSuccessful();
         $this->assertDatabaseHas('rounds', [
-            'date' => "2021-10-10",
+            'date' => '2021-10-10',
             'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
@@ -251,7 +251,7 @@ class RoundControllerTest extends TestCase
         $preference = Preference::factory()->create();
 
         $response = $this->actingAs($user)->patch(route('api.v1.round.update', $round->id), [
-            'date' => "2021-10-10",
+            'date' => '2021-10-10',
             'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
@@ -263,7 +263,7 @@ class RoundControllerTest extends TestCase
         $response->assertSuccessful();
         $this->assertDatabaseHas('rounds', [
             'id' => $round->id,
-            'date' => "2021-10-10",
+            'date' => '2021-10-10',
             'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
