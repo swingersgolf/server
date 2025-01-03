@@ -6,20 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\UserProfileUpdateRequest;
 use App\Http\Resources\Api\V1\UserProfileResource;
 use App\Services\GeocodingService;
+use App\Services\ProfilePhotoServiceInterface;
 
 class UserProfileController extends Controller
 {
     protected GeocodingService $geocodingService;
+    protected ProfilePhotoServiceInterface $profilePhotoService;
 
-    public function __construct(GeocodingService $geocodingService)
+    public function __construct(GeocodingService $geocodingService, ProfilePhotoServiceInterface $profilePhotoService)
     {
         $this->geocodingService = $geocodingService; // Inject GeocodingService
+        $this->profilePhotoService = $profilePhotoService;
     }
 
     public function show(): UserProfileResource
     {
         $user = auth()->user();
-        return new UserProfileResource($user->userProfile);
+        return new UserProfileResource($user->userProfile, $this->profilePhotoService);
     }
 
     public function update(UserProfileUpdateRequest $request): UserProfileResource
@@ -39,6 +42,6 @@ class UserProfileController extends Controller
         // Update the user's profile with the validated data (only changes the necessary fields)
         $user->userProfile()->update($validatedData);
 
-        return new UserProfileResource($user->userProfile);
+        return new UserProfileResource($user->userProfile, $this->profilePhotoService);
     }
 }
