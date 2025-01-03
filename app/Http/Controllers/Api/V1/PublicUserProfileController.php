@@ -5,11 +5,17 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\PublicUserProfileResource;
 use App\Models\User;
-use App\Services\ProfilePhotoService;
+use App\Services\ProfilePhotoServiceInterface;
 use Illuminate\Http\JsonResponse;
 
 class PublicUserProfileController extends Controller
 {
+    private ProfilePhotoServiceInterface $profilePhotoService;
+    public function __construct(ProfilePhotoServiceInterface $profilePhotoService)
+    {
+        $this->$profilePhotoService = $profilePhotoService;
+    }
+
     public function show($userId): JsonResponse|PublicUserProfileResource
     {
 
@@ -23,8 +29,7 @@ class PublicUserProfileController extends Controller
             ], 404);
         }
 
-        $profilePhotoService = app(ProfilePhotoService::class);
         // Return the public profile resource
-        return new PublicUserProfileResource($user, $profilePhotoService);
+        return new PublicUserProfileResource($user, $this->profilePhotoService);
     }
 }

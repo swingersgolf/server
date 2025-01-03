@@ -6,7 +6,9 @@ use App\Models\Course;
 use App\Models\Preference;
 use App\Models\Round;
 use App\Models\User;
+use App\Services\ProfilePhotoServiceInterface;
 use Illuminate\Support\Carbon;
+use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -14,6 +16,7 @@ class RoundControllerTest extends TestCase
 {
     public function test_index_returns_all_rounds(): void
     {
+
         $user = User::factory()->create();
         $rounds = Round::factory()->count(3)->create();
         $response = $this->actingAs($user)->get(route('api.v1.round.index'))
@@ -97,6 +100,12 @@ class RoundControllerTest extends TestCase
 
     public function test_show_returns_round_with_preferences(): void
     {
+        $mockProfilePhotoService = Mockery::mock(ProfilePhotoServiceInterface::class);
+        $mockProfilePhotoService->shouldReceive('getPresignedUrl')
+            ->times(3)
+            ->andReturn('https://picsum.photos/200/300');
+        $this->app->instance(ProfilePhotoServiceInterface::class, $mockProfilePhotoService);
+
         $users = User::factory()->count(3)->create();
         $where = Course::factory()->create([
             'course_name' => 'Some Course Name',
@@ -207,9 +216,9 @@ class RoundControllerTest extends TestCase
         $course = Course::factory()->create();
         // Create a preference to use in the test
         $preference = Preference::factory()->create();
-    
+
         $response = $this->actingAs($user)->post(route('api.v1.round.store'), [
-            'date' => "2021-10-10",
+            'date' => '2021-10-10',
             'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
@@ -217,10 +226,10 @@ class RoundControllerTest extends TestCase
                 $preference->id => 'preferred',  // Add a valid preference with status
             ],
         ]);
-    
+
         $response->assertSuccessful();
         $this->assertDatabaseHas('rounds', [
-            'date' => "2021-10-10",
+            'date' => '2021-10-10',
             'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
@@ -232,7 +241,7 @@ class RoundControllerTest extends TestCase
             'status' => 'preferred', // Ensure the status is set properly
         ]);
     }
-    
+
     public function test_update_round(): void
     {
         $user = User::factory()->create();
@@ -240,9 +249,9 @@ class RoundControllerTest extends TestCase
         $round = Round::factory()->create();
         // Create a preference to use in the test
         $preference = Preference::factory()->create();
-    
+
         $response = $this->actingAs($user)->patch(route('api.v1.round.update', $round->id), [
-            'date' => "2021-10-10",
+            'date' => '2021-10-10',
             'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
@@ -250,11 +259,11 @@ class RoundControllerTest extends TestCase
                 $preference->id => 'preferred',  // Add a valid preference with status
             ],
         ]);
-    
+
         $response->assertSuccessful();
         $this->assertDatabaseHas('rounds', [
             'id' => $round->id,
-            'date' => "2021-10-10",
+            'date' => '2021-10-10',
             'time_range' => 'morning',
             'course_id' => $course->id,
             'group_size' => 4,
@@ -266,7 +275,7 @@ class RoundControllerTest extends TestCase
             'status' => 'preferred', // Ensure the status is set properly
         ]);
     }
-    
+
     public function test_delete_round(): void
     {
         $user = User::factory()->create();

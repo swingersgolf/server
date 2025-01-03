@@ -2,14 +2,14 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Services\ProfilePhotoService;
+use App\Services\ProfilePhotoServiceInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PublicUserProfileResource extends JsonResource
 {
-    protected ProfilePhotoService $profilePhotoService;
+    protected ProfilePhotoServiceInterface $profilePhotoService;
 
-    public function __construct($resource, ProfilePhotoService $profilePhotoService)
+    public function __construct($resource, ProfilePhotoServiceInterface $profilePhotoService)
     {
         parent::__construct($resource);
         $this->profilePhotoService = $profilePhotoService;

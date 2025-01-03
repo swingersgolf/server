@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ProfilePhotoService;
+use App\Services\ProfilePhotoServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProfilePhotoController extends Controller
 {
-    private ProfilePhotoService $profilePhotoService;
+    private ProfilePhotoServiceInterface $profilePhotoService;
 
-    public function __construct(ProfilePhotoService $profilePhotoService)
+    public function __construct(ProfilePhotoServiceInterface $profilePhotoService)
     {
         $this->profilePhotoService = $profilePhotoService;
     }
