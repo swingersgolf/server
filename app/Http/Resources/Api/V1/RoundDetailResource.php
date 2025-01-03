@@ -3,20 +3,20 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Services\GeocodingService;
-use App\Services\ProfilePhotoService;
+use App\Services\ProfilePhotoServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoundDetailResource extends JsonResource
 {
     protected GeocodingService $geocodingService;
-    protected ProfilePhotoService $profilePhotoService;
+    protected ProfilePhotoServiceInterface $profilePhotoService;
 
-    public function __construct($resource)
+    public function __construct($resource, ProfilePhotoServiceInterface $profilePhotoService)
     {
         parent::__construct($resource);
         $this->geocodingService = new GeocodingService(); // Initialize the GeocodingService
-        $this->profilePhotoService = new ProfilePhotoService();
+        $this->profilePhotoService = $profilePhotoService;
     }
 
     /**

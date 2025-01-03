@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\RoundRequest;
 use App\Http\Resources\Api\V1\RoundDetailResource;
 use App\Http\Resources\Api\V1\RoundResource;
 use App\Models\Round;
+use App\Services\ProfilePhotoServiceInterface;
 use App\Services\PushNotificationService;
 use App\Services\RoundSorting\RoundSortingStrategyInterface;
 use Illuminate\Http\Request;
@@ -15,14 +16,16 @@ use Illuminate\Support\Facades\Auth;
 
 class RoundController extends Controller
 {
+    protected ProfilePhotoServiceInterface $profilePhotoService;
     protected PushNotificationService $notificationService;
 
     protected RoundSortingStrategyInterface $roundSortingStrategy;
 
-    public function __construct(PushNotificationService $notificationService, RoundSortingStrategyInterface $roundSortingStrategy)
+    public function __construct(PushNotificationService $notificationService, RoundSortingStrategyInterface $roundSortingStrategy, ProfilePhotoServiceInterface $profilePhotoService)
     {
         $this->notificationService = $notificationService;
         $this->roundSortingStrategy = $roundSortingStrategy;
+        $this->profilePhotoService = $profilePhotoService;
     }
 
     public function index(Request $request): AnonymousResourceCollection
@@ -39,7 +42,7 @@ class RoundController extends Controller
 
     public function show(Round $round): RoundDetailResource
     {
-        return new RoundDetailResource($round);
+        return new RoundDetailResource($round, $this->profilePhotoService);
     }
 
     public function store(RoundRequest $request)
