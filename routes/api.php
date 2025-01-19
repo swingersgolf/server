@@ -2,14 +2,14 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
-use App\Http\Controllers\Api\V1\ProfilePhotoController;
-use App\Http\Controllers\Api\V1\RoundController;
-use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V1\UserProfileController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PreferenceController;
 use App\Http\Controllers\Api\V1\PreferenceUserController;
+use App\Http\Controllers\Api\V1\ProfilePhotoController;
 use App\Http\Controllers\Api\V1\PublicUserProfileController;
+use App\Http\Controllers\Api\V1\RoundController;
+use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\UserProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,14 +17,26 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::get('/trigger', function () {
+    event(new \App\Events\TestMessageEvent('Hello World!'));
+
+    return 'event broadcast';
+});
+
 Route::name('api.')->group(function () {
     Route::name('v1.')->prefix('v1')->group(function () {
-        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/login', [AuthController::class, 'login'])->name('login');
-        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/register', [AuthController::class, 'register'])->name('register');
-        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/verify', [AuthController::class, 'verify'])->name('verify');
-        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/resend', [AuthController::class, 'resend'])->name('resend');
-        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/forgot', [AuthController::class, 'forgot'])->name('forgot');
-        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/reset', [AuthController::class, 'reset'])->name('reset');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/login',
+            [AuthController::class, 'login'])->name('login');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/register',
+            [AuthController::class, 'register'])->name('register');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/verify',
+            [AuthController::class, 'verify'])->name('verify');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/resend',
+            [AuthController::class, 'resend'])->name('resend');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/forgot',
+            [AuthController::class, 'forgot'])->name('forgot');
+        Route::middleware(env('APP_ENV') === 'production' ? 'throttle:10,30' : [])->post('/reset',
+            [AuthController::class, 'reset'])->name('reset');
     });
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -63,8 +75,10 @@ Route::name('api.')->group(function () {
                 Route::get('notification', [NotificationController::class, 'index'])->name('index');
                 Route::get('notification/user', [NotificationController::class, 'user'])->name('user');
                 Route::patch('notification/{notification}/read', [NotificationController::class, 'read'])->name('read');
-                Route::patch('notification/{notification}/unread', [NotificationController::class, 'unread'])->name('unread');
-                Route::delete('notification/{notification}', [NotificationController::class, 'destroy'])->name('delete');
+                Route::patch('notification/{notification}/unread',
+                    [NotificationController::class, 'unread'])->name('unread');
+                Route::delete('notification/{notification}',
+                    [NotificationController::class, 'destroy'])->name('delete');
             });
             Route::name('preference.')->group(function () {
                 Route::get('preference', [PreferenceController::class, 'index'])->name('index');
