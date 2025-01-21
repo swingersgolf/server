@@ -4,21 +4,22 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
-class TestMessageEvent implements ShouldBroadcast
+class RoundMessageEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public string $message;
-
+    private $message;
     /**
      * Create a new event instance.
      */
-    public function __construct($message)
+    public function __construct(string $message = 'no message provided')
     {
         $this->message = $message;
     }
@@ -31,13 +32,19 @@ class TestMessageEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            //            new PrivateChannel('channel-name'),
-            new Channel('test-name'),
+            new Channel('my-channel'),
+        ];
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'message' => $this->message,
         ];
     }
 
     public function broadcastAs(): string
     {
-        return 'test-event';
+        return 'my-event';
     }
 }
