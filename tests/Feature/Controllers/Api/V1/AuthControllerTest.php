@@ -114,7 +114,8 @@ class AuthControllerTest extends TestCase
     public function test_register_registers_a_new_user(): void
     {
         $userPayload = [
-            'name' => 'my name',
+            'firstname' => 'my',
+            'lastname' => 'name',
             'email' => 'my.name@example.com',
             'password' => 'password',
             'birthdate' => '1970-12-31',
@@ -133,7 +134,8 @@ class AuthControllerTest extends TestCase
         Notification::fake();
         $email = 'my.name@example.com';
         $userPayload = [
-            'name' => 'my name',
+            'firstname' => 'my',
+            'lastname' => 'name',
             'email' => $email,
             'password' => 'password',
             'birthdate' => '1970-12-31',
@@ -167,13 +169,15 @@ class AuthControllerTest extends TestCase
     public function test_register_prevents_duplicate_user_registration(): void
     {
         $userPayload = [
-            'name' => 'my name',
+            'firstname' => 'my',
+            'lastname' => 'name',
             'email' => 'my.name@example.com',
             'password' => 'password',
         ];
 
         User::factory()->create([
-            'name' => $userPayload['name'],
+            'firstname' => $userPayload['firstname'],
+            'lastname' => $userPayload['lastname'],
             'email' => $userPayload['email'],
             'password' => Hash::make('password'),
         ]);
@@ -505,7 +509,8 @@ class AuthControllerTest extends TestCase
                 'payload' => [
                     'email' => 'birthdate@example.com',
                     'password' => 'password',
-                    'name' => 'Birthday',
+                    'firstname' => 'Birthday',
+                    'lastname' => 'Cake',
                     'birthdate' => '12-31-1970',
                 ],
                 'error' => 'birthdate',
@@ -514,7 +519,8 @@ class AuthControllerTest extends TestCase
                 'payload' => [
                     'email' => 'birthdate@example.com',
                     'password' => 'password',
-                    'name' => 'Birthday',
+                    'firstname' => 'Birthday',
+                    'lastname' => 'Cake',
                     'birthdate' => now()->subYears(17)->format('Y-m-d'),
                 ],
                 'error' => 'birthdate',
@@ -523,7 +529,8 @@ class AuthControllerTest extends TestCase
                 'payload' => [
                     'email' => 'birthdate@example.com',
                     'password' => 'password',
-                    'name' => 'Birthday',
+                    'firstname' => 'Birthday',
+                    'lastname' => 'Cake',
                     'birthdate' => '12-31-70',
                 ],
                 'error' => 'birthdate',
@@ -532,7 +539,8 @@ class AuthControllerTest extends TestCase
                 'payload' => [
                     'email' => 'birthdate@example.com',
                     'password' => 'password',
-                    'name' => 'Birthday',
+                    'firstname' => 'Birthday',
+                    'lastname' => 'Cake',
                     'birthdate' => '1970-31-12',
                 ],
                 'error' => 'birthdate',
@@ -541,7 +549,8 @@ class AuthControllerTest extends TestCase
                 'payload' => [
                     'email' => 'birthdate@example.com',
                     'password' => 'password',
-                    'name' => 'Birthday',
+                    'firstname' => 'Birthday',
+                    'lastname' => 'Cake',
                     'birthdate' => 'not a birthdate',
                 ],
                 'error' => 'birthdate',
@@ -550,21 +559,24 @@ class AuthControllerTest extends TestCase
                 'payload' => [
                     'email' => 'birthdate@example.com',
                     'password' => 'password',
-                    'name' => 'Birthday',
+                    'firstname' => 'Birthday',
+                    'lastname' => 'Cake',
                 ],
                 'error' => 'birthdate',
             ],
-            'name missing' => [
+            'firstname missing' => [
                 'payload' => [
                     'email' => 'my.name@example.com',
                     'password' => 'password',
                     'birthdate' => '1970-01-31',
+                    'lastname' => 'Cake',
                 ],
-                'error' => 'name',
+                'error' => 'firstname',
             ],
             'email missing' => [
                 'payload' => [
-                    'name' => 'my name',
+                    'firstname' => 'my',
+                    'lastname' => 'name',
                     'password' => 'password',
                     'birthdate' => '1970-01-31',
                 ],
@@ -572,7 +584,8 @@ class AuthControllerTest extends TestCase
             ],
             'password missing' => [
                 'payload' => [
-                    'name' => 'my name',
+                    'firstname' => 'my',
+                    'lastname' => 'name',
                     'email' => 'my.name@example.com',
                     'birthdate' => '1970-01-31',
                 ],
@@ -580,7 +593,8 @@ class AuthControllerTest extends TestCase
             ],
             'password too short' => [
                 'payload' => [
-                    'name' => 'my name',
+                    'firstname' => 'my',
+                    'lastname' => 'name',
                     'email' => 'my.name@example.com',
                     'password' => 'passwor',
                     'birthdate' => '1970-01-31',
@@ -589,7 +603,8 @@ class AuthControllerTest extends TestCase
             ],
             'invalid email format' => [
                 'payload' => [
-                    'name' => 'my name',
+                    'firstname' => 'my',
+                    'lastname' => 'name',
                     'email' => 'not an email',
                     'password' => 'password',
                     'birthdate' => '1970-01-31',

@@ -22,7 +22,8 @@ class ShowUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'nullable|string',
+            'firstname' => 'nullable|string',
+            'lastname' => 'nullable|string',
             'email' => 'required|string|email',
             'birthdate' => 'required|date',
         ];

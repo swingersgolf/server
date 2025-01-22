@@ -23,7 +23,8 @@ class GoogleLoginController extends Controller
         $user = User::where('email', $googleUser->email)->first();
         if (! $user) {
             $user = User::create([
-                'name' => $googleUser->name,
+                'firstname' => $googleUser->firstname,
+                'lastname' => $googleUser->lastname,
                 'email' => $googleUser->email,
                 'password' => Hash::make(Str::random(16)),
             ]);
