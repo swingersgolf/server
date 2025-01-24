@@ -51,6 +51,11 @@ class Round extends Model
         return $this->belongsTo(User::class, 'host_id');
     }
 
+    public function messageGroup(): BelongsTo
+    {
+        return $this->belongsTo(MessageGroup::class);
+    }
+
     public function scopeDateRange($query, $start = null, $end = null)
     {
         if ($start) {

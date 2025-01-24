@@ -63,6 +63,8 @@ class RoundController extends Controller
         // Create messaging group for the round
         $messageGroup = MessageGroup::create();
 
+        $messageGroup->users()->attach(Auth::id());
+
         // Create the round with specific fields
         $round = Round::create([
             'date' => $validatedData['date'],
@@ -81,8 +83,8 @@ class RoundController extends Controller
         foreach ($validatedData['preferences'] as $preferenceId => $status) {
             $round->preferences()->attach((int) $preferenceId, ['status' => $status]);
         }
-
-        return new RoundResource($round);
+        $foo = new RoundResource($round);
+        return $foo;
     }
 
     public function update(RoundRequest $request, Round $round)

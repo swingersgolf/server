@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('message_group_user', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('message_group_id');
-            $table->uuid('user_id');
-            $table->foreign('message_group_id')->references('id')->on('message_groups');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->boolean('user_active')->default(true);
+            $table->foreignId('message_group_id')->references('id')->on('message_groups');
+            $table->foreignUuid('user_id')->references('id')->on('users');
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }

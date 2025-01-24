@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\Course;
+use App\Models\MessageGroup;
 use App\Models\Preference;
 use App\Models\Round;
 use App\Models\User;
@@ -239,6 +240,10 @@ class RoundControllerTest extends TestCase
             'round_id' => Round::first()->id,
             'preference_id' => $preference->id,
             'status' => 'preferred', // Ensure the status is set properly
+        ]);
+        // Ensure the round's message group has been created
+        $this->assertDatabaseHas('message_groups', [
+            'id' => $response->json(['data'])['message_group_id'],
         ]);
     }
 
