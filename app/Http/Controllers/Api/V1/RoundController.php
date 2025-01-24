@@ -83,8 +83,8 @@ class RoundController extends Controller
         foreach ($validatedData['preferences'] as $preferenceId => $status) {
             $round->preferences()->attach((int) $preferenceId, ['status' => $status]);
         }
-        $foo = new RoundResource($round);
-        return $foo;
+
+        return new RoundResource($round);
     }
 
     public function update(RoundRequest $request, Round $round)

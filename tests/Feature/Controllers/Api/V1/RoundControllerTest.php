@@ -245,6 +245,11 @@ class RoundControllerTest extends TestCase
         $this->assertDatabaseHas('message_groups', [
             'id' => $response->json(['data'])['message_group_id'],
         ]);
+        // Ensure the round host is added as a member of the messaging group
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $response->json(['data'])['message_group_id'],
+            'user_id' => $user->id,
+        ]);
     }
 
     public function test_update_round(): void
