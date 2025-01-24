@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\MessageGroup;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class MessageGroupPolicy
 {
@@ -29,7 +28,9 @@ class MessageGroupPolicy
      */
     public function create(User $user, MessageGroup $messageGroup): bool
     {
-        return $messageGroup->users()->where('users.id', $user->id)->exists();;
+        return $messageGroup->users()
+            ->where('user_id', $user->id)
+            ->exists();
     }
 
     /**

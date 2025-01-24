@@ -22,6 +22,7 @@ Route::get('/user', function (Request $request) {
 Route::get('/trigger', function () {
     $event = new RoundMessageEvent('hello world at:'.now());
     broadcast($event);
+
     return 'fired at:'.now();
 });
 
@@ -93,7 +94,7 @@ Route::name('api.')->group(function () {
                 Route::get('public-account/{userId}', [PublicUserProfileController::class, 'show'])->name('show');
             });
             Route::name('message.')->group(function () {
-                Route::post('message',[MessageController::class, 'store'])->name('store');
+                Route::post('message', [MessageController::class, 'store'])->name('store');
             });
         });
     });

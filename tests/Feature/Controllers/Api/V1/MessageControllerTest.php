@@ -2,12 +2,9 @@
 
 namespace Tests\Feature\Controllers\Api\V1;
 
-use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\Round;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class MessageControllerTest extends TestCase
@@ -17,6 +14,7 @@ class MessageControllerTest extends TestCase
         $user = User::factory()->create();
         $message = 'Hello World';
         $messageGroup = MessageGroup::factory()->create();
+        $messageGroup->users()->attach($user->id);
         $round = Round::factory()->create([
             'host_id' => $user->id,
             'message_group_id' => $messageGroup->id,
@@ -65,14 +63,17 @@ class MessageControllerTest extends TestCase
 
     }
 
-    public function test_the_user_must_belong_to_the_message_group_user_list(): void
+    public function test_returns_403_if_the_user_does_not_belong_to_the_message_group(): void
     {
-        // TODO: start here and fix this test trying to use messagegrouppolicy
         $user = User::factory()->create();
         $message = 'Hello World';
         $messageGroup = MessageGroup::factory()->create([
             'id' => 5,
         ]);
+        $otherMessageGroup = MessageGroup::factory()->create([
+            'id' => 6,
+        ]);
+        $messageGroup->users()->attach($user);
         $round = Round::factory()->create([
             'host_id' => $user->id,
             'message_group_id' => $messageGroup->id,
@@ -80,14 +81,12 @@ class MessageControllerTest extends TestCase
 
         $payload = [
             'message' => $message,
+            'message_group_id' => $otherMessageGroup->id,
         ];
 
         $response = $this->actingAs($user)->postJson(
-            route('api.v1.message.store', [
-                'message_group_id' => 5,
-            ]), $payload)->assertStatus(422);
+            route('api.v1.message.store'), $payload);
 
+        $response->assertStatus(403);
     }
-
-
 }
