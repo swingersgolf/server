@@ -3,6 +3,7 @@
 use App\Events\RoundMessageEvent;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
+use App\Http\Controllers\Api\V1\MessageController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PreferenceController;
 use App\Http\Controllers\Api\V1\PreferenceUserController;
@@ -90,6 +91,9 @@ Route::name('api.')->group(function () {
             });
             Route::name('public-account.')->group(function () {
                 Route::get('public-account/{userId}', [PublicUserProfileController::class, 'show'])->name('show');
+            });
+            Route::name('message.')->group(function () {
+                Route::post('message',[MessageController::class, 'store'])->name('store');
             });
         });
     });

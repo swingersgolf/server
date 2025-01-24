@@ -2,14 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\MessageGroup;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Round>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MessageGroup>
  */
-class RoundFactory extends Factory
+class MessageGroupFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,8 +17,7 @@ class RoundFactory extends Factory
     public function definition(): array
     {
         return [
-            'host_id' => User::factory(),
-            'message_group_id' => MessageGroup::factory(),
+            //
         ];
     }
 }

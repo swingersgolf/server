@@ -23,6 +23,7 @@ class Round extends Model
         'group_size',
         'host_id',
         'course_id',
+        'message_group_id',
     ];
 
     protected $with = ['preferences'];

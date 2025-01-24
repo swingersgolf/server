@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Course;
+use App\Models\Message;
+use App\Models\MessageGroup;
 use App\Models\Preference;
 use App\Models\Round;
 use App\Models\User;
@@ -22,6 +24,7 @@ class RoundSeeder extends Seeder
                 ->format('Y-m-d'),
             'time_range' => fn () => $this->getRandomTimeRange(),  // Get a random time range (morning, afternoon, evening)
             'group_size' => fn () => rand(2, 4),
+            'message_group_id' => fn () => MessageGroup::factory()->create()->id,
         ]);
 
         $preferenceIds = Preference::pluck('id');
@@ -61,7 +64,7 @@ class RoundSeeder extends Seeder
                     'user_id' => $userId, // Include user_id here
                     'status' => 'accepted',  // Set all users to 'accepted'
                 ];
-            }, $selectedUsers));            
+            }, $selectedUsers));
 
             // Set a random course ID
             $round->course_id = $courseIds->random();
