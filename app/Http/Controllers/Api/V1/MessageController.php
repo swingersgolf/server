@@ -13,12 +13,15 @@ class MessageController extends Controller
 {
     public function store(MessageStoreRequest $request): JsonResponse
     {
+        if (Auth::user()->can('create', Message::class)) {
         $message = Message::create([
             'user_id' => Auth::id(),
             'message_group_id' => $request->message_group_id,
             'message' => $request->message,
         ]);
 
-        return response()->json($message);
+            return response()->json($message);
+        }
+        abort(403);
     }
 }

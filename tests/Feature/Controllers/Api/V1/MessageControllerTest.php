@@ -65,4 +65,29 @@ class MessageControllerTest extends TestCase
 
     }
 
+    public function test_the_user_must_belong_to_the_message_group_user_list(): void
+    {
+        // TODO: start here and fix this test trying to use messagegrouppolicy
+        $user = User::factory()->create();
+        $message = 'Hello World';
+        $messageGroup = MessageGroup::factory()->create([
+            'id' => 5,
+        ]);
+        $round = Round::factory()->create([
+            'host_id' => $user->id,
+            'message_group_id' => $messageGroup->id,
+        ]);
+
+        $payload = [
+            'message' => $message,
+        ];
+
+        $response = $this->actingAs($user)->postJson(
+            route('api.v1.message.store', [
+                'message_group_id' => 5,
+            ]), $payload)->assertStatus(422);
+
+    }
+
+
 }
