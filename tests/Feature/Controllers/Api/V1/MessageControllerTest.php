@@ -114,4 +114,29 @@ class MessageControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
+    public function test_returns_403_if_the_message_group_is_not_active(): void
+    {
+        $user = User::factory()->create();
+        $message = 'Hello World';
+        $messageGroup = MessageGroup::factory()->create([
+            'id' => 5,
+            'active' => false,
+        ]);
+
+        $messageGroup->users()->attach($user);
+        $round = Round::factory()->create([
+            'host_id' => $user->id,
+            'message_group_id' => $messageGroup->id,
+        ]);
+
+        $payload = [
+            'message' => $message,
+            'message_group_id' => $messageGroup->id,
+        ];
+
+        $response = $this->actingAs($user)->postJson(
+            route('api.v1.message.store'), $payload);
+
+        $response->assertStatus(403);
+    }
 }

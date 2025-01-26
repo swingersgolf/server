@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('message_groups', function (Blueprint $table) {
             $table->id();
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }

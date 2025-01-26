@@ -28,7 +28,7 @@ class MessageGroupPolicy
      */
     public function create(User $user, MessageGroup $messageGroup): bool
     {
-        return $messageGroup->users()
+        return $messageGroup->active && $messageGroup->users()
             ->where('user_id', $user->id)
             ->wherePivot('active', true)
             ->exists();
