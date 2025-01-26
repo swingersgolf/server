@@ -124,6 +124,8 @@ class RoundController extends Controller
 
     public function destroy(Round $round)
     {
+        $round->messageGroup->update(['active' => false]);
+
         $round->delete();
 
         return response()->json(['message' => 'Round deleted.']);

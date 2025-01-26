@@ -299,6 +299,25 @@ class RoundControllerTest extends TestCase
         ]);
     }
 
+    public function test_delete_round_sets_message_group_to_inactive(): void
+    {
+        $user = User::factory()->create();
+        $messageGroup = MessageGroup::factory()->create([
+            'active' => true,
+        ]);
+        $round = Round::factory()->create([
+            'message_group_id' => $messageGroup->id,
+        ]);
+
+        $response = $this->actingAs($user)->delete(route('api.v1.round.destroy', $round->id));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('message_groups', [
+            'id' => $messageGroup->id,
+            'active' => false,
+        ]);
+    }
+
     public static function dateScenarios(): array
     {
         return [

@@ -11,6 +11,10 @@ class MessageGroup extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'active',
+    ];
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
