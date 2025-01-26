@@ -166,6 +166,7 @@ class RoundController extends Controller
         }
 
         $round->users()->detach($userId);
+        $round->messageGroup->users()->updateExistingPivot($userId, ['active' => false]);
 
         return response()->json(['message' => 'User left round.']);
     }
