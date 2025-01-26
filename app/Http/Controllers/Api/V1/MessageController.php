@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\MessageStoreRequest;
+use App\Http\Requests\MessageIndexRequest;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
@@ -28,7 +28,7 @@ class MessageController extends Controller
         return response()->json($message);
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(MessageIndexRequest $request): JsonResponse
     {
         $messageGroup = MessageGroup::findOrFail($request->message_group_id);
         if ($request->user()->cannot('view', $messageGroup)) {

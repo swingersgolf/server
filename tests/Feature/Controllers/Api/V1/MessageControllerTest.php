@@ -169,6 +169,17 @@ class MessageControllerTest extends TestCase
             ->assertSuccessful();
         $this->assertCount($users->count(), $response->original);
     }
+
+    public function test_index_returns_json_error_if_group_does_not_exist(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->getJson(route('api.v1.message.index', [
+            'message_group_id' => 5,
+        ]))
+            ->assertJsonValidationErrors('message_group_id');
+    }
+
     public function test_index_returns_403_if_requester_not_member_of_message_group(): void
     {
         $users = User::factory()->count(2)->create();
