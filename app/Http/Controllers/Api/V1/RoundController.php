@@ -191,6 +191,8 @@ class RoundController extends Controller
                 );
             }
 
+            $round->messageGroup->users()->attach($userId);
+
             return response()->json(['message' => 'User accepted.']);
         }
 

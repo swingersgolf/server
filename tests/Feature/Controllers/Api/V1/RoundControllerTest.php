@@ -192,6 +192,27 @@ class RoundControllerTest extends TestCase
         ]);
     }
 
+    public function test_accept_user_request_adds_user_to_rounds_message_group(): void
+    {
+        $user = User::factory()->create();
+        $messageGroup = MessageGroup::factory()->create();
+        $round = Round::factory()->create([
+            'message_group_id' => $messageGroup->id,
+        ]);
+        $round->users()->attach($user->id, ['status' => 'pending']);
+
+        $this->actingAs($user)->post(route('api.v1.round.accept', [
+            'round' => $round->id,
+            'user_id' => $user->id,
+        ]))->assertSuccessful();
+
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $messageGroup->id,
+            'user_id' => $user->id,
+            'active' => true,
+        ]);
+    }
+
     public function test_reject_user_request(): void
     {
         $user = User::factory()->withExpoPushToken()->create();
