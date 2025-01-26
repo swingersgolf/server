@@ -115,6 +115,7 @@ class MessageControllerTest extends TestCase
 
         $response->assertStatus(403);
     }
+
     public function test_returns_403_if_the_message_group_is_not_active(): void
     {
         $user = User::factory()->create();
@@ -155,15 +156,15 @@ class MessageControllerTest extends TestCase
         ]);
 
         $users->each(function ($user) use ($messageGroup) {
-           Message::factory()->create([
-               'message_group_id' => $messageGroup->id,
-               'user_id' => $user->id,
-               'message' => $user->name,
-           ]);
+            Message::factory()->create([
+                'message_group_id' => $messageGroup->id,
+                'user_id' => $user->id,
+                'message' => $user->name,
+            ]);
         });
 
-        $response = $this->actingAs($users[0])->getJson(route('api.v1.message.index',[
-            'message_group_id' => $messageGroup->id
+        $response = $this->actingAs($users[0])->getJson(route('api.v1.message.index', [
+            'message_group_id' => $messageGroup->id,
         ]))
             ->assertSuccessful();
         $this->assertCount($users->count(), $response->original);
