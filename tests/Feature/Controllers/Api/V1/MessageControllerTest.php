@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Controllers\Api\V1;
 
+use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\Round;
 use App\Models\User;
@@ -47,7 +48,7 @@ class MessageControllerTest extends TestCase
         $messageGroup = MessageGroup::factory()->create([
             'id' => 5,
         ]);
-        $round = Round::factory()->create([
+        Round::factory()->create([
             'host_id' => $user->id,
             'message_group_id' => $messageGroup->id,
         ]);
@@ -56,7 +57,7 @@ class MessageControllerTest extends TestCase
             'message' => $message,
         ];
 
-        $response = $this->actingAs($user)->postJson(
+        $this->actingAs($user)->postJson(
             route('api.v1.message.store', [
                 'message_group_id' => 55,
             ]), $payload)->assertStatus(422);
@@ -138,5 +139,33 @@ class MessageControllerTest extends TestCase
             route('api.v1.message.store'), $payload);
 
         $response->assertStatus(403);
+    }
+
+    public function test_index_returns_all_messages_for_message_group(): void
+    {
+        $users = User::factory()->count(2)->create();
+        $messageGroup = MessageGroup::factory()->create([]);
+        $messageGroup->users()->attach($users->pluck('id'));
+
+        $anotherMessageGroup = MessageGroup::factory()->create([]);
+        $anotherMessage = Message::factory()->create([
+            'user_id' => $users[0]->id,
+            'message_group_id' => $anotherMessageGroup->id,
+            'message' => $users[0]->name,
+        ]);
+
+        $users->each(function ($user) use ($messageGroup) {
+           Message::factory()->create([
+               'message_group_id' => $messageGroup->id,
+               'user_id' => $user->id,
+               'message' => $user->name,
+           ]);
+        });
+
+        $response = $this->actingAs($users[0])->getJson(route('api.v1.message.index',[
+            'message_group_id' => $messageGroup->id
+        ]))
+            ->assertSuccessful();
+        $this->assertCount($users->count(), $response->original);
     }
 }

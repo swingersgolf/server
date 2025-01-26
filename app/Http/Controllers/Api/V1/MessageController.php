@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\MessageStoreRequest;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
@@ -25,5 +26,11 @@ class MessageController extends Controller
         ]);
 
         return response()->json($message);
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        $messages = Message::where('message_group_id', $request->message_group_id)->get();
+        return response()->json($messages);
     }
 }
