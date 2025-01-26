@@ -30,6 +30,11 @@ class MessageController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $messageGroup = MessageGroup::findOrFail($request->message_group_id);
+        if ($request->user()->cannot('view', $messageGroup)) {
+            abort(403);
+        }
+
         $messages = Message::where('message_group_id', $request->message_group_id)->get();
         return response()->json($messages);
     }

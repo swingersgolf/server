@@ -20,7 +20,10 @@ class MessageGroupPolicy
      */
     public function view(User $user, MessageGroup $messageGroup): bool
     {
-        return false;
+        return $messageGroup->active && $messageGroup->users()
+                ->where('user_id', $user->id)
+                ->wherePivot('active', true)
+                ->exists();
     }
 
     /**

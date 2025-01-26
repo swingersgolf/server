@@ -91,7 +91,7 @@ class MessageControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_returns_403_if_the_user_is_not_active_member_of_message_group(): void
+    public function test_post_returns_403_if_the_user_is_not_active_member_of_message_group(): void
     {
         $user = User::factory()->create();
         $message = 'Hello World';
@@ -116,7 +116,7 @@ class MessageControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_returns_403_if_the_message_group_is_not_active(): void
+    public function test_post_returns_403_if_the_message_group_is_not_active(): void
     {
         $user = User::factory()->create();
         $message = 'Hello World';
@@ -168,5 +168,64 @@ class MessageControllerTest extends TestCase
         ]))
             ->assertSuccessful();
         $this->assertCount($users->count(), $response->original);
+    }
+    public function test_index_returns_403_if_requester_not_member_of_message_group(): void
+    {
+        $users = User::factory()->count(2)->create();
+        $messageGroup = MessageGroup::factory()->create([]);
+
+        $users->each(function ($user) use ($messageGroup) {
+            Message::factory()->create([
+                'message_group_id' => $messageGroup->id,
+                'user_id' => $user->id,
+                'message' => $user->name,
+            ]);
+        });
+
+        $response = $this->actingAs($users[0])->getJson(route('api.v1.message.index', [
+            'message_group_id' => $messageGroup->id,
+        ]));
+        $response->assertStatus(403);
+    }
+    public function test_index_returns_403_if_requester_inactive_member_of_message_group(): void
+    {
+        $users = User::factory()->count(2)->create();
+        $messageGroup = MessageGroup::factory()->create([]);
+        $messageGroup->users()->attach($users->pluck('id'));
+        $messageGroup->users()->updateExistingPivot($users[0]->id, ['active' => false]);
+
+        $users->each(function ($user) use ($messageGroup) {
+            Message::factory()->create([
+                'message_group_id' => $messageGroup->id,
+                'user_id' => $user->id,
+                'message' => $user->name,
+            ]);
+        });
+
+        $response = $this->actingAs($users[0])->getJson(route('api.v1.message.index', [
+            'message_group_id' => $messageGroup->id,
+        ]));
+        $response->assertStatus(403);
+    }
+    public function test_index_returns_403_if_message_group_not_active(): void
+    {
+        $users = User::factory()->count(2)->create();
+        $messageGroup = MessageGroup::factory()->create([
+            'active' => false,
+        ]);
+        $messageGroup->users()->attach($users->pluck('id'));
+
+        $users->each(function ($user) use ($messageGroup) {
+            Message::factory()->create([
+                'message_group_id' => $messageGroup->id,
+                'user_id' => $user->id,
+                'message' => $user->name,
+            ]);
+        });
+
+        $response = $this->actingAs($users[0])->getJson(route('api.v1.message.index', [
+            'message_group_id' => $messageGroup->id,
+        ]));
+        $response->assertStatus(403);
     }
 }
