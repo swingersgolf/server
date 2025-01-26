@@ -339,6 +339,66 @@ class RoundControllerTest extends TestCase
         ]);
     }
 
+    public function test_removeUser(): void
+    {
+        $host = User::factory()->create();
+
+        $round = Round::factory()->create();
+        $round->users()->attach($host->id);
+        $round->host_id = $host->id;
+
+        $roundMember = User::factory()->create();
+        $round->users()->attach($roundMember->id);
+        $round->save();
+
+        $this->assertDatabaseHas('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $roundMember->id,
+        ]);
+
+         $this->actingAs($host)->delete(route('api.v1.round-user.remove-user', $round->id), [
+            'user_id' => $roundMember->id,
+        ])->assertSuccessful();
+
+        $this->assertDatabaseMissing('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $roundMember->id,
+        ]);
+    }
+    public function test_removeUser_sets_message_group_user_inactive(): void
+    {
+        $host = User::factory()->create();
+
+        $messageGroup = MessageGroup::factory()->create([]);
+        $round = Round::factory()->create([
+            'message_group_id' => $messageGroup->id,
+        ]);
+        $round->users()->attach($host->id);
+        $round->host_id = $host->id;
+
+        $roundMember = User::factory()->create();
+        $round->users()->attach($roundMember->id);
+        $round->save();
+
+        $messageGroup->users()->attach([$host->id, $roundMember->id]);
+
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $messageGroup->id,
+            'user_id' => $roundMember->id,
+            'active' => true,
+        ]);
+
+         $this->actingAs($host)->delete(route('api.v1.round-user.remove-user', $round->id), [
+            'user_id' => $roundMember->id,
+        ])->assertSuccessful();
+
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $messageGroup->id,
+            'user_id' => $roundMember->id,
+            'active' => false,
+        ]);
+    }
+
     public static function dateScenarios(): array
     {
         return [

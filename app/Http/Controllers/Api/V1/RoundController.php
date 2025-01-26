@@ -235,7 +235,7 @@ class RoundController extends Controller
 
         if ($round->users()->where('user_id', $userId)->first()) {
             $round->users()->detach($userId);
-
+            $round->messageGroup->users()->updateExistingPivot($userId, ['active' => false]);
             return response()->json(['message' => 'User removed.']);
         }
 
