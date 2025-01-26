@@ -1,6 +1,6 @@
 <?php
 
-use App\Events\RoundMessageEvent;
+use App\Events\MessageEvent;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\MessageController;
@@ -18,13 +18,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-
-Route::get('/trigger', function () {
-    $event = new RoundMessageEvent('hello world at:'.now());
-    broadcast($event);
-
-    return 'fired at:'.now();
-});
 
 Route::name('api.')->group(function () {
     Route::name('v1.')->prefix('v1')->group(function () {

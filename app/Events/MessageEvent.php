@@ -11,11 +11,11 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class RoundMessageEvent implements ShouldBroadcast
+class MessageEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    private $message;
+    public string $message;
     /**
      * Create a new event instance.
      */
@@ -32,7 +32,7 @@ class RoundMessageEvent implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('my-channel'),
+            new PrivateChannel('message-group.' . $this->message->message_group_id),
         ];
     }
 

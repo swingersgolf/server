@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\MessageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\MessageStoreRequest;
 use App\Http\Requests\MessageIndexRequest;
@@ -24,6 +25,8 @@ class MessageController extends Controller
             'message_group_id' => $request->message_group_id,
             'message' => $request->message,
         ]);
+
+        MessageEvent::dispatch($message);
 
         return response()->json($message);
     }

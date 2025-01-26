@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\DB;
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
-});
-
-Broadcast::channel('my-channel', function () {
-    return true;
+Broadcast::channel('message-group.{messageGroupId}', function ($user, $messageGroupId) {
+    return DB::table('message_group_user')
+        ->where('message_group_id', $messageGroupId)
+        ->where('user_id', $user->id)
+        ->where('active', true)
+        ->exists();
 });

@@ -2,16 +2,19 @@
 
 namespace Tests\Feature\Controllers\Api\V1;
 
+use App\Events\MessageEvent;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\Round;
 use App\Models\User;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class MessageControllerTest extends TestCase
 {
     public function test_it_posts_message_and_returns_message(): void
     {
+        Event::fake();
         $user = User::factory()->create();
         $message = 'Hello World';
         $messageGroup = MessageGroup::factory()->create();
@@ -39,6 +42,13 @@ class MessageControllerTest extends TestCase
         $this->assertEquals($payload['message'], $response->json('message'));
         $this->assertEquals($user->id, $response->json('user_id'));
         $this->assertEquals($messageGroup->id, $response->json('message_group_id'));
+
+        Event::assertDispatched(MessageEvent::class, function ($event) use ($user, $messageGroup, $message) {
+            $decodedEvent = json_decode($event->message, true);
+            return $decodedEvent['user_id'] === $user->id &&
+                $decodedEvent['message_group_id'] === strval($messageGroup->id) &&
+                $decodedEvent['message'] === $message;
+        });
     }
 
     public function test_it_must_post_to_an_existing_message_group(): void
