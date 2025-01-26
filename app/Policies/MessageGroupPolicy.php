@@ -30,6 +30,7 @@ class MessageGroupPolicy
     {
         return $messageGroup->users()
             ->where('user_id', $user->id)
+            ->wherePivot('active', true)
             ->exists();
     }
 
