@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -15,11 +16,11 @@ class MessageEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public string $message;
+    public Message $message;
     /**
      * Create a new event instance.
      */
-    public function __construct(string $message = 'no message provided')
+    public function __construct(Message $message)
     {
         Log::info("Inside constructor of messageevent");
 
@@ -42,7 +43,7 @@ class MessageEvent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'message' => $this->message,
+            'message' => 'foobar',
         ];
     }
 

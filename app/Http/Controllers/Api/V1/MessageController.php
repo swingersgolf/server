@@ -25,7 +25,7 @@ class MessageController extends Controller
 
         $message = Message::create([
             'user_id' => Auth::id(),
-            'message_group_id' => $request->message_group_id,
+            'message_group_id' => $messageGroup->id,
             'message' => $request->message,
         ]);
         Log::info("Message created... now dispatching messageevent");
