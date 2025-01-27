@@ -10,21 +10,25 @@ use App\Models\Message;
 use App\Models\MessageGroup;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class MessageController extends Controller
 {
     public function store(MessageStoreRequest $request): JsonResponse
     {
+        Log::info("Inside messagecontroller store");
         $messageGroup = MessageGroup::findOrFail($request->message_group_id);
         if ($request->user()->cannot('create', $messageGroup)) {
             abort(403);
         }
+        Log::info("User can create");
 
         $message = Message::create([
             'user_id' => Auth::id(),
             'message_group_id' => $request->message_group_id,
             'message' => $request->message,
         ]);
+        Log::info("Message created... now dispatching messageevent");
 
         MessageEvent::dispatch($message);
 

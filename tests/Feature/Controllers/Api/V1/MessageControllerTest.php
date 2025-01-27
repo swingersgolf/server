@@ -25,13 +25,12 @@ class MessageControllerTest extends TestCase
         ]);
 
         $payload = [
+            'message_group_id' => $messageGroup->id,
             'message' => $message,
         ];
 
         $response = $this->actingAs($user)->postJson(
-            route('api.v1.message.store', [
-                'message_group_id' => $round->message_group_id,
-            ]), $payload);
+            route('api.v1.message.store'), $payload);
 
         $this->assertDatabaseHas('messages', [
             'user_id' => $user->id,
@@ -46,7 +45,7 @@ class MessageControllerTest extends TestCase
         Event::assertDispatched(MessageEvent::class, function ($event) use ($user, $messageGroup, $message) {
             $decodedEvent = json_decode($event->message, true);
             return $decodedEvent['user_id'] === $user->id &&
-                $decodedEvent['message_group_id'] === strval($messageGroup->id) &&
+                $decodedEvent['message_group_id'] === $messageGroup->id &&
                 $decodedEvent['message'] === $message;
         });
     }

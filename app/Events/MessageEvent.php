@@ -21,6 +21,8 @@ class MessageEvent implements ShouldBroadcast
      */
     public function __construct(string $message = 'no message provided')
     {
+        Log::info("Inside constructor of messageevent");
+
         $this->message = $message;
     }
 
@@ -31,6 +33,7 @@ class MessageEvent implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        Log::info("Inside BroadcastOn");
         return [
             new PrivateChannel('message-group.' . $this->message->message_group_id),
         ];
