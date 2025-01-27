@@ -72,6 +72,10 @@ class RoundSeeder extends Seeder
             // Assign the host_id from the selected users
             $round->host_id = $selectedUsers[array_rand($selectedUsers)];
 
+            foreach ($selectedUsers as $userId) {
+                $round->messageGroup->users()->attach($userId, ['active' => true]);
+            }
+
             // Save the round
             $round->save();
         });
