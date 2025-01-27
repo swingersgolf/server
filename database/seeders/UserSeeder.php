@@ -14,7 +14,21 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::factory()->count(10)->create([
+        User::factory()->create([
+            'name' => 'Test Sender',
+            'email' => 'sender@example.com',
+            'password' => Hash::make('password'),
+            'expo_push_token' => config('expo.push_token'),
+        ]);
+
+        User::factory()->create([
+            'name' => 'Test Listener',
+            'email' => 'listener@example.com',
+            'password' => Hash::make('password'),
+            'expo_push_token' => config('expo.push_token'),
+        ]);
+
+        User::factory()->count(8)->create([
             'password' => Hash::make('password'),
         ]);
     }

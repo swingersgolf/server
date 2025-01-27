@@ -18,18 +18,50 @@ class RoundSeeder extends Seeder
      */
     public function run(): void
     {
-        $rounds = Round::factory()->count(20)->create([
-            'date' => fn () => Carbon::now()
+        $preferenceIds = Preference::pluck('id');
+        $courseIds = Course::pluck('id');
+
+        // broadcast testing seeder
+        $firstRound = Round::factory()->create([
+            'date' => fn() => Carbon::now()
                 ->addMinutes(rand(0, 3 * 7 * 24 * 60))  // Add random minutes to get a future date
                 ->format('Y-m-d'),
-            'time_range' => fn () => $this->getRandomTimeRange(),  // Get a random time range (morning, afternoon, evening)
-            'group_size' => fn () => rand(2, 4),
-            'message_group_id' => fn () => MessageGroup::factory()->create()->id,
+            'time_range' => fn() => $this->getRandomTimeRange(),
+            // Get a random time range (morning, afternoon, evening)
+            'group_size' => 3,
+            'message_group_id' => fn() => MessageGroup::factory()->create()->id,
+        ]);
+        $preferenceIds->each(function ($preferenceId) use ($firstRound) {
+            $firstRound->preferences()->attach($preferenceId, [
+                'status' => Preference::STATUS_PREFERRED,
+            ]);
+        });
+        $userSender = User::where('email','sender@example.com')->first();
+        $userListener = User::where('email','listener@example.com')->first();
+        $firstRound->users()->attach($userSender->id, [
+            'status'=>'accepted'
+        ]);
+        $firstRound->users()->attach($userListener->id, [
+            'status'=>'accepted'
+        ]);
+        $firstRound->course_id = $courseIds->random();
+        $firstRound->host_id = $userSender->id;
+        $firstRound->messageGroup->users()->attach($userSender->id, ['active' => true]);
+        $firstRound->messageGroup->users()->attach($userListener->id, ['active' => true]);
+        $firstRound->save();
+
+        // rest of round seeding
+        $rounds = Round::factory()->count(19)->create([
+            'date' => fn() => Carbon::now()
+                ->addMinutes(rand(0, 3 * 7 * 24 * 60))  // Add random minutes to get a future date
+                ->format('Y-m-d'),
+            'time_range' => fn() => $this->getRandomTimeRange(),
+            // Get a random time range (morning, afternoon, evening)
+            'group_size' => fn() => rand(2, 4),
+            'message_group_id' => fn() => MessageGroup::factory()->create()->id,
         ]);
 
-        $preferenceIds = Preference::pluck('id');
         $userIds = User::pluck('id');
-        $courseIds = Course::pluck('id');
 
         $rounds->each(function ($round) use ($preferenceIds, $userIds, $courseIds) {
             // Assign preferences
