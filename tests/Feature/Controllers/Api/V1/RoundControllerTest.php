@@ -141,9 +141,9 @@ class RoundControllerTest extends TestCase
         $this->assertEquals($courseName, $responseData['course']);
 
         $this->assertCount($users->count(), $responseData['golfers']);
-        $names = $users->pluck('name')->toArray();
-        array_map(function ($golfer) use ($names) {
-            $this->assertTrue(in_array($golfer['name'], $names));
+        $firstnames = $users->pluck('firstname')->toArray();
+        array_map(function ($golfer) use ($firstnames) {
+            $this->assertTrue(in_array($golfer['firstname'], $firstnames));
         }, $responseData['golfers']);
 
         $this->assertEquals($preferences[0]->name, $responseData['preferences'][0]['name']);

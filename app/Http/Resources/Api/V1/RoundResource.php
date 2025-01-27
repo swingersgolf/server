@@ -60,7 +60,8 @@ class RoundResource extends JsonResource
             'golfers' => $this->users->map(function ($user) {
                 return [
                     'id' => $user->id,
-                    'name' => $user->name,
+                    'firstname' => $user->firstname,
+                    'lastname' => $user->lastname,
                     'status' => $user->pivot->status,
                 ];
             }),

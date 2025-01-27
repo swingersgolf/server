@@ -23,7 +23,8 @@ class PublicUserProfileResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'name' => $this->name,
+            'firstname' => $this->firstname,
+            'lastname' => $this->lastname,
             'photo' => $this->profilePhotoService->getPresignedUrl($this->id),
             'birthdate' => $this->date_of_birth,
             'preferences' => $this->preferences->map(function ($preference) {
