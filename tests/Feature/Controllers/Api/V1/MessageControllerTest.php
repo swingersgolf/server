@@ -161,14 +161,12 @@ class MessageControllerTest extends TestCase
         $anotherMessage = Message::factory()->create([
             'user_id' => $users[0]->id,
             'message_group_id' => $anotherMessageGroup->id,
-            'message' => $users[0]->name,
         ]);
 
         $users->each(function ($user) use ($messageGroup) {
             Message::factory()->create([
                 'message_group_id' => $messageGroup->id,
                 'user_id' => $user->id,
-                'message' => $user->name,
             ]);
         });
 
@@ -198,7 +196,6 @@ class MessageControllerTest extends TestCase
             Message::factory()->create([
                 'message_group_id' => $messageGroup->id,
                 'user_id' => $user->id,
-                'message' => $user->name,
             ]);
         });
 
@@ -218,7 +215,6 @@ class MessageControllerTest extends TestCase
             Message::factory()->create([
                 'message_group_id' => $messageGroup->id,
                 'user_id' => $user->id,
-                'message' => $user->name,
             ]);
         });
 
@@ -239,7 +235,6 @@ class MessageControllerTest extends TestCase
             Message::factory()->create([
                 'message_group_id' => $messageGroup->id,
                 'user_id' => $user->id,
-                'message' => $user->name,
             ]);
         });
 
