@@ -24,7 +24,7 @@ class RoundResource extends JsonResource
     public function toArray(Request $request): array
     {
         $authUser = $request->user();
-        
+
         $userLatitude = $authUser?->userProfile?->latitude;
         $userLongitude = $authUser?->userProfile?->longitude;
 
@@ -72,6 +72,7 @@ class RoundResource extends JsonResource
             'group_size' => $this->group_size,
             'host_id' => $this->host_id,
             'distance' => $distance, // Include the calculated distance
+            'message_group_id' => $this->messageGroup->id,
         ];
     }
 }

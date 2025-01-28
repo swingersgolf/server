@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\RoundRequest;
 use App\Http\Resources\Api\V1\RoundDetailResource;
 use App\Http\Resources\Api\V1\RoundResource;
+use App\Models\MessageGroup;
 use App\Models\Round;
 use App\Services\ProfilePhotoServiceInterface;
 use App\Services\PushNotificationService;
@@ -59,6 +60,11 @@ class RoundController extends Controller
         // Set the host_id to the authenticated user's ID
         $validatedData['host_id'] = Auth::id();
 
+        // Create messaging group for the round
+        $messageGroup = MessageGroup::create();
+
+        $messageGroup->users()->attach(Auth::id());
+
         // Create the round with specific fields
         $round = Round::create([
             'date' => $validatedData['date'],
@@ -66,6 +72,7 @@ class RoundController extends Controller
             'group_size' => $validatedData['group_size'],
             'course_id' => $validatedData['course_id'],
             'host_id' => $validatedData['host_id'],
+            'message_group_id' => $messageGroup->id,
         ]);
 
         // Automatically add the host as a golfer to the round
@@ -117,6 +124,8 @@ class RoundController extends Controller
 
     public function destroy(Round $round)
     {
+        $round->messageGroup->update(['active' => false]);
+
         $round->delete();
 
         return response()->json(['message' => 'Round deleted.']);
@@ -157,6 +166,7 @@ class RoundController extends Controller
         }
 
         $round->users()->detach($userId);
+        $round->messageGroup->users()->updateExistingPivot($userId, ['active' => false]);
 
         return response()->json(['message' => 'User left round.']);
     }
@@ -181,6 +191,8 @@ class RoundController extends Controller
                     ]
                 );
             }
+
+            $round->messageGroup->users()->attach($userId);
 
             return response()->json(['message' => 'User accepted.']);
         }
@@ -224,7 +236,7 @@ class RoundController extends Controller
 
         if ($round->users()->where('user_id', $userId)->first()) {
             $round->users()->detach($userId);
-
+            $round->messageGroup->users()->updateExistingPivot($userId, ['active' => false]);
             return response()->json(['message' => 'User removed.']);
         }
 

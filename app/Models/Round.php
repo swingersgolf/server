@@ -23,6 +23,7 @@ class Round extends Model
         'group_size',
         'host_id',
         'course_id',
+        'message_group_id',
     ];
 
     protected $with = ['preferences'];
@@ -48,6 +49,11 @@ class Round extends Model
     public function host(): BelongsTo
     {
         return $this->belongsTo(User::class, 'host_id');
+    }
+
+    public function messageGroup(): BelongsTo
+    {
+        return $this->belongsTo(MessageGroup::class);
     }
 
     public function scopeDateRange($query, $start = null, $end = null)

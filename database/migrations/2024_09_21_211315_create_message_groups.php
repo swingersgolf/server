@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rounds', function (Blueprint $table) {
+        Schema::create('message_groups', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('when')->nullable();
-            $table->tinyInteger('group_size')->default(0);
-            $table->unsignedBigInteger('course_id')->nullable();
-            $table->uuid('host_id');
-            $table->foreignId('message_group_id')->references('id')->on('message_groups');
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }
@@ -27,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rounds');
+        Schema::dropIfExists('message_group');
     }
 };

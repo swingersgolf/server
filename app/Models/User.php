@@ -76,9 +76,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class);
     }
-  
+
     public function preferences(): BelongsToMany
     {
         return $this->belongsToMany(Preference::class)->withPivot('status');
     }
+
+    public function messageGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(MessageGroup::class, 'message_group_user');
+    }
+
 }

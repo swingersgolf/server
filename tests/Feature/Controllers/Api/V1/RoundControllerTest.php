@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Models\Course;
+use App\Models\MessageGroup;
 use App\Models\Preference;
 use App\Models\Round;
 use App\Models\User;
@@ -191,6 +192,27 @@ class RoundControllerTest extends TestCase
         ]);
     }
 
+    public function test_accept_user_request_adds_user_to_rounds_message_group(): void
+    {
+        $user = User::factory()->create();
+        $messageGroup = MessageGroup::factory()->create();
+        $round = Round::factory()->create([
+            'message_group_id' => $messageGroup->id,
+        ]);
+        $round->users()->attach($user->id, ['status' => 'pending']);
+
+        $this->actingAs($user)->post(route('api.v1.round.accept', [
+            'round' => $round->id,
+            'user_id' => $user->id,
+        ]))->assertSuccessful();
+
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $messageGroup->id,
+            'user_id' => $user->id,
+            'active' => true,
+        ]);
+    }
+
     public function test_reject_user_request(): void
     {
         $user = User::factory()->withExpoPushToken()->create();
@@ -240,6 +262,15 @@ class RoundControllerTest extends TestCase
             'preference_id' => $preference->id,
             'status' => 'preferred', // Ensure the status is set properly
         ]);
+        // Ensure the round's message group has been created
+        $this->assertDatabaseHas('message_groups', [
+            'id' => $response->json(['data'])['message_group_id'],
+        ]);
+        // Ensure the round host is added as a member of the messaging group
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $response->json(['data'])['message_group_id'],
+            'user_id' => $user->id,
+        ]);
     }
 
     public function test_update_round(): void
@@ -286,6 +317,136 @@ class RoundControllerTest extends TestCase
         $response->assertSuccessful();
         $this->assertDatabaseMissing('rounds', [
             'id' => $round->id,
+        ]);
+    }
+
+    public function test_delete_round_sets_message_group_to_inactive(): void
+    {
+        $user = User::factory()->create();
+        $messageGroup = MessageGroup::factory()->create([
+            'active' => true,
+        ]);
+        $round = Round::factory()->create([
+            'message_group_id' => $messageGroup->id,
+        ]);
+
+        $response = $this->actingAs($user)->delete(route('api.v1.round.destroy', $round->id));
+
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('message_groups', [
+            'id' => $messageGroup->id,
+            'active' => false,
+        ]);
+    }
+
+    public function test_removeUser(): void
+    {
+        $host = User::factory()->create();
+
+        $round = Round::factory()->create();
+        $round->users()->attach($host->id);
+        $round->host_id = $host->id;
+
+        $roundMember = User::factory()->create();
+        $round->users()->attach($roundMember->id);
+        $round->save();
+
+        $this->assertDatabaseHas('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $roundMember->id,
+        ]);
+
+         $this->actingAs($host)->delete(route('api.v1.round-user.remove-user', $round->id), [
+            'user_id' => $roundMember->id,
+        ])->assertSuccessful();
+
+        $this->assertDatabaseMissing('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $roundMember->id,
+        ]);
+    }
+
+    public function test_leave(): void
+    {
+        $round = Round::factory()->create();
+        $roundMember = User::factory()->create();
+        $round->users()->attach($roundMember->id);
+        $round->save();
+
+        $this->assertDatabaseHas('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $roundMember->id,
+        ]);
+
+         $this->actingAs($roundMember)->delete(route('api.v1.round.leave', $round->id), [
+            'user_id' => $roundMember->id,
+        ])->assertSuccessful();
+
+        $this->assertDatabaseMissing('round_user', [
+            'round_id' => $round->id,
+            'user_id' => $roundMember->id,
+        ]);
+    }
+    public function test_leave_sets_message_group_user_to_inactive(): void
+    {
+        $messageGroup = MessageGroup::factory()->create([]);
+        $round = Round::factory()->create([
+            'message_group_id' => $messageGroup->id,
+        ]);
+
+        $roundMember = User::factory()->create();
+        $round->users()->attach($roundMember->id);
+        $round->save();
+
+        $messageGroup->users()->attach($roundMember->id, ['active'=>true]);
+
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $messageGroup->id,
+            'user_id' => $roundMember->id,
+            'active' => true,
+        ]);
+
+         $this->actingAs($roundMember)->delete(route('api.v1.round.leave', $round->id), [
+            'user_id' => $roundMember->id,
+        ])->assertSuccessful();
+
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $messageGroup->id,
+            'user_id' => $roundMember->id,
+            'active' => false,
+        ]);
+    }
+    public function test_removeUser_sets_message_group_user_inactive(): void
+    {
+        $host = User::factory()->create();
+
+        $messageGroup = MessageGroup::factory()->create([]);
+        $round = Round::factory()->create([
+            'message_group_id' => $messageGroup->id,
+        ]);
+        $round->users()->attach($host->id);
+        $round->host_id = $host->id;
+
+        $roundMember = User::factory()->create();
+        $round->users()->attach($roundMember->id);
+        $round->save();
+
+        $messageGroup->users()->attach([$host->id, $roundMember->id]);
+
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $messageGroup->id,
+            'user_id' => $roundMember->id,
+            'active' => true,
+        ]);
+
+         $this->actingAs($host)->delete(route('api.v1.round-user.remove-user', $round->id), [
+            'user_id' => $roundMember->id,
+        ])->assertSuccessful();
+
+        $this->assertDatabaseHas('message_group_user', [
+            'message_group_id' => $messageGroup->id,
+            'user_id' => $roundMember->id,
+            'active' => false,
         ]);
     }
 
