@@ -15,14 +15,16 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Test Sender',
+            'firstname' => 'Test',
+            'lastname' => 'Sender',
             'email' => 'sender@example.com',
             'password' => Hash::make('password'),
             'expo_push_token' => config('expo.push_token'),
         ]);
 
         User::factory()->create([
-            'name' => 'Test Listener',
+            'firstname' => 'Test',
+            'lastname' => 'Listener',
             'email' => 'listener@example.com',
             'password' => Hash::make('password'),
             'expo_push_token' => config('expo.push_token'),
