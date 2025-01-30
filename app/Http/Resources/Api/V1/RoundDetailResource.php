@@ -76,6 +76,7 @@ class RoundDetailResource extends JsonResource
             'group_size' => $this->group_size,
             'host_id' => $this->host_id,
             'distance' => $distance, // Include the calculated distance
+            'message_group_id' => $this->messageGroup->id,
         ];
     }
 }
