@@ -99,7 +99,7 @@ class RoundControllerTest extends TestCase
         $this->assertEquals($count, count($response->json()['data']));
     }
 
-    public function test_show_returns_round_with_preferences(): void
+    public function test_show_returns_round_with_preferences_and_message_group_id(): void
     {
         $mockProfilePhotoService = Mockery::mock(ProfilePhotoServiceInterface::class);
         $mockProfilePhotoService->shouldReceive('getPresignedUrl')
@@ -113,11 +113,14 @@ class RoundControllerTest extends TestCase
         ]);
         $preferences = Preference::factory()->count(3)->create();
 
+        $messageGroup = MessageGroup::factory()->create([]);
+
         $round = Round::factory()->create([
             'date' => now()->format('Y-m-d'),
             'time_range' => 'morning',
             'course_id' => $where->id,
             'group_size' => 4,
+            'message_group_id' => $messageGroup->id,
         ]);
 
         $round->preferences()->attach($preferences[0], [
@@ -137,6 +140,7 @@ class RoundControllerTest extends TestCase
         $responseData = $response->json()['data'];
 
         $this->assertEquals($round->date, $responseData['date']);
+        $this->assertEquals($messageGroup->id, $responseData['message_group_id']);
 
         $courseName = Course::find($round->course_id)->course_name;
         $this->assertEquals($courseName, $responseData['course']);
