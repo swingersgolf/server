@@ -174,6 +174,8 @@ class MessageControllerTest extends TestCase
             'message_group_id' => $messageGroup->id,
         ]))
             ->assertSuccessful();
+        $responseData = $response->json();
+
         $this->assertCount($users->count(), $response->original);
     }
 
