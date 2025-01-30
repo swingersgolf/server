@@ -19,8 +19,8 @@ class MessageResource extends JsonResource
             'message_group_id' => $this->message_group_id,
             'user' => $this->user ? [
                 'id' => $this->user->id,
-                'first_name' => $this->user->first_name,
-                'last_name' => $this->user->last_name,
+                'firstname' => $this->user->firstname,
+                'lastname' => $this->user->lastname,
             ] : null,
             'message'=> $this->message,
         ];
