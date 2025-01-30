@@ -157,12 +157,6 @@ class MessageControllerTest extends TestCase
         $messageGroup = MessageGroup::factory()->create([]);
         $messageGroup->users()->attach($users->pluck('id'));
 
-        $anotherMessageGroup = MessageGroup::factory()->create([]);
-        $anotherMessage = Message::factory()->create([
-            'user_id' => $users[0]->id,
-            'message_group_id' => $anotherMessageGroup->id,
-        ]);
-
         $users->each(function ($user) use ($messageGroup) {
             Message::factory()->create([
                 'message_group_id' => $messageGroup->id,
@@ -170,13 +164,22 @@ class MessageControllerTest extends TestCase
             ]);
         });
 
+        $anotherMessageGroup = MessageGroup::factory()->create([]);
+        $anotherMessage = Message::factory()->create([
+            'user_id' => $users[0]->id,
+            'message_group_id' => $anotherMessageGroup->id,
+        ]);
+
         $response = $this->actingAs($users[0])->getJson(route('api.v1.message.index', [
             'message_group_id' => $messageGroup->id,
         ]))
             ->assertSuccessful();
-        $responseData = $response->json();
-
+        $messages = $response->json('data');
         $this->assertCount($users->count(), $response->original);
+        $this->assertEquals($users[0]->id, $messages[0]['user']['id']);
+        $this->assertEquals($users[0]->firstname, $messages[0]['user']['firstname']);
+        $this->assertEquals($users[0]->lastname, $messages[0]['user']['lastname']);
+
     }
 
     public function test_index_returns_json_error_if_group_does_not_exist(): void
