@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Events\MessageEvent;
+use App\Events\MessageSent;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\Round;
@@ -42,7 +43,7 @@ class MessageControllerTest extends TestCase
         $this->assertEquals($user->id, $response->json('user_id'));
         $this->assertEquals($messageGroup->id, $response->json('message_group_id'));
 
-        Event::assertDispatched(MessageEvent::class, function ($event) use ($user, $messageGroup, $message) {
+        Event::assertDispatched(MessageSent::class, function ($event) use ($user, $messageGroup, $message) {
             $decodedEvent = json_decode($event->message, true);
             return $decodedEvent['user_id'] === $user->id &&
                 $decodedEvent['message_group_id'] === $messageGroup->id &&

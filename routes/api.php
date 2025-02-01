@@ -1,6 +1,5 @@
 <?php
 
-use App\Events\MessageEvent;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\MessageController;
@@ -13,6 +12,7 @@ use App\Http\Controllers\Api\V1\RoundController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UserProfileController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
@@ -89,6 +89,9 @@ Route::name('api.')->group(function () {
             Route::name('message.')->group(function () {
                 Route::get('message', [MessageController::class, 'index'])->name('index');
                 Route::post('message', [MessageController::class, 'store'])->name('store');
+//                Route::post('message', function () {
+//                    Log::info('HELLO WORLD');
+//                });
             });
         });
     });
