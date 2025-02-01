@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\PublicMessageEvent;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\MessageController;
@@ -18,6 +19,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+//Route::post('/broadcast', function (Request $request) {
+//    event(new PublicMessageEvent('Hello World!'));
+//    return response()->json(['status' => 'Message sent']);
+//});
 
 Route::name('api.')->group(function () {
     Route::name('v1.')->prefix('v1')->group(function () {

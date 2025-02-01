@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 //        ->exists();
 //});
 
-Broadcast::channel('chat-room.{roomId}', function ($user, $roomId) {
-    return ['id' => $user->id, 'name' => $user->name];
+Broadcast::channel('public-messages', function () {
+//    return $user->id === $id;
+    return true;
 });

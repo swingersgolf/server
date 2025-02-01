@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\MessageEvent;
 use App\Events\MessageSent;
+use App\Events\PublicMessageEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\MessageStoreRequest;
 use App\Http\Requests\MessageIndexRequest;
@@ -33,9 +35,10 @@ class MessageController extends Controller
 
         Log::info('Message created... now dispatching messagesent');
 
-        broadcast(new MessageSent($message, auth()->id()));
-
-        return response()->json($message);
+//        broadcast(new MessageSent($message, auth()->id()));
+//        broadcast(new MessageEvent($message, auth()->id()));
+        event(new PublicMessageEvent('Hello from Swingers!'));
+        return response()->json(['status' => 'Public Message sent']);
     }
 
     public function index(MessageIndexRequest $request): AnonymousResourceCollection
