@@ -29,7 +29,7 @@ class PrivateMessageEvent implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel
     {
-        return new PrivateChannel('private_messages.'.$this->message->message_group_id);
+        return new PrivateChannel('message-group.'.$this->message->message_group_id);
     }
 
     public function broadcastAs(): string
