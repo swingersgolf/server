@@ -3,6 +3,8 @@
 namespace Tests\Feature\Controllers\Api\V1;
 
 use App\Events\MessageEvent;
+use App\Events\MessageSent;
+use App\Events\PrivateMessageEvent;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Models\Round;
@@ -31,6 +33,7 @@ class MessageControllerTest extends TestCase
 
         $response = $this->actingAs($user)->postJson(
             route('api.v1.message.store'), $payload);
+        $responseData = $response->json(['data']);
 
         $this->assertDatabaseHas('messages', [
             'user_id' => $user->id,
@@ -38,13 +41,15 @@ class MessageControllerTest extends TestCase
             'message' => $message,
         ]);
 
-        $this->assertEquals($payload['message'], $response->json('message'));
-        $this->assertEquals($user->id, $response->json('user_id'));
-        $this->assertEquals($messageGroup->id, $response->json('message_group_id'));
+        $this->assertEquals($payload['message'], $responseData['message']);
+        $this->assertEquals($user->id, $responseData['user']['id']);
+        $this->assertEquals($messageGroup->id, $responseData['message_group_id']);
 
-        Event::assertDispatched(MessageEvent::class, function ($event) use ($user, $messageGroup, $message) {
+        Event::assertDispatched(PrivateMessageEvent::class, function ($event) use ($user, $messageGroup, $message) {
             $decodedEvent = json_decode($event->message, true);
             return $decodedEvent['user_id'] === $user->id &&
+                $decodedEvent['user']['firstname'] === $user->firstname &&
+                $decodedEvent['user']['lastname'] === $user->lastname &&
                 $decodedEvent['message_group_id'] === $messageGroup->id &&
                 $decodedEvent['message'] === $message;
         });

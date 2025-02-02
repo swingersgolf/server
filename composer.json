@@ -10,11 +10,11 @@
         "guzzlehttp/guzzle": "^7.9",
         "laravel-notification-channels/expo": "^2.0",
         "laravel/framework": "^11.9",
+        "laravel/reverb": "^1.4",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.29",
         "maatwebsite/excel": "^3.1",
-        "pusher/pusher-php-server": "^7.2",
         "spatie/geocoder": "^3.16"
     },
     "require-dev": {
