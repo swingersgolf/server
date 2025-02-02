@@ -2,29 +2,24 @@
 
 namespace App\Events;
 
+use App\Http\Resources\Api\V1\MessageResource;
+use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class PrivateMessageEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    private $message;
+    public Message $message;
 
-    private $userId;
-
-    /**
-     * Create a new event instance.
-     */
-    public function __construct(string $message, string $userId)
+    public function __construct(Message $message)
     {
         $this->message = $message;
-        $this->userId = $userId;
     }
 
     /**
@@ -34,10 +29,7 @@ class PrivateMessageEvent implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel
     {
-        Log::info('BROADCASTING ON: '. 'private_messages.'.$this->userId);
-        $foo = new PrivateChannel('private_messages.'.$this->userId);
-        Log::info('PRIVATE CHANNEL NAME: '. $foo->name);
-        return new PrivateChannel('private_messages.'.$this->userId);
+        return new PrivateChannel('private_messages.'.$this->message->message_group_id);
     }
 
     public function broadcastAs(): string
@@ -47,9 +39,6 @@ class PrivateMessageEvent implements ShouldBroadcastNow
 
     public function broadcastWith(): array
     {
-        return [
-            'message' => $this->message,
-            'user_id' => $this->userId,
-        ];
+        return (new MessageResource($this->message))->resolve();
     }
 }

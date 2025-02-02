@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Log;
 
 class MessageController extends Controller
 {
-    public function store(MessageStoreRequest $request): JsonResponse
+    public function store(MessageStoreRequest $request): MessageResource
     {
         $messageGroup = MessageGroup::findOrFail($request->message_group_id);
         if ($request->user()->cannot('create', $messageGroup)) {
@@ -32,13 +32,8 @@ class MessageController extends Controller
             'message' => $request->message,
         ]);
 
-        Log::info('MESSAGE CONTROLLER: MESSAGE CREATED - NOW DISPATCHING EVENT');
-
-//        broadcast(new MessageSent($message, auth()->id()));
-//        broadcast(new MessageEvent($message, auth()->id()));
-//        event(new PublicMessageEvent('Hello from Swingers!'));
-        event(new PrivateMessageEvent($message, Auth::id()));
-        return response()->json(['status' => 'Public Message sent']);
+        event(new PrivateMessageEvent($message));
+        return new MessageResource($message);
     }
 
     public function index(MessageIndexRequest $request): AnonymousResourceCollection
