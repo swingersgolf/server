@@ -4,23 +4,27 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class PublicMessageEvent implements ShouldBroadcastNow
+class PrivateMessageEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    private string $message;
+    private $message;
+
+    private $userId;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(string $message)
+    public function __construct(string $message, string $userId)
     {
         $this->message = $message;
+        $this->userId = $userId;
     }
 
     /**
@@ -30,9 +34,10 @@ class PublicMessageEvent implements ShouldBroadcastNow
      */
     public function broadcastOn(): Channel
     {
-        Log::info('PUBLIC MESSAGE EVENT, BROADCAST ON, MESSAGE: '.$this->message);
-
-        return new Channel('public_messages');
+        Log::info('BROADCASTING ON: '. 'private_messages.'.$this->userId);
+        $foo = new PrivateChannel('private_messages.'.$this->userId);
+        Log::info('PRIVATE CHANNEL NAME: '. $foo->name);
+        return new PrivateChannel('private_messages.'.$this->userId);
     }
 
     public function broadcastAs(): string
@@ -43,7 +48,8 @@ class PublicMessageEvent implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'message' => $this->message, // ✅ Ensure this matches the expected format
+            'message' => $this->message,
+            'user_id' => $this->userId,
         ];
     }
 }
