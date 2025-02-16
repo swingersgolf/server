@@ -161,8 +161,8 @@ class AuthControllerTest extends TestCase
                 $mailContents = $notification->toMail($notification);
 
                 return
-                    str_contains($mailContents->introLines[1], strval($code)) &&
-                    str_contains($mailContents->introLines[2], strval($expiry));
+                    str_contains($mailContents->data()['code'], strval($code)) &&
+                    str_contains($mailContents->data()['expiration'], strval($expiry));
             });
     }
 
@@ -372,8 +372,8 @@ class AuthControllerTest extends TestCase
         Notification::assertSentTo($user, ResetPasswordNotification::class, function (ResetPasswordNotification $notification) use ($user, $code, $expiry) {
             $mailContents = $notification->toMail($user);
 
-            return str_contains($mailContents->introLines[1], $code) &&
-                str_contains($mailContents->introLines[2], $expiry);
+            return str_contains($mailContents->data()['code'], $code) &&
+                str_contains($mailContents->data()['expiration'], $expiry);
         });
     }
 
