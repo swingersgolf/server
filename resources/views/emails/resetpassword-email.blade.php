@@ -15,12 +15,12 @@
     </tr>
     <tr>
         <td>
-            <h2 style="color: #333;">Swingers Email Verification</h2>
+            <h2 style="color: #333;">Swingers Password Reset</h2>
             <p>Hi there!</p>
-            <p>This is your one time verification code:</p>
+            <p>This is your one time password reset code:</p>
             <h1 style="background-color: #f3f3f3; padding: 10px; text-align: center; border-radius: 5px;">{{ $code }}</h1>
             <p>This code will expire in <strong>{{ $expiration }} minutes</strong>.</p>
-            <p>If you did not request the creation of this Swingers Golf account, no further action is required.</p>
+            <p>If you did not request this password reset, no further action is required.</p>
             <p>Thanks,<br><strong>Swingers Team</strong></p>
         </td>
     </tr>
