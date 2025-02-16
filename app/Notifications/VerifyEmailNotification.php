@@ -37,7 +37,7 @@ class VerifyEmailNotification extends Notification
     {
         return (new MailMessage)
             ->subject('Swingers Email Address Verification')
-            ->markdown('emails.verify-email', [
+            ->view('emails.verify-email', [
                 'code' => $this->code,
                 'expiration' => config('auth.passwords.users.expire'),
             ]);
