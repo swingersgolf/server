@@ -11,7 +11,7 @@ class UserUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();  // This checks if the user is logged in
     }
 
     /**
@@ -22,7 +22,7 @@ class UserUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'expo_push_token' => 'required|regex:/^ExponentPushToken\[[A-Za-z0-9]{24}\]$/',
+            'expo_push_token' => 'required|regex:/^ExponentPushToken\[[A-Za-z0-9]+\]$/',
         ];
     }
 }
