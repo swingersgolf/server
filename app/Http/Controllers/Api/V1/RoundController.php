@@ -145,7 +145,7 @@ class RoundController extends Controller
 
             $this->notificationService->sendNotification(
                 'Join Request',
-                '' . Auth::user()->name . ' has requested to join your round.',
+                '' . Auth::user()->firstname . ' has requested to join your round.',
                 $host->id,
                 [
                     'type' => 'join_request',
