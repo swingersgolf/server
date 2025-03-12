@@ -23,6 +23,8 @@ class NotificationSeeder extends Seeder
             foreach (['today', '1-6_days', '7-31_days', '31-364_days', '365_plus_days'] as $range) {
                 Notification::factory()->count(3)->create([
                     'user_id' => $userId,
+                    'title' => fake()->sentence(),
+                    'body' => fake()->paragraph(),
                     'created_at' => $this->getRandomDateForRange($range),
                     'updated_at' => $this->getRandomDateForRange($range),
                     'data' => $this->generateRandomData(),
@@ -65,8 +67,6 @@ class NotificationSeeder extends Seeder
     {
         return [
             'to' => 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]',
-            'title' => fake()->sentence(),
-            'body' => fake()->paragraph(),
             'data' => (object) [
                 'type' => fake()->randomElement(['round_accepted', 'round_rejected', 'round_requested']),
                 'route' => '(round)/details',
@@ -80,10 +80,16 @@ class NotificationSeeder extends Seeder
     /**
      * Generate a random read_at timestamp or null.
      *
-     * @return \Illuminate\Support\Carbon|null
+     * @return string|null
      */
-    private function randomReadAt(): ?\Illuminate\Support\Carbon
+    private function randomReadAt(): ?string
     {
-        return rand(0, 1) ? Carbon::now()->subMinutes(rand(0, 10080))->setTime(rand(0, 23), rand(0, 59)) : null; // 10080 minutes = 7 days
+        if (rand(0, 1)) {
+            return Carbon::now('UTC')->subMinutes(rand(0, 10080))  // Enforce UTC timezone
+                ->setTime(rand(0, 23), rand(0, 59))
+                ->toDateTimeString();  // Ensure it returns a valid string format
+        }
+
+        return null; // Null for unread notifications
     }
 }
