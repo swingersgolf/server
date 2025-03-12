@@ -49,10 +49,9 @@ class PushNotificationService
                 // Store the notification in the database
                 Notification::create([
                     'user_id' => $userId, // The user receiving the notification
-                    'data' => [
-                        'title' => $title,
-                        'body' => $body,
-                    ],
+                    'title' => $title,
+                    'body' => $body,
+                    'data' => $data,
                 ]);
                 return true;
             }

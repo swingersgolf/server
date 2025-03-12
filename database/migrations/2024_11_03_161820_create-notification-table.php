@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('user_id'); // Change to match `users.id` type (UUID/string)
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('title');
+            $table->text('body');   
             $table->json('data');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();

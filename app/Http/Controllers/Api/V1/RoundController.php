@@ -149,7 +149,8 @@ class RoundController extends Controller
                 $host->id,
                 [
                     'type' => 'join_request',
-                    'route' => 'rounds/' . $round->id,
+                    'route' => '/(home)/(round)/details',
+                    'params' => ['roundId' => $round->id]
                 ]
             );
         }
@@ -187,8 +188,8 @@ class RoundController extends Controller
                     $user->id,
                     [
                         'type' => 'round_accepted',
-                        'route' => 'rounds/' . $round->id,
-                    ]
+                        'route' => '/(home)/(round)/details',
+                        'params' => ['roundId' => $round->id]                    ]
                 );
             }
 
@@ -216,8 +217,8 @@ class RoundController extends Controller
                     $user->id,
                     [
                         'type' => 'round_rejected',
-                        'route' => 'rounds/' . $round->id,
-                    ]
+                        'route' => '/(home)/(round)/details',
+                        'params' => ['roundId' => $round->id]                    ]
                 );
             }
 
